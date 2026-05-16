@@ -1,3 +1,6 @@
 [submodule "RE-UE4SS"]
 	path = RE-UE4SS
 	url = git@github.com:UE4SS-RE/RE-UE4SS.git
+[submodule "APCpp"]
+	path = APCpp
+	url = git@github.com:N00byKing/APCpp.git
