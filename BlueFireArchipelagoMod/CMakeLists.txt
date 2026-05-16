@@ -2,6 +2,9 @@ set(TARGET BlueFireArchipelagoMod)
 
 add_library(${TARGET} SHARED
     dllmain.cpp
+    BlueFireArchipelagoMod.cpp
+    HookManager.cpp
+    ObjectCreateListener.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE .)
