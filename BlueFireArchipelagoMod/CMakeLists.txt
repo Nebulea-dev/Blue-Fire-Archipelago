@@ -9,10 +9,12 @@ add_library(${TARGET} SHARED
 
 target_include_directories(${TARGET} PRIVATE .)
 target_link_libraries(${TARGET} PUBLIC UE4SS)
+target_link_libraries(${TARGET} PUBLIC APCpp)
 
-# Copy the DLL to the game's mod directory after building (optional, adjust path as needed)
-
+# Copy the DLL to the game's mod directory after building
 add_custom_command(TARGET ${TARGET} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "D:/SteamLibrary/steamapps/common/Blue Fire/Blue Fire/Binaries/Win64/ue4ss/Mods/${TARGET}/dlls/"
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TARGET}> "D:/SteamLibrary/steamapps/common/Blue Fire/Blue Fire/Binaries/Win64/ue4ss/Mods/${TARGET}/dlls/main.dll"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${GAME_MOD_DLL_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:${TARGET}>
+        "${GAME_MOD_DLL_DIR}main.dll"
 )

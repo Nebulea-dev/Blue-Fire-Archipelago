@@ -3,4 +3,4 @@
 	url = git@github.com:UE4SS-RE/RE-UE4SS.git
 [submodule "APCpp"]
 	path = APCpp
-	url = git@github.com:N00byKing/APCpp.git
+	url = git@github.com:Nebulea-dev/APCpp.git
