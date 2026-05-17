@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+
 #include <Unreal/UObject.hpp>
 #include <Unreal/Hooks.hpp>
 #include <Unreal/FProperty.hpp>
@@ -8,7 +10,7 @@
 using namespace RC;
 using namespace Unreal;
 
-using HookFunctionSignature = void(*)(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+using HookFunctionSignature = bool(*)(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 class HookManager {
 public:
@@ -36,6 +38,10 @@ public:
     static bool setParamValue(std::wstring paramName, FFrame& Stack, T object);
     template <class T>
     static bool setParamValue(std::wstring paramName, FFrame& Stack, T* object);
+
+    void executeInGameThread(std::function<void()> func);
+
+    std::queue<std::function<void()>> functionsToExecuteInGameThread;
 
 private:
     // We can't use FName as Maps use comparator operators for insertion 
