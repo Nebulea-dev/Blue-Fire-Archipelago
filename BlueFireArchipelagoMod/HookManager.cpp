@@ -11,7 +11,13 @@ void HookManager::Init()
     Hook::RegisterProcessLocalScriptFunctionPreCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
     {
         // Get name of the function that was called
-        const std::wstring objectName = Stack.Node()->GetNamePrivate().ToString();
+        const std::wstring objectName = Stack.Node()->GetFullName();
+
+        // If name contains "DownKey"
+        if(objectName.find(STR("DownKey")) != std::string::npos)
+        {
+            Output::send<LogLevel::Verbose>(objectName);
+        }
 
         // Find in the Map the object with the right name
         std::map<std::wstring, HookFunctionSignature>::iterator objectCallbackIt = hooksRegistered.find(objectName);

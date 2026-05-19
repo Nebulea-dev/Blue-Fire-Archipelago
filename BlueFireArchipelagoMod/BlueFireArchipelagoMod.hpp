@@ -19,7 +19,7 @@ public:
     static inline ObjectCreateListener ObjectCreateListener{};
     static inline HookManager HookManager{};
 
-    static inline uint8_t fileNamingActiveWidgetIndex;
+    static inline uint8_t fileNamingActiveWidgetIndex = 0;
 
 
     BlueFireArchipelagoMod();

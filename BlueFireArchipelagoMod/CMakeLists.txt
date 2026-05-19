@@ -5,6 +5,7 @@ add_library(${TARGET} SHARED
     BlueFireArchipelagoMod.cpp
     HookManager.cpp
     ObjectCreateListener.cpp
+    ObjectFinder.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE .)
