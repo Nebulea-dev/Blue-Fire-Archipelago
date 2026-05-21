@@ -4,7 +4,7 @@
 
 #include <Unreal/UObject.hpp>
 #include <Unreal/Hooks.hpp>
-#include <Unreal/FProperty.hpp>
+#include <Unreal/CoreUObject/UObject/UnrealType.hpp>
 #include <DynamicOutput/DynamicOutput.hpp> 
 
 using namespace RC;
@@ -20,7 +20,12 @@ public:
     // Registers a callback for a specific object name
     // Returns true if hook was registered with the same callback
     // Returns false if objectName was already hooked with the same function
-    bool registerHook(std::wstring funcName, HookFunctionSignature callback);
+    bool registerPreHook(std::wstring funcName, HookFunctionSignature callback);
+
+    // Registers a callback for a specific object name
+    // Returns true if hook was registered with the same callback
+    // Returns false if objectName was already hooked with the same function
+    bool registerPostHook(std::wstring funcName, HookFunctionSignature callback);
 
     // Delete a callback for a specific object name that was previously registered through registerObjectCallback
     void deleteHook(std::wstring objectName);
@@ -46,7 +51,8 @@ public:
 private:
     // We can't use FName as Maps use comparator operators for insertion 
     // and FName does not implement them
-    std::map<std::wstring, HookFunctionSignature> hooksRegistered;
+    std::map<std::wstring, HookFunctionSignature> prehooksRegistered;
+    std::map<std::wstring, HookFunctionSignature> posthooksRegistered;
 };
 
 

@@ -6,6 +6,8 @@ add_library(${TARGET} SHARED
     HookManager.cpp
     ObjectCreateListener.cpp
     ObjectFinder.cpp
+    GUIManager.cpp
+    ArchipelagoLogic.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE .)

@@ -1,8 +1,8 @@
 #include <Unreal/UObject.hpp>
 #include <Unreal/Hooks.hpp>
-#include <Unreal/FProperty.hpp>
+#include <Unreal/CoreUObject/UObject/UnrealType.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
-#include <Unreal/UFunction.hpp>
+#include <Unreal/CoreUObject/UObject/Class.hpp>
 
 #include <ObjectFinder.hpp>
 

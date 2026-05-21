@@ -5,7 +5,7 @@
 #include <Unreal/UObject.hpp>
 
 #include <Unreal/Hooks.hpp>
-#include <Unreal/UFunction.hpp>
+#include <Unreal/CoreUObject/UObject/Class.hpp>
 
 #include <ObjectCreateListener.hpp>
 #include <HookManager.hpp>
@@ -27,19 +27,13 @@ public:
     void on_unreal_init();
 
     static void ObjectCreatedNewItem(const UObjectBase* object, int32 index);
-    static void ObjectCreatedEditableTextBox(const UObjectBase* object, int32 index);
 
     static bool PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool UpKeyPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool DownKeyPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
-
-
-    static void CopyStyle();
+    static void ActivateControlPreHook(const UObjectBase* object, int32 index);
 
 private:
-    static bool UpdateFileNamingFocus();
-    static bool isUserInArchipelagoMenu();
     static void onReturnPressed();
-
-    static inline bool bFileTextBoxRemoved{false};
+    static void connectToArchipelagoServer(FText* IP, FText* Username, FText* Password);
 };

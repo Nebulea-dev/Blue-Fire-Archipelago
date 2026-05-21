@@ -1,5 +1,5 @@
 #include <Unreal/UObject.hpp>
-#include <Unreal/UFunction.hpp>
+#include <Unreal/CoreUObject/UObject/Class.hpp>
 
 #include <ObjectCreateListener.hpp>
 
