@@ -3,16 +3,16 @@ set(TARGET BlueFireArchipelagoMod)
 add_library(${TARGET} SHARED
     dllmain.cpp
     BlueFireArchipelagoMod.cpp
-    HookManager.cpp
-    ObjectCreateListener.cpp
-    ObjectFinder.cpp
-    GUIManager.cpp
+    Helper/HookHelper.cpp
+    Helper/ObjectCreateListener.cpp
+    Helper/ObjectFinder.cpp
+    Helper/UnrealObjectQueries.cpp
+    MainMenuManager.cpp
     ItemManager.cpp
-    ArchipelagoLogic.cpp
-    UnrealObjectQueries.cpp
+    ArchipelagoManager.cpp
 )
 
-target_include_directories(${TARGET} PRIVATE .)
+target_include_directories(${TARGET} PRIVATE . Include)
 target_link_libraries(${TARGET} PUBLIC UE4SS)
 target_link_libraries(${TARGET} PUBLIC APCpp)
 

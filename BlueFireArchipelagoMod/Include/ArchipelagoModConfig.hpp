@@ -5,9 +5,25 @@
 using namespace RC;
 using namespace Unreal;
 
-/// Centralized configuration for the Archipelago Mod
-/// All hardcoded paths, magic numbers, and UI strings are defined here
-/// Makes the codebase maintainable and easy to adjust game paths if they change
+/*******************************************************************************
+ * ArchipelagoModConfig
+ *
+ * @brief   Centralized configuration for the Archipelago mod.
+ *
+ *          Contains all hardcoded paths, magic numbers, property names, and
+ *          UI strings used throughout the mod. Organizing all configuration
+ *          in one place makes the codebase maintainable and allows easy
+ *          adjustment of game object paths if they change in future updates.
+ *
+ *          Organized into logical namespaces:
+ *          - Hooks: Unreal function paths for hooking
+ *          - GameObjects: Game element names and identifiers
+ *          - UnrealClasses: UMG (UI framework) class and function paths
+ *          - Assets: Game resource paths (fonts, etc.)
+ *          - UI: Configuration constants for UI styling
+ *          - Strings: User-facing text for hints and labels
+ *          - PropertyNames: Unreal property names for reflection
+ */
 namespace ArchipelagoModConfig
 {
 	// ============================================================
@@ -126,13 +142,18 @@ namespace ArchipelagoModConfig
 	}
 
 	// ============================================================
-	// UI Strings - Hint text for textboxes
+	// UI Strings - Hint text and item information
 	// ============================================================
 	namespace Strings
 	{
+		// Textbox hint text
 		inline const FText HINT_ARCHIPELAGO_SERVER_IP(STR("Archipelago Server IP"));
 		inline const FText HINT_ARCHIPELAGO_USERNAME(STR("Archipelago Username"));
 		inline const FText HINT_ARCHIPELAGO_PASSWORD(STR("Archipelago Password"));
+
+		// Item display information
+		inline const FText ITEM_NAME(STR("Archipelago Item"));
+		inline const FText ITEM_DESCRIPTION(STR("An item from the Archipelago Mod. Is used to unlock items in the game of the other players in your session."));
 	}
 
 	// ============================================================

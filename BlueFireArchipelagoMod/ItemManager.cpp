@@ -2,8 +2,8 @@
 #include <Unreal/Hooks.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
 
-#include <ObjectFinder.hpp>
-#include <HookManager.hpp>
+#include <Helper/ObjectFinder.hpp>
+#include <Helper/HookHelper.hpp>
 #include <ItemManager.hpp>
 #include <ArchipelagoModConfig.hpp>
 
@@ -11,11 +11,11 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-// External global variables defined in BlueFireArchipelagoMod.cpp
-extern FText* itemName;
-extern FText* itemDescription;
+ItemManager::ItemManager()
+{
+	Output::send<LogLevel::Verbose>(STR("ItemManager instance created\n"));
+}
 
-// Static item reception callback - called when items are received from Archipelago server
 void ItemManager::itemReceiveCb(int itemID, bool notify)
 {
     // TODO: Implement item reception callback
@@ -23,21 +23,20 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
     // std::string itemToRecieve = items[id - gdBaseID];
 }
 
-// Static hook called when a new item is about to be displayed
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     // Example of how to read and write function parameters from a hook
     // Useless here, but kept as a reference
-    std::optional<FText> InText = HookManager::readParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack);
+    std::optional<FText> InText = HookHelper::readParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack);
     if (InText.has_value())
     {
         Output::send<LogLevel::Verbose>(STR("InText has value {} ♥\n"), InText.value().ToString());
     }
 
-    HookManager::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
-    HookManager::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
-    HookManager::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
-    HookManager::setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
+    HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, (FText*)&Strings::ITEM_NAME);
+    HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, (FText*)&Strings::ITEM_DESCRIPTION);
+    HookHelper::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
+    HookHelper::setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
 
     // Do not prevent the original function from being called
     return false;

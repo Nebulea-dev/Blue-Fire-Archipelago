@@ -1,5 +1,5 @@
-#include <UnrealObjectQueries.hpp>
-#include <ObjectFinder.hpp>
+#include <Helper/UnrealObjectQueries.hpp>
+#include <Helper/ObjectFinder.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
 
 std::optional<UObject*> UnrealObjectQueries::FindArchipelagoTextbox(std::wstring_view boxName)
