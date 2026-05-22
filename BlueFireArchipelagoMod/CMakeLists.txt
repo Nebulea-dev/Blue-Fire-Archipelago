@@ -7,7 +7,9 @@ add_library(${TARGET} SHARED
     ObjectCreateListener.cpp
     ObjectFinder.cpp
     GUIManager.cpp
+    ItemManager.cpp
     ArchipelagoLogic.cpp
+    UnrealObjectQueries.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE .)

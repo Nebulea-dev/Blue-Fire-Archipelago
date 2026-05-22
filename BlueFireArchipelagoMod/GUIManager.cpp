@@ -3,11 +3,13 @@
 
 #include <GUIManager.hpp>
 #include <ObjectFinder.hpp>
+#include <UnrealObjectQueries.hpp>
 #include <ArchipelagoLogic.hpp>
-
+#include <ArchipelagoModConfig.hpp>
 
 using namespace RC;
 using namespace Unreal;
+using namespace ArchipelagoModConfig;
 
 bool GUIManager::UpdateFileNamingFocus()
 {
@@ -15,65 +17,34 @@ bool GUIManager::UpdateFileNamingFocus()
     // This includes the 3 text boxes, the game controller and the start button
 
 
-    // Find the one EditableTextBox object that has a full path that
-    // - starts with /Engine/
-    // - ends with "EditableTextBoxArchipelagoIP"
-    std::optional<UObject*> IPEditableTextBox = ObjectFinder::FindObject(L"EditableTextBox", [](UObject* obj) {
-        return obj->GetFullName().starts_with(STR("EditableTextBox /Engine/")) &&
-                obj->GetNamePrivate().ToString().ends_with(STR("EditableTextBoxArchipelagoIP"));
-    });
-
+    // Find the three Archipelago textboxes using helpers
+    std::optional<UObject*> IPEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_IP);
     if (!IPEditableTextBox.has_value())
     {
         return false;
     }
 
-    // Find the one EditableTextBox object that has a full path that
-    // - starts with /Engine/
-    // - ends with "EditableTextBoxArchipelagoUsername"
-    std::optional<UObject*> UsernameEditableTextBox = ObjectFinder::FindObject(L"EditableTextBox", [](UObject* obj) {
-        return obj->GetFullName().starts_with(STR("EditableTextBox /Engine/")) &&
-                obj->GetNamePrivate().ToString().ends_with(STR("EditableTextBoxArchipelagoUsername"));
-    });
-
+    std::optional<UObject*> UsernameEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_USERNAME);
     if (!UsernameEditableTextBox.has_value())
     {
         return false;
     }
 
-    // Find the one EditableTextBox object that has a full path that
-    // - starts with /Engine/
-    // - ends with "EditableTextBoxArchipelagoPassword"
-    std::optional<UObject*> PasswordEditableTextBox = ObjectFinder::FindObject(L"EditableTextBox", [](UObject* obj) {
-        return obj->GetFullName().starts_with(STR("EditableTextBox /Engine/")) &&
-                obj->GetNamePrivate().ToString().ends_with(STR("EditableTextBoxArchipelagoPassword"));
-    });
-
+    std::optional<UObject*> PasswordEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_PASSWORD);
     if (!PasswordEditableTextBox.has_value())
     {
         return false;
     }
 
-    // Find the one GameMenuController_C object that has a full path that
-    // - ends with "GameMenuController_2"
-    std::optional<UObject*> GameMenuController = ObjectFinder::FindObject(L"GameMenuController_C", [](UObject* obj) {
-        return obj->GetFullName().starts_with(STR("GameMenuController_C")) &&
-                obj->GetNamePrivate().ToString().ends_with(STR("GameMenuController_2"));
-    });
-
+    // Find the game menu controller
+    std::optional<UObject*> GameMenuController = UnrealObjectQueries::FindGameMenuController();
     if (!GameMenuController.has_value())
     {
         return false;
     }
 
-    // Find the one GameMenuTitle_C object that has a full path that
-    // - starts with /Engine/
-    // - ends with "File_1"
-    std::optional<UObject*> fileTitle = ObjectFinder::FindObject(L"GameMenuTitle_C", [](UObject* obj) {
-        return obj->GetFullName().starts_with(STR("GameMenuTitle_C /Engine/")) &&
-                obj->GetNamePrivate().ToString().ends_with(STR("File_1"));
-    });
-
+    // Find the menu title widget
+    std::optional<UObject*> fileTitle = UnrealObjectQueries::FindGameMenuTitle(GameObjects::MENU_TITLE_FILE);
     if (!fileTitle.has_value())
     {
         return false;
@@ -84,8 +55,8 @@ bool GUIManager::UpdateFileNamingFocus()
 
 
     // Find the "SetFocus" and "DownKey" functions
-    UFunction* SetFocusFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, STR("/Script/UMG.Widget:SetFocus"));
-    UFunction* DownKeyFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, STR("/Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:DownKey"));
+    UFunction* SetFocusFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, UnrealClasses::FUNC_WIDGET_SET_FOCUS);
+    UFunction* DownKeyFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, UnrealClasses::FUNC_DOWN_KEY);
     if(!DownKeyFunc || !SetFocusFunc)
     {
         Output::send<LogLevel::Error>(STR("Could not find one or more required functions\n"));
@@ -143,6 +114,237 @@ static UObject* ConstructWidget(UObject* classObj, UObject* outer, const wchar_t
 }
 
 
+/// Step 1: Find and validate all required UI container objects
+bool GUIManager::FindUIContainers(UObject*& outWrapBox, UObject*& outWidgetTree, UObject*& outFontObject)
+{
+    // Find the game menu wrap box and widget tree
+    std::optional<UObject*> wrapBox = UnrealObjectQueries::FindGameMenuWrapBox();
+    if(!wrapBox.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find WrapBox object\n"));
+        return false;
+    }
+
+    std::optional<UObject*> widgetTree = UnrealObjectQueries::FindGameMenuWidgetTree();
+    if(!widgetTree.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find WidgetTree object\n"));
+        return false;
+    }
+
+    // Find font object for the text boxes
+    UObject* fontObject = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, Assets::FONT_SPECTRAL_BOLD);
+    if(!fontObject)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find font object\n"));
+        return false;
+    }
+
+    outWrapBox = wrapBox.value();
+    outWidgetTree = widgetTree.value();
+    outFontObject = fontObject;
+    return true;
+}
+
+
+/// Step 2: Create WrapBoxSlot objects and add them to the parent WrapBox
+bool GUIManager::CreateWrapBoxSlots(UObject* wrapBox, TArray<UObject*>& outSlots)
+{
+    // Construct the WrapBoxSlot objects that will be the parents of our new text boxes
+    UObject* wrapBoxSlotClass = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, UnrealClasses::CLASS_WRAP_BOX_SLOT);
+    if (!wrapBoxSlotClass)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find WrapBoxSlot class\n"));
+        return false;
+    }
+
+    UObject* IPwrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox, STR("WrapBoxSlotArchipelagoIP"));
+    UObject* UsernamewrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox, STR("WrapBoxSlotArchipelagoUsername"));
+    UObject* PasswordwrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox, STR("WrapBoxSlotArchipelagoPassword"));
+
+    if (!IPwrapBoxSlot || !UsernamewrapBoxSlot || !PasswordwrapBoxSlot)
+    {
+        Output::send<LogLevel::Error>(STR("Could not create WrapBoxSlot objects\n"));
+        return false;
+    }
+
+    // Get the "Slots" property, which is an array of UPanelSlot
+    TArray<UObject*>* slotsArray = wrapBox->GetValuePtrByPropertyNameInChain<TArray<UObject*>>(PropertyNames::PROP_SLOTS);
+    if (!slotsArray)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Slots property in WrapBox\n"));
+        return false;
+    }
+
+    // Insert our WrapBoxSlots
+    slotsArray->Insert(IPwrapBoxSlot, 1);
+    slotsArray->Insert(UsernamewrapBoxSlot, 2);
+    slotsArray->Insert(PasswordwrapBoxSlot, 3);
+
+    // Populate output array
+    outSlots.Add(IPwrapBoxSlot);
+    outSlots.Add(UsernamewrapBoxSlot);
+    outSlots.Add(PasswordwrapBoxSlot);
+
+    return true;
+}
+
+
+/// Step 3: Create EditableTextBox objects and set hint text on them
+bool GUIManager::CreateEditableTextBoxes(UObject* widgetTree, TArray<UObject*>& outTextboxes)
+{
+    UObject* editableTextBoxClass = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, UnrealClasses::CLASS_EDITABLE_TEXT_BOX);
+    if (!editableTextBoxClass)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find EditableTextBox class\n"));
+        return false;
+    }
+
+    UObject* IPeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree, GameObjects::TEXTBOX_IP);
+    UObject* UsernameeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree, GameObjects::TEXTBOX_USERNAME);
+    UObject* PasswordeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree, GameObjects::TEXTBOX_PASSWORD);
+
+    if (!IPeditableTextBox || !UsernameeditableTextBox || !PasswordeditableTextBox)
+    {
+        Output::send<LogLevel::Error>(STR("Could not create EditableTextBox objects\n"));
+        return false;
+    }
+
+    // Populate output array
+    outTextboxes.Add(IPeditableTextBox);
+    outTextboxes.Add(UsernameeditableTextBox);
+    outTextboxes.Add(PasswordeditableTextBox);
+
+    // Set hint text on each textbox
+    TArray<FText> hints = {
+        Strings::HINT_ARCHIPELAGO_SERVER_IP,
+        Strings::HINT_ARCHIPELAGO_USERNAME,
+        Strings::HINT_ARCHIPELAGO_PASSWORD
+    };
+
+    for(int32_t i = 0; i < outTextboxes.Num() && i < hints.Num(); i++)
+    {
+        FText* hintTextProperty = outTextboxes[i]->GetValuePtrByPropertyNameInChain<FText>(PropertyNames::PROP_HINT_TEXT);
+        if (hintTextProperty != nullptr)
+        {
+            *hintTextProperty = hints[i];
+        }
+        else
+        {
+            Output::send<LogLevel::Warning>(STR("Could not find HintText property on textbox %d\n"), i);
+        }
+    }
+
+    return true;
+}
+
+
+/// Step 4: Link parent/child relationships between slots and textboxes
+bool GUIManager::SetupWidgetHierarchy(const TArray<UObject*>& slots, const TArray<UObject*>& textboxes, UObject* wrapBox)
+{
+    if (slots.Num() != textboxes.Num())
+    {
+        Output::send<LogLevel::Error>(STR("Slot and textbox arrays have different sizes\n"));
+        return false;
+    }
+
+    for(int32_t i = 0; i < slots.Num(); i++)
+    {
+        UObject* slot = slots[i];
+        UObject* textBox = textboxes[i];
+
+        // Set the "Parent" property of the WrapBoxSlot to be the parent WrapBox
+        UObject** wrapBoxSlotParentProperty = slot->GetValuePtrByPropertyNameInChain<UObject*>(PropertyNames::PROP_PARENT);
+        if (wrapBoxSlotParentProperty == nullptr)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find Parent property in WrapBoxSlot\n"));
+            return false;
+        }
+        *wrapBoxSlotParentProperty = wrapBox;
+
+        // Set the "Content" property of the WrapBoxSlot to be our new EditableTextBox
+        UObject** wrapBoxSlotContentProperty = slot->GetValuePtrByPropertyNameInChain<UObject*>(PropertyNames::PROP_CONTENT);
+        if (wrapBoxSlotContentProperty == nullptr)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find Content property in WrapBoxSlot\n"));
+            return false;
+        }
+        *wrapBoxSlotContentProperty = textBox;
+
+        // Set the "Slot" property of the EditableTextBox
+        UObject** editableTextBoxSlotProperty = textBox->GetValuePtrByPropertyNameInChain<UObject*>(PropertyNames::PROP_SLOT);
+        if (editableTextBoxSlotProperty == nullptr)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find Slot property in EditableTextBox\n"));
+            return false;
+        }
+        *editableTextBoxSlotProperty = slot;
+    }
+
+    return true;
+}
+
+
+/// Step 5: Configure all styling properties (fonts, colors, justification, etc.)
+bool GUIManager::ConfigureTextboxStyles(const TArray<UObject*>& textboxes, UObject* fontObject)
+{
+    if (textboxes.Num() == 0)
+    {
+        Output::send<LogLevel::Error>(STR("No textboxes to style\n"));
+        return false;
+    }
+
+    // Configure font and style properties (nested struct access) for each textbox
+    for(int32_t i = 0; i < textboxes.Num(); i++)
+    {
+        UObject* textBox = textboxes[i];
+
+        // Get the "WidgetStyle" property
+        FStructProperty* StyleWidgetProperty = static_cast<FStructProperty*>(textBox->GetPropertyByNameInChain(PropertyNames::PROP_WIDGET_STYLE));
+        if (!StyleWidgetProperty)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find WidgetStyle property\n"));
+            return false;
+        }
+
+        // Get the "WidgetStyle.Font" property
+        auto StyleWidgetStruct = StyleWidgetProperty->GetStruct();
+        auto StyleWidget = StyleWidgetProperty->ContainerPtrToValuePtr<void>(textBox);
+        FStructProperty* FontProperty = static_cast<FStructProperty*>(StyleWidgetStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT));
+        if (!FontProperty)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find Font property in WidgetStyle\n"));
+            return false;
+        }
+
+        auto FontStruct = FontProperty->GetStruct();
+        auto Font = FontProperty->ContainerPtrToValuePtr<void>(StyleWidget);
+
+        // Get the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
+        FProperty* FontSizeProperty = static_cast<FProperty*>(FontStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT_SIZE));
+        FStructProperty* FontObjectProperty = static_cast<FStructProperty*>(FontStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT_OBJECT));
+        if (!FontSizeProperty || !FontObjectProperty)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find FontSize or FontObject property\n"));
+            return false;
+        }
+
+        uint32_t* widgetFontSize = FontSizeProperty->ContainerPtrToValuePtr<uint32_t>(Font);
+        UObject** widgetFontObject = FontObjectProperty->ContainerPtrToValuePtr<UObject*>(Font);
+
+        // Set the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
+        *widgetFontObject = fontObject;
+        *widgetFontSize = UI::TEXTBOX_FONT_SIZE;
+    }
+
+    return true;
+}
+
+
+// ============================================================
+// Public API: Refactored CreateTextboxes() using helper methods
+// ============================================================
+
 void GUIManager::CreateTextboxes()
 {
 	if(bTextboxesCreated)
@@ -155,266 +357,63 @@ void GUIManager::CreateTextboxes()
 
 	Output::send<LogLevel::Verbose>(STR("Creating textboxes for Archipelago menu\n"));
 
-    // Step 1 - Get the necessary objects for creating everything
+	// Orchestrate the creation process through helper methods
+	// Each helper is responsible for one step, making the flow clear and modular
 
+	// Step 1: Find all required UI containers (WrapBox, WidgetTree, Font)
+	UObject* wrapBox = nullptr;
+	UObject* widgetTree = nullptr;
+	UObject* fontObject = nullptr;
+	if (!FindUIContainers(wrapBox, widgetTree, fontObject))
+	{
+		return;
+	}
 
-    // Find the one WrapBox object that has a full path that :
-    // - starts with /Engine/
-    // - ends with SaveFileWrapBox_1
-    std::optional<UObject*> wrapBox = ObjectFinder::FindObject(L"WrapBox", [](UObject* obj) {
-            return obj->GetFullName().starts_with(STR("WrapBox /Engine/")) &&
-                   obj->GetNamePrivate().ToString().ends_with(STR("SaveFileWrapBox_1"));
-        });
+	// Step 2: Create WrapBoxSlot objects and add to parent
+	TArray<UObject*> slots;
+	if (!CreateWrapBoxSlots(wrapBox, slots))
+	{
+		return;
+	}
 
-    if(!wrapBox.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find WrapBox object\n"));
-        return;
-    }
+	// Step 3: Create EditableTextBox objects and set hints
+	TArray<UObject*> textboxes;
+	if (!CreateEditableTextBoxes(widgetTree, textboxes))
+	{
+		return;
+	}
 
+	// Step 4: Set up parent/child widget hierarchy
+	if (!SetupWidgetHierarchy(slots, textboxes, wrapBox))
+	{
+		return;
+	}
 
-    // Find the one WidgetTree object that has a full path that
-    // - starts with /Engine/
-    // - ends with WidgetTree_0
-    // - contains only the substring "WidgetTree_0" once in its full path
-    // - contains "GameMenu_C" in its full path
-    std::optional<UObject*> widgetTree = ObjectFinder::FindObject(L"WidgetTree", [](UObject* obj) {
-            return obj->GetFullName().starts_with(STR("WidgetTree /Engine/")) &&
-                   obj->GetNamePrivate().ToString().ends_with(STR("WidgetTree_0")) &&
-                   obj->GetFullName().find(STR("WidgetTree_0")) == obj->GetFullName().rfind(STR("WidgetTree_0")) &&
-                   obj->GetFullName().find(STR("GameMenu_C")) != std::string::npos;
-        });
-
-    if(!widgetTree.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find WidgetTree object\n"));
-        return;
-    }
-
-    // Find font object for the text boxes
-    UObject* fontObject = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, STR("/Game/BlueFire/HUD/Font/BlueFire-Spectral/BlueFire-SpectralSC-Bold_Font.BlueFire-SpectralSC-Bold_Font"));
-    if(!fontObject)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find font object\n"));
-        return;
-    }
-
-
-    // Step 2 - Create the WrapBoxSlots
-
-
-    // Construct the WrapBoxSlot objects that will be the parents of our new text boxes
-    UObject* wrapBoxSlotClass  = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, STR("/Script/UMG.WrapBoxSlot"));
-    UObject* IPwrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox.value(), STR("WrapBoxSlotArchipelagoIP"));
-    UObject* UsernamewrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox.value(), STR("WrapBoxSlotArchipelagoUsername"));
-    UObject* PasswordwrapBoxSlot = ConstructWidget(wrapBoxSlotClass, wrapBox.value(), STR("WrapBoxSlotArchipelagoPassword"));
-
-    // Get the "Slots" property, which is an array of UPanelSlot
-    TArray<UObject*>* slotsArray = wrapBox.value()->GetValuePtrByPropertyNameInChain<TArray<UObject*>>(STR("Slots"));
-
-    // Insert our WrapBoxSlots
-    slotsArray->Insert(IPwrapBoxSlot, 1);
-    slotsArray->Insert(UsernamewrapBoxSlot, 2);
-    slotsArray->Insert(PasswordwrapBoxSlot, 3);
-
-    // Create an array for the slots
-    TArray<UObject*> wrapBoxSlotsArray;
-    wrapBoxSlotsArray.Add(IPwrapBoxSlot);
-    wrapBoxSlotsArray.Add(UsernamewrapBoxSlot);
-    wrapBoxSlotsArray.Add(PasswordwrapBoxSlot);
-
-
-    // Step 3 - Create the EditableTextBoxes
-
-
-    UObject* editableTextBoxClass  = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, STR("/Script/UMG.EditableTextBox"));
-    UObject* IPeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree.value(), STR("EditableTextBoxArchipelagoIP"));
-    UObject* UsernameeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree.value(), STR("EditableTextBoxArchipelagoUsername"));
-    UObject* PasswordeditableTextBox = ConstructWidget(editableTextBoxClass, widgetTree.value(), STR("EditableTextBoxArchipelagoPassword"));
-
-    // Create an array for the text boxes
-    TArray<UObject*> editableTextBoxesArray;
-    editableTextBoxesArray.Add(IPeditableTextBox);
-    editableTextBoxesArray.Add(UsernameeditableTextBox);
-    editableTextBoxesArray.Add(PasswordeditableTextBox);
-
-    TArray<std::wstring> editableTextBoxHint = {
-        STR("Archipelago Server IP"),
-        STR("Archipelago Username"),
-        STR("Archipelago Password")
-    };
-
-
-    // Step 4 - Set the widget hierarchy
-
-    // The hierarchy should be :
-    // WrapBox
-    //  ├─ WrapBoxSlotArchipelagoIP
-    //  │   └─ EditableTextBoxArchipelagoIP
-    //  ├─ WrapBoxSlotArchipelagoUsername
-    //  │   └─ EditableTextBoxArchipelagoUsername
-    //  └─ WrapBoxSlotArchipelagoPassword
-    //      └─ EditableTextBoxArchipelagoPassword
-
-
-    for(uint8_t i = 0; i < wrapBoxSlotsArray.Num(); i++)
-    {
-        UObject* slot = wrapBoxSlotsArray[i];
-        UObject* textBox = editableTextBoxesArray[i];
-        std::wstring textBoxHint = editableTextBoxHint[i];
-
-
-        // Set the "Parent" property of the WrapBoxSlot to be the parent WrapBox
-        UObject** wrapBoxSlotParentProperty = slot->GetValuePtrByPropertyNameInChain<UObject*>(STR("Parent"));
-        if (wrapBoxSlotParentProperty == nullptr)    {
-            Output::send<LogLevel::Error>(STR("Could not find Parent property in WrapBoxSlot\n"));
-            return;
-        }
-        *wrapBoxSlotParentProperty = wrapBox.value();
-
-
-        // Set the "Content" property of the WrapBoxSlot to be our new EditableTextBox
-        UObject** wrapBoxSlotContentProperty = slot->GetValuePtrByPropertyNameInChain<UObject*>(STR("Content"));
-        if (wrapBoxSlotContentProperty == nullptr)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find Content property in WrapBoxSlot\n"));
-            return;
-        }
-        *wrapBoxSlotContentProperty = textBox;
-
-
-        // Set the "Slot" property of the EditableTextBox
-        UObject** editableTextBoxSlotProperty = textBox->GetValuePtrByPropertyNameInChain<UObject*>(STR("Slot"));
-        if (editableTextBoxSlotProperty == nullptr)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find Slot property in EditableTextBox\n"));
-            return;
-        }
-        *editableTextBoxSlotProperty = slot;
-    }
-
-
-    // Step 5 - Set the easy properties of the widgets
-
-
-    for(uint8_t i = 0; i < wrapBoxSlotsArray.Num(); i++)
-    {
-        UObject* slot = wrapBoxSlotsArray[i];
-        UObject* textBox = editableTextBoxesArray[i];
-        std::wstring textBoxHint = editableTextBoxHint[i];
-
-
-        // Set the "bFillEmptySpace" property of the WrapBoxSlot to true
-        uint8_t* bFillEmptySpaceProperty = slot->GetValuePtrByPropertyNameInChain<uint8_t>(STR("bFillEmptySpace"));
-        if (bFillEmptySpaceProperty == nullptr)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find bFillEmptySpace property in WrapBoxSlot\n"));
-            return;
-        }
-        *bFillEmptySpaceProperty = 0x1;
-
-
-        // Set the "Justification" property of our new EditableTextBox to center
-        uint8_t* justificationProperty = textBox->GetValuePtrByPropertyNameInChain<uint8_t>(STR("Justification"));
-        if (justificationProperty == nullptr)        {
-            Output::send<LogLevel::Error>(STR("Could not find Justification property in new EditableTextBox\n"));
-            return;
-        }
-        *justificationProperty = 0x1; // ETextJustify::Center
-
-
-        // Set the "HintText" property of our new EditableTextBoxes
-        FText* newHintText = textBox->GetValuePtrByPropertyNameInChain<FText>(STR("HintText"));
-        if (newHintText == nullptr)    {
-            Output::send<LogLevel::Error>(STR("Could not find HintText property in new EditableTextBox\n"));
-            return;
-        }
-        *newHintText = FText(textBoxHint);
-    }
-
-
-    // Step 5 - Set the style struct property of the EditableTextBoxes
-
-
-    for(uint8_t i = 0; i < wrapBoxSlotsArray.Num(); i++)
-    {
-        UObject* slot = wrapBoxSlotsArray[i];
-        UObject* textBox = editableTextBoxesArray[i];
-        std::wstring textBoxHint = editableTextBoxHint[i];
-
-
-        // Get the "WidgetStyle" property
-        FStructProperty* StyleWidgetProperty = static_cast<FStructProperty*>(textBox->GetPropertyByNameInChain(STR("WidgetStyle")));
-        if (!StyleWidgetProperty)
-        {
-            return;
-        }
-
-
-        // Get the "WidgetStyle.Font" property
-        auto StyleWidgetStruct = StyleWidgetProperty->GetStruct();
-        auto StyleWidget = StyleWidgetProperty->ContainerPtrToValuePtr<void>(textBox);
-        FStructProperty* FontProperty = static_cast<FStructProperty*>(StyleWidgetStruct->GetPropertyByNameInChain(STR("Font")));
-        if (!FontProperty)
-        {
-            return;
-        }
-
-        auto FontStruct = FontProperty->GetStruct();
-        auto Font = FontProperty->ContainerPtrToValuePtr<void>(StyleWidget);
-
-
-        // Get the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
-        FProperty* FontSizeProperty = static_cast<FProperty*>(FontStruct->GetPropertyByNameInChain(STR("Size")));
-        FStructProperty* FontObjectProperty = static_cast<FStructProperty*>(FontStruct->GetPropertyByNameInChain(STR("FontObject")));
-        if (!FontSizeProperty || !FontObjectProperty)
-        {
-            return;
-        }
-
-
-        uint32_t* widgetFontSize = FontSizeProperty->ContainerPtrToValuePtr<uint32_t>(Font);
-        UObject** widgetFontObject = FontObjectProperty->ContainerPtrToValuePtr<UObject*>(Font);
-
-
-        // Set the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
-        *widgetFontObject = fontObject;
-        *widgetFontSize = 40;
-    }
+	// Step 5: Configure all styling properties
+	if (!ConfigureTextboxStyles(textboxes, fontObject))
+	{
+		return;
+	}
 }
 
 void GUIManager::deleteOldTextbox()
 {
-	std::optional<UObject*> editableTextBoxOriginal = ObjectFinder::FindObject(L"EditableTextBox", [](UObject* obj) {
-		return obj->GetFullName().starts_with(STR("EditableTextBox /Engine/")) &&
-				obj->GetNamePrivate().ToString().ends_with(STR("VK_EditableTextBox_89"));
-	});
-
+	std::optional<UObject*> editableTextBoxOriginal = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::ORIGINAL_TEXTBOX_NAME);
 	if (!editableTextBoxOriginal.has_value())
 	{
 		return;
 	}
 
 	// Call the "RemoveFromParent" method on the original EditableTextBox to remove it from the menu
-	UFunction* RemoveFromParentFunc = static_cast<UFunction*>(UObjectGlobals::StaticFindObject(nullptr, nullptr, STR("/Script/UMG.Widget:RemoveFromParent")));
+	UFunction* RemoveFromParentFunc = static_cast<UFunction*>(UObjectGlobals::StaticFindObject(nullptr, nullptr, UnrealClasses::FUNC_WIDGET_REMOVE_FROM_PARENT));
 	editableTextBoxOriginal.value()->ProcessEvent(RemoveFromParentFunc, nullptr);
 }
 
 
 bool GUIManager::isUserInArchipelagoMenu()
 {
-    // Find the one WidgetSwitcher object that has a full path that
-    // - starts with /Engine/
-    // - ends with WidgetSwitcher_0
-    // - contains only the substring "WidgetSwitcher_0" once in its full path
-    // - contains "GameMenu_C" in its full path
-    std::optional<UObject*> widgetSwitcher = ObjectFinder::FindObject(L"WidgetSwitcher", [](UObject* obj) {
-            return obj->GetFullName().starts_with(STR("WidgetSwitcher /Engine/")) &&
-                   obj->GetNamePrivate().ToString().ends_with(STR("WidgetSwitcher_0")) &&
-                   obj->GetFullName().find(STR("WidgetSwitcher_0")) == obj->GetFullName().rfind(STR("WidgetSwitcher_0")) &&
-                   obj->GetFullName().find(STR("GameMenu_C")) != std::string::npos;
-        });
-
+    // Find the game menu widget switcher
+    std::optional<UObject*> widgetSwitcher = UnrealObjectQueries::FindGameMenuWidgetSwitcher();
     if(!widgetSwitcher.has_value())
     {
         Output::send<LogLevel::Error>(STR("Could not find WidgetSwitcher object\n"));
@@ -422,17 +421,15 @@ bool GUIManager::isUserInArchipelagoMenu()
     }
 
     // Get the "ActiveWidgetIndex" property
-    uint32_t* activeWidgetIndex = widgetSwitcher.value()->GetValuePtrByPropertyNameInChain<uint32_t>(STR("ActiveWidgetIndex"));
+    uint32_t* activeWidgetIndex = widgetSwitcher.value()->GetValuePtrByPropertyNameInChain<uint32_t>(PropertyNames::PROP_ACTIVE_WIDGET_INDEX);
     if (activeWidgetIndex == nullptr)
     {
         Output::send<LogLevel::Error>(STR("Could not find ActiveWidgetIndex property in WidgetSwitcher\n"));
         return false;
     }
 
-
-    // If we are not in the file naming section of the menu
-    // TODO : not hardcode this value
-    if (*activeWidgetIndex != 8)
+    // Check if we are in the Archipelago menu (file naming section)
+    if (*activeWidgetIndex != GameObjects::MENU_INDEX_ARCHIPELAGO)
     {
         return false;
     }
