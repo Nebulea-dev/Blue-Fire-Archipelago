@@ -48,7 +48,6 @@ void BlueFireArchipelagoMod::on_unreal_init()
     // Initialize managers that have initialization logic
     hookManager->Init();
     arcManager->init();
-    locationManager->Init(hookManager);
 
     Output::send<LogLevel::Verbose>(STR("All managers initialized\n"));
 
@@ -65,6 +64,7 @@ void BlueFireArchipelagoMod::on_unreal_init()
     });
 
     // Initialize MainMenuManager hooks and callbacks
+    locationManager->Init(hookManager, &ObjectCreateListener);
     mainMenuManager->Init(hookManager, &ObjectCreateListener);
 
     // Register the ItemManager hook

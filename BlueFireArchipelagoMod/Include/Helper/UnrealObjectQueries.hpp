@@ -116,4 +116,7 @@ public:
 	 * @return  optional containing title pointer, empty if not found
 	 */
 	static std::optional<UObject*> FindGameMenuTitle(std::wstring_view nameSuffix);
+
+	// TODO : apply same documentation style
+	static std::optional<UObject*> FindGameInstance();
 };

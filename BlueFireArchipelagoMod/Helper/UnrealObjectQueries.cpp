@@ -94,5 +94,10 @@ std::optional<UObject*> UnrealObjectQueries::FindGameMenuWidgetTree()
 
 std::optional<UObject*> UnrealObjectQueries::FindGameMenuTitle(std::wstring_view nameSuffix)
 {
-	return FindWidget(L"GameMenuTitle_C", STR("GameMenuTitle_C /Engine/"), nameSuffix);
+	return FindWidget(L"GameMenuTitle_C", L"GameMenuTitle_C /Engine/", nameSuffix);
+}
+
+std::optional<UObject*> UnrealObjectQueries::FindGameInstance()
+{
+	return FindWidget(L"BlueFire_Game_Instance_C", L"BlueFire_Game_Instance_C /Engine/", L"");
 }
