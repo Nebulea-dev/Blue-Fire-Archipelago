@@ -114,9 +114,9 @@ bool MainMenuManager::UpdateMenuFocus()
             FText* Username = UsernameEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
             FText* Password = PasswordEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
 
-            if (BlueFireArchipelagoMod::arcLogic)
+            if (BlueFireArchipelagoMod::arcManager)
             {
-                BlueFireArchipelagoMod::arcLogic->connectToArchipelagoServer(IP, Username, Password);
+                BlueFireArchipelagoMod::arcManager->connectToArchipelagoServer(IP, Username, Password);
             }
             // For the button, we use the initial DownKey button, as this function
             // is the only way I currently have to allow the button to be pressed
