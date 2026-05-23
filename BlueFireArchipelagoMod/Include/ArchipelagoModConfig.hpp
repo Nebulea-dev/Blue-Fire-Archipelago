@@ -182,4 +182,54 @@ namespace ArchipelagoModConfig
 		constexpr auto PARAM_KEY_ITEM = STR("KeyItem");
 		constexpr auto PARAM_AMOUNT = STR("Amount");
 	}
+
+	// ============================================================
+	// Chest Names - Name of all the chests in the game
+	// ============================================================
+	namespace ChestNames
+	{
+		namespace FireKeep
+		{
+			constexpr auto AMBUSH_CHEST_1 = STR("Chest_A01_Keep_Shield");
+			constexpr auto AMBUSH_CHEST_2 = STR("Chest_A02_Keep_Key_01");
+			constexpr auto SPIN_ATTACK_CHEST = STR("Chest_A01_TempleGardens_Ability_SpinAttack2");
+			constexpr auto LOOT_CHEST_1 = STR("Chest_A02_Keep_Loot_01");
+			constexpr auto LOOT_CHEST_2 = STR("Chest_A02_Keep_Loot_02");
+			constexpr auto LOOT_CHEST_3 = STR("Chest_A02_GameIntro_44");
+			constexpr auto DIAMOND_WING_CHEST = STR("Chest_A02_Sword_DiamondWings");
+
+		}
+		namespace ArcaneTunnels
+		{
+			constexpr auto CHEST_1 = STR("BP_Chest_01_C_0");
+			constexpr auto CHEST_2 = STR("BP_Chest_02_C_0");
+		}
+	}
+
+	// ============================================================
+	// Location IDs - Mapping of chest names to location IDs for Archipelago
+	// ============================================================
+	inline std::map<std::wstring, uint32_t> ChestNameToLocationID = {
+		// Chests in Fire Keep
+		{ ChestNames::FireKeep::AMBUSH_CHEST_1, 1 },
+		{ ChestNames::FireKeep::AMBUSH_CHEST_2, 2 },
+		{ ChestNames::FireKeep::SPIN_ATTACK_CHEST, 3 },
+		{ ChestNames::FireKeep::LOOT_CHEST_1, 4 },
+		{ ChestNames::FireKeep::LOOT_CHEST_2, 5 },
+		{ ChestNames::FireKeep::LOOT_CHEST_3, 6 },
+		{ ChestNames::FireKeep::DIAMOND_WING_CHEST, 7 },
+
+		// Chests in Arcane Tunnels
+		{ ChestNames::ArcaneTunnels::CHEST_1, 8 },
+		{ ChestNames::ArcaneTunnels::CHEST_2, 9 }
+	};
+
+	// ============================================================
+	// Archipelago - Values for Archipelago integration
+	// ============================================================
+	namespace Archipelago
+	{
+		constexpr uint32_t BF_BASE_ID = 0xB70EF14E;
+		constexpr char GAME_NAME[] = "Blue Fire";
+	}
 }

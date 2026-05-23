@@ -10,6 +10,7 @@ add_library(${TARGET} SHARED
     MainMenuManager.cpp
     ItemManager.cpp
     ArchipelagoManager.cpp
+    LocationManager.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE . Include)

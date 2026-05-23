@@ -15,6 +15,7 @@
 #include <ItemManager.hpp>
 #include <ArchipelagoManager.hpp>
 #include <ArchipelagoModConfig.hpp>
+#include <LocationManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -35,6 +36,7 @@ BlueFireArchipelagoMod::BlueFireArchipelagoMod() : CppUserModBase()
 
 void BlueFireArchipelagoMod::on_unreal_init()
 {
+    return;
     Output::send<LogLevel::Verbose>(STR("BlueFireArchipelagoMod says hello from on_unreal_init ♥\n"));
 
     // Create and initialize all manager instances
@@ -42,10 +44,12 @@ void BlueFireArchipelagoMod::on_unreal_init()
     hookManager = new HookHelper();
     itemManager = new ItemManager();
     arcManager = new ArchipelagoManager();
+    locationManager = new LocationManager();
 
     // Initialize managers that have initialization logic
     hookManager->Init();
     arcManager->init();
+    locationManager->Init(hookManager);
 
     Output::send<LogLevel::Verbose>(STR("All managers initialized\n"));
 

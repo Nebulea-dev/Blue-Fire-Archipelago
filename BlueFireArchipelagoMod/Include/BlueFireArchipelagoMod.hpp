@@ -18,6 +18,7 @@ class MainMenuManager;
 class HookHelper;
 class ItemManager;
 class ArchipelagoManager;
+class LocationManager;
 
 /*******************************************************************************
  * BlueFireArchipelagoMod
@@ -47,6 +48,9 @@ public:
 
 	/// Archipelago manager instance - manages server connection and events
 	static inline ArchipelagoManager* arcManager = nullptr;
+
+	/// Location manager instance - manages location checks and events
+	static inline LocationManager* locationManager = nullptr;
 
 	/*******************************************************************************
 	 * @fn      BlueFireArchipelagoMod

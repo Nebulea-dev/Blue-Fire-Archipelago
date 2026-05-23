@@ -25,14 +25,6 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-    // Example of how to read and write function parameters from a hook
-    // Useless here, but kept as a reference
-    std::optional<FText> InText = HookHelper::readParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack);
-    if (InText.has_value())
-    {
-        Output::send<LogLevel::Verbose>(STR("InText has value {} ♥\n"), InText.value().ToString());
-    }
-
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, (FText*)&Strings::ITEM_NAME);
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, (FText*)&Strings::ITEM_DESCRIPTION);
     HookHelper::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);

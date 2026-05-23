@@ -6,9 +6,11 @@
 
 #include <ArchipelagoManager.hpp>
 #include <BlueFireArchipelagoMod.hpp>
+#include <ArchipelagoModConfig.hpp>
 
 using namespace RC;
 using namespace Unreal;
+using namespace ArchipelagoModConfig;
 
 ArchipelagoManager::ArchipelagoManager()
 {
@@ -85,6 +87,6 @@ void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText
 
     /// Initialize Archipelago client
     Output::send<LogLevel::Verbose>(STR("Connecting to Archipelago server...\n"));
-    AP_Init(IPCstr, "Blue Fire", UsernameCstr, PasswordCstr);
+    AP_Init(IPCstr, Archipelago::GAME_NAME, UsernameCstr, PasswordCstr);
     AP_Start();
 }
