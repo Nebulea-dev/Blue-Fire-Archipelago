@@ -147,13 +147,13 @@ namespace ArchipelagoModConfig
 	namespace Strings
 	{
 		// Textbox hint text
-		inline const FText HINT_ARCHIPELAGO_SERVER_IP(STR("Archipelago Server IP"));
-		inline const FText HINT_ARCHIPELAGO_USERNAME(STR("Archipelago Username"));
-		inline const FText HINT_ARCHIPELAGO_PASSWORD(STR("Archipelago Password"));
+		constexpr auto HINT_ARCHIPELAGO_SERVER_IP = STR("Archipelago Server IP");
+		constexpr auto HINT_ARCHIPELAGO_USERNAME = STR("Archipelago Username");
+		constexpr auto HINT_ARCHIPELAGO_PASSWORD = STR("Archipelago Password");
 
 		// Item display information
-		inline const FText ITEM_NAME(STR("Archipelago Item"));
-		inline const FText ITEM_DESCRIPTION(STR("An item from the Archipelago Mod. Is used to unlock items in the game of the other players in your session."));
+		constexpr auto ITEM_NAME = STR("Archipelago Item");
+		constexpr auto ITEM_DESCRIPTION = STR("An item from the Archipelago Mod. Is used to unlock items in the game of the other players in your session.");
 	}
 
 	// ============================================================

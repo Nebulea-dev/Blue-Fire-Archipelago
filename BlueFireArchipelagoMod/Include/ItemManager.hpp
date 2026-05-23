@@ -64,5 +64,6 @@ class ItemManager
 	bool PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 	private:
-	// TODO: Add member variables for item state management here
+    FText* itemName;
+    FText* itemDescription;
 };

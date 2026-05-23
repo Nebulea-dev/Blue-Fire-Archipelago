@@ -246,18 +246,22 @@ bool MainMenuManager::CreateEditableTextBoxes(UObject* widgetTree, TArray<UObjec
     outTextboxes.Add(PasswordeditableTextBox);
 
     // Set hint text on each textbox
-    TArray<FText> hints = {
-        Strings::HINT_ARCHIPELAGO_SERVER_IP,
-        Strings::HINT_ARCHIPELAGO_USERNAME,
-        Strings::HINT_ARCHIPELAGO_PASSWORD
-    };
+    TArray<FText*> hints;
 
+    // Note : Yes this is clearly a memeory leak
+    // This is fine to do for now, as it's not like we want to ever clear them from memory
+    // They'll be deleted when the game closes, and there's only 3 of them, so who cares
+    hints.Add(new FText(Strings::HINT_ARCHIPELAGO_SERVER_IP));
+    hints.Add(new FText(Strings::HINT_ARCHIPELAGO_USERNAME));
+    hints.Add(new FText(Strings::HINT_ARCHIPELAGO_PASSWORD));
+
+    // Set hint text on each textbox
     for(int32_t i = 0; i < outTextboxes.Num() && i < hints.Num(); i++)
     {
         FText* hintTextProperty = outTextboxes[i]->GetValuePtrByPropertyNameInChain<FText>(PropertyNames::PROP_HINT_TEXT);
         if (hintTextProperty != nullptr)
         {
-            *hintTextProperty = hints[i];
+            *hintTextProperty = *(hints[i]);
         }
         else
         {

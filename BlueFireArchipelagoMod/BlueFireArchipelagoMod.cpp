@@ -36,7 +36,6 @@ BlueFireArchipelagoMod::BlueFireArchipelagoMod() : CppUserModBase()
 
 void BlueFireArchipelagoMod::on_unreal_init()
 {
-    return;
     Output::send<LogLevel::Verbose>(STR("BlueFireArchipelagoMod says hello from on_unreal_init ♥\n"));
 
     // Create and initialize all manager instances

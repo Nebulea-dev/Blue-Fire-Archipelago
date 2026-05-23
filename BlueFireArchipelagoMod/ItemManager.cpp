@@ -14,6 +14,9 @@ using namespace ArchipelagoModConfig;
 ItemManager::ItemManager()
 {
 	Output::send<LogLevel::Verbose>(STR("ItemManager instance created\n"));
+
+    itemName = new FText(Strings::ITEM_NAME);
+    itemDescription = new FText(Strings::ITEM_DESCRIPTION);
 }
 
 void ItemManager::itemReceiveCb(int itemID, bool notify)
@@ -25,8 +28,8 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-    HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, (FText*)&Strings::ITEM_NAME);
-    HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, (FText*)&Strings::ITEM_DESCRIPTION);
+    HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
+    HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
     HookHelper::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
     HookHelper::setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
 
