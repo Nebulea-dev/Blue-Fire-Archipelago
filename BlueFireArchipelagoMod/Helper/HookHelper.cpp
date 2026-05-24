@@ -20,6 +20,12 @@ void HookHelper::Init()
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
+        if(objectName.find(STR("Ubergraph")) == std::string::npos &&
+           objectName.find(STR("InputAxis")) == std::string::npos)
+        {
+            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+        }
+
         // Find in the Map the object with the right name
         std::map<std::wstring, HookFunctionSignature>::iterator objectCallbackIt = prehooksRegistered.find(objectName);
 

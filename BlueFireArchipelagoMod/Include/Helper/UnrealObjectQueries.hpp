@@ -119,4 +119,5 @@ public:
 
 	// TODO : apply same documentation style
 	static std::optional<UObject*> FindGameInstance();
+	static std::optional<UObject*> FindGameMenu();
 };

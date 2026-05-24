@@ -101,3 +101,8 @@ std::optional<UObject*> UnrealObjectQueries::FindGameInstance()
 {
 	return FindWidget(L"BlueFire_Game_Instance_C", L"BlueFire_Game_Instance_C /Engine/", L"");
 }
+
+std::optional<UObject*> UnrealObjectQueries::FindGameMenu()
+{
+	return FindWidget(L"GameMenu_C", L"GameMenu_C /Engine/", L"");
+}

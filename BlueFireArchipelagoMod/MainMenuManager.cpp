@@ -37,6 +37,7 @@ void MainMenuManager::Init(HookHelper* hookManager, ObjectCreateListener* object
 	// Register menu navigation hooks
 	hookManager->registerPreHook(Hooks::UP_KEY, UpKeyHook);
 	hookManager->registerPreHook(Hooks::DOWN_KEY, DownKeyHook);
+	hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame", StartGameHook);
 
 	Output::send<LogLevel::Verbose>(STR("MainMenuManager initialization complete\n"));
 }
@@ -110,14 +111,7 @@ bool MainMenuManager::UpdateMenuFocus()
             PasswordEditableTextBox.value()->ProcessEvent(SetFocusFunc, nullptr);
             break;
         case 4:
-            FText* IP = IPEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
-            FText* Username = UsernameEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
-            FText* Password = PasswordEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
 
-            if (BlueFireArchipelagoMod::arcManager)
-            {
-                BlueFireArchipelagoMod::arcManager->connectToArchipelagoServer(IP, Username, Password);
-            }
             // For the button, we use the initial DownKey button, as this function
             // is the only way I currently have to allow the button to be pressed
 
@@ -478,19 +472,25 @@ void MainMenuManager::OnReturnPressed()
 {
     Output::send<LogLevel::Verbose>(STR("RETURN was pressed in menu\n"));
 
+    // TODO : Do this somewhere else this is horrible
     DeleteOriginalTextbox();
 
-    if(!IsUserInArchipelagoMenu())
+    if (!IsUserInArchipelagoMenu())
     {
         SetMenuFocusIndex(0);
         return;
     }
 
-    // At index 4, submit the connection
-    if (menuFocusIndex == 4)
+    int currentIndex = GetMenuFocusIndex();
+    if (currentIndex == 3)
     {
         SubmitMenuConnection();
+        return;
     }
+
+    // Move focus down (increase index, staying within 1-4 range)
+    SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 4));
+    UpdateMenuFocus();
 }
 
 bool MainMenuManager::HandleUpKeyPress()
@@ -513,13 +513,18 @@ bool MainMenuManager::HandleDownKeyPress()
 {
     Output::send<LogLevel::Verbose>(STR("DOWN key pressed in menu\n"));
 
-    if (!IsUserInArchipelagoMenu() || GetMenuFocusIndex() == 4)
+    if (!IsUserInArchipelagoMenu())
     {
         return false;
     }
 
-    // Move focus down (increase index, staying within 1-4 range)
     int currentIndex = GetMenuFocusIndex();
+    if (currentIndex == 4)
+    {
+        return true;
+    }
+
+    // Move focus down (increase index, staying within 1-4 range)
     SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 4));
 
     return UpdateMenuFocus();
@@ -569,23 +574,119 @@ void MainMenuManager::OnEditableTextBoxCreated(const UObjectBase* object, int32 
 
 void MainMenuManager::SubmitMenuConnection()
 {
-    // Find the game menu controller
-    std::optional<UObject*> GameMenuController = UnrealObjectQueries::FindGameMenuController();
-
-    if (!GameMenuController.has_value())
+    std::optional<UObject*> IPEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_IP);
+    if (!IPEditableTextBox.has_value())
     {
         return;
     }
 
-    // Find the "DownKey" function
-    UFunction* DownKeyFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, UnrealClasses::FUNC_DOWN_KEY);
-    if(!DownKeyFunc)
+    std::optional<UObject*> UsernameEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_USERNAME);
+    if (!UsernameEditableTextBox.has_value())
     {
-        Output::send<LogLevel::Error>(STR("Could not find DownKey function\n"));
         return;
     }
 
-    // Empty param struct (DownKey is not a /Script/ function)
-    struct dummyStruct{} params{};
-    GameMenuController.value()->ProcessEvent(DownKeyFunc, &params);
+    std::optional<UObject*> PasswordEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_PASSWORD);
+    if (!PasswordEditableTextBox.has_value())
+    {
+        return;
+    }
+
+    FText* IP = IPEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
+    FText* Username = UsernameEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
+    FText* Password = PasswordEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
+
+    if (BlueFireArchipelagoMod::arcManager)
+    {
+        BlueFireArchipelagoMod::arcManager->connectToArchipelagoServer(IP, Username, Password);
+    }
+
+    // TODO : change the name of the save file to "Archipelago" here
+    // TODO : Move this to a callback of the ArchipelagoManager that checks the connection status
+
+    std::optional<UObject*> gameMenuController = UnrealObjectQueries::FindGameMenuController();
+    if(!gameMenuController.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Game Menu Controller object\n"));
+        return;
+    }
+
+    // Check if save file already exists or not
+    std::optional<UObject*> gameMenu = UnrealObjectQueries::FindGameMenu();
+    if(!gameMenu.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Game Menu object\n"));
+        return;
+    }
+
+    bool* bIsAlreadyUsedSaveSlot = gameMenu.value()->GetValuePtrByPropertyNameInChain<bool>(STR("SaveGameExists"));
+    if(*bIsAlreadyUsedSaveSlot)
+    {
+        UFunction* StartGameFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, L"/Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame");
+        if(!StartGameFunc)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find StartGame function\n"));
+            return;
+        }
+
+        UFunction* CancelWriteFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, L"/Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:CancelWrite");
+        if(!CancelWriteFunc)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find CancelWrite function\n"));
+            return;
+        }
+
+        BlueFireArchipelagoMod::mainMenuManager->bNoHookGameStartOnce = true;
+
+        struct dummyStruct{} params{};
+        gameMenuController.value()->ProcessEvent(CancelWriteFunc, &params);
+        gameMenuController.value()->ProcessEvent(StartGameFunc, &params);
+    }
+    else
+    {
+        UFunction* StartNewGameFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, L"/Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartNewGame");
+        if(!StartNewGameFunc)
+        {
+            Output::send<LogLevel::Error>(STR("Could not find StartNewGame function\n"));
+            return;
+        }
+
+        struct startNewGameStruct{
+            uint32_t demo;
+        } params{0};
+        gameMenuController.value()->ProcessEvent(StartNewGameFunc, &params);
+    }
+}
+
+
+bool MainMenuManager::StartGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+    if(BlueFireArchipelagoMod::mainMenuManager->bNoHookGameStartOnce)
+    {
+        BlueFireArchipelagoMod::mainMenuManager->bNoHookGameStartOnce = false;
+        return false;
+    }
+
+    // User is trying to start a game file, first send them to the Archipelago menu
+    std::optional<UObject*> gameMenu = UnrealObjectQueries::FindGameMenu();
+    if(!gameMenu.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Game Menu object\n"));
+        return false;
+    }
+
+    UFunction* ChangeTabFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, L"/Game/BlueFire/HUD/Menu/GameMenu.GameMenu_C:ChangeTab");
+    if(!ChangeTabFunc)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find ChangeTab function\n"));
+        return false;
+    }
+
+    struct changeTabStruct{
+        uint32_t index;
+    };
+    changeTabStruct params{8};
+    gameMenu.value()->ProcessEvent(ChangeTabFunc, &params);
+
+    return true;
 }

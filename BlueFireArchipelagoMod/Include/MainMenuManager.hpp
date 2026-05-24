@@ -333,4 +333,9 @@ class MainMenuManager
 	 * @return  none
 	 */
 	void SubmitMenuConnection();
+
+	//TODO : Make this pretty docs
+	static bool StartGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
+	bool bNoHookGameStartOnce{false};
 };
