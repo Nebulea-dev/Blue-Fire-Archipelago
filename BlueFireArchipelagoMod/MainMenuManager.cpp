@@ -38,6 +38,7 @@ void MainMenuManager::Init(HookHelper* hookManager, ObjectCreateListener* object
 	hookManager->registerPreHook(Hooks::UP_KEY, UpKeyHook);
 	hookManager->registerPreHook(Hooks::DOWN_KEY, DownKeyHook);
 	hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame", StartGameHook);
+	hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenu.GameMenu_C:CancelWrite", CancelWriteHook);
 
 	Output::send<LogLevel::Verbose>(STR("MainMenuManager initialization complete\n"));
 }
@@ -67,30 +68,15 @@ bool MainMenuManager::UpdateMenuFocus()
         return false;
     }
 
-    // Find the game menu controller
-    std::optional<UObject*> GameMenuController = UnrealObjectQueries::FindGameMenuController();
-    if (!GameMenuController.has_value())
-    {
-        return false;
-    }
-
-    // Find the menu title widget
-    std::optional<UObject*> fileTitle = UnrealObjectQueries::FindGameMenuTitle(GameObjects::MENU_TITLE_FILE);
-    if (!fileTitle.has_value())
-    {
-        return false;
-    }
-
 
     // Step 2 - Find the functions that we will need to call
 
 
     // Find the "SetFocus" and "DownKey" functions
     UFunction* SetFocusFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, UnrealClasses::FUNC_WIDGET_SET_FOCUS);
-    UFunction* DownKeyFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, UnrealClasses::FUNC_DOWN_KEY);
-    if(!DownKeyFunc || !SetFocusFunc)
+    if(!SetFocusFunc)
     {
-        Output::send<LogLevel::Error>(STR("Could not find one or more required functions\n"));
+        Output::send<LogLevel::Error>(STR("Could not find the SetFocus function\n"));
         return false;
     }
 
@@ -109,16 +95,6 @@ bool MainMenuManager::UpdateMenuFocus()
             break;
         case 3:
             PasswordEditableTextBox.value()->ProcessEvent(SetFocusFunc, nullptr);
-            break;
-        case 4:
-
-            // For the button, we use the initial DownKey button, as this function
-            // is the only way I currently have to allow the button to be pressed
-
-            // Also this function takes an empty param struct because fuck you idk
-            // My suspicion is that it's because it's not a /Script/ function
-            struct dummyStruct{} params{};
-            GameMenuController.value()->ProcessEvent(DownKeyFunc, &params);
             break;
     }
 
@@ -488,8 +464,8 @@ void MainMenuManager::OnReturnPressed()
         return;
     }
 
-    // Move focus down (increase index, staying within 1-4 range)
-    SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 4));
+    // Move focus down (increase index, staying within 1-3 range)
+    SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 3));
     UpdateMenuFocus();
 }
 
@@ -502,9 +478,9 @@ bool MainMenuManager::HandleUpKeyPress()
         return false;
     }
 
-    // Move focus up (decrease index, staying within 1-4 range)
+    // Move focus up (decrease index, staying within 1-3 range)
     int currentIndex = GetMenuFocusIndex();
-    SetMenuFocusIndex(std::clamp(currentIndex - 1, 1, 4));
+    SetMenuFocusIndex(std::clamp(currentIndex - 1, 1, 3));
 
     return UpdateMenuFocus();
 }
@@ -519,13 +495,13 @@ bool MainMenuManager::HandleDownKeyPress()
     }
 
     int currentIndex = GetMenuFocusIndex();
-    if (currentIndex == 4)
+    if (currentIndex == 3)
     {
         return true;
     }
 
-    // Move focus down (increase index, staying within 1-4 range)
-    SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 4));
+    // Move focus down (increase index, staying within 1-3 range)
+    SetMenuFocusIndex(std::clamp(currentIndex + 1, 1, 3));
 
     return UpdateMenuFocus();
 }
@@ -689,4 +665,12 @@ bool MainMenuManager::StartGameHook(UObject* Context, FFrame& Stack, void* RESUL
     gameMenu.value()->ProcessEvent(ChangeTabFunc, &params);
 
     return true;
+}
+
+
+bool MainMenuManager::CancelWriteHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+    Output::send<LogLevel::Verbose>(STR("CancelWriteHook called!\n"));
+    BlueFireArchipelagoMod::mainMenuManager->SetMenuFocusIndex(0);
+    return false;
 }

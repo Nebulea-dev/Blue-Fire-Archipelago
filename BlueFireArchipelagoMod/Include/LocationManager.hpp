@@ -15,6 +15,7 @@ public:
     std::optional<uint32_t> GetLocationIDFromStatueName(const std::wstring& chestName);
 
     static bool OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+    static bool OnPressButton(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
     static void OnNewItemCreated(const UObjectBase* object, int32 index);

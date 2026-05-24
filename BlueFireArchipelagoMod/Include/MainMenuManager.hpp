@@ -336,6 +336,7 @@ class MainMenuManager
 
 	//TODO : Make this pretty docs
 	static bool StartGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+	static bool CancelWriteHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 	bool bNoHookGameStartOnce{false};
 };

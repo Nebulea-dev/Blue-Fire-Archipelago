@@ -13,6 +13,7 @@ LocationManager::LocationManager() {}
 
 void LocationManager::Init(HookHelper* hookManager, ObjectCreateListener* objectListener) {
 	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:Set Used Chest"), OnChestOpened);
+	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:PressButton"), OnPressButton);
 	hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/EmoteStatue/EmoteStatue_BP.EmoteStatue_BP_C:CustomEvent_5"), OnDialogueWithStatueEnded);
 
 	// Listen to object creation for EditableTextBox controls
@@ -20,14 +21,6 @@ void LocationManager::Init(HookHelper* hookManager, ObjectCreateListener* object
 }
 
 bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL) {
-	// Get the Used_Chest parameter
-	std::optional<bool> Used_Chest = HookHelper::readParamValue<bool>(STR("Used_Chest"), Stack);
-    if (!Used_Chest.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find the Used_Chest parameter in Set Used Chest function call\n"));
-		return false;
-    }
-
 	// Get the path of the chest being opened
 	const std::wstring chestName = Context->GetNamePrivate().ToString();
 
@@ -42,6 +35,7 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
 	Output::send<LogLevel::Verbose>(STR("Chest {} opened, marking location ID {} as checked in Archipelago\n"), chestName, locationID.value());
 	AP_SendItem(locationID.value());
 
+
     return false;
 }
 
@@ -55,6 +49,31 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromChestName(const std::w
 	{
 		return std::nullopt;
 	}
+}
+
+
+bool LocationManager::OnPressButton(UObject* Context, FFrame& Stack, void* RESULT_DECL) {
+	// Get the Type parameter
+	uint8_t* chestType = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Type");
+	if(!chestType)
+	{
+        Output::send<LogLevel::Error>(STR("Could not find the Type parameter of the opened chest\n"));
+		return false;
+	}
+
+	// Get the Weapon parameter
+	uint8_t* chestWeapon = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Weapon");
+	if(!chestWeapon)
+	{
+        Output::send<LogLevel::Error>(STR("Could not find the Weapon parameter of the opened chest\n"));
+		return false;
+	}
+
+	// Set the chest content to the default sword
+	*chestType = 1;
+	*chestWeapon = 0;
+
+    return false;
 }
 
 bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack, void* RESULT_DECL) {
@@ -78,20 +97,8 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 		return false;
 	}
 
-	bool bIsEmoteInInventory = false;
-	for(int32_t i = 0; i < emoteInventory->Num(); i++)
-	{
-		uint32_t emote = (*emoteInventory)[i];
-
-		if(emote == *emoteEnum)
-		{
-			bIsEmoteInInventory = true;
-			break;
-		}
-	}
-
 	// The dialogue has been cancelled and the emote was not purchased
-	if(!bIsEmoteInInventory)
+	if(emoteInventory->Top() != *emoteEnum)
 	{
 		return false;
 	}
@@ -111,6 +118,8 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 	AP_SendItem(locationID.value());
 
 	// TODO : remove item from inventory
+	emoteInventory->Pop();
+
 
 	return false;
 }

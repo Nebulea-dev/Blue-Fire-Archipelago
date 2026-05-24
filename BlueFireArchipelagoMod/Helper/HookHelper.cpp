@@ -23,7 +23,7 @@ void HookHelper::Init()
         if(objectName.find(STR("Ubergraph")) == std::string::npos &&
            objectName.find(STR("InputAxis")) == std::string::npos)
         {
-            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+            // Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
 
         // Find in the Map the object with the right name
@@ -68,7 +68,6 @@ void HookHelper::Init()
 
 bool HookHelper::registerPreHook(std::wstring objectName, HookFunctionSignature callback)
 {
-
 	// If object is already in the objectsListened Map
 	auto objectCallbackIt = this->prehooksRegistered.find(objectName);
 	if (objectCallbackIt != this->prehooksRegistered.end() && objectCallbackIt->second == callback) return false;
@@ -80,7 +79,6 @@ bool HookHelper::registerPreHook(std::wstring objectName, HookFunctionSignature 
 
 bool HookHelper::registerPostHook(std::wstring objectName, HookFunctionSignature callback)
 {
-
 	// If object is already in the objectsListened Map
 	auto objectCallbackIt = this->posthooksRegistered.find(objectName);
 	if (objectCallbackIt != this->posthooksRegistered.end() && objectCallbackIt->second == callback) return false;
