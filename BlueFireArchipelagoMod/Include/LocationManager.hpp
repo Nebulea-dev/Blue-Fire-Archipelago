@@ -19,5 +19,6 @@ public:
     static bool OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
     static void OnNewItemCreated(const UObjectBase* object, int32 index);
-
+private:
+    static void logIncorrectMapping(const std::wstring locationName);
 };

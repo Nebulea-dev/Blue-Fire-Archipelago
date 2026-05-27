@@ -224,10 +224,11 @@ namespace ArchipelagoModConfig
 
 		namespace WaterWays
 		{
+			// Uncategorized yet
 			constexpr auto PURE_SHADOW_CHEST = STR("Chest_A02_Tunic_PureShadow");
 		}
 
-		namespace CliffPath
+		namespace StoneHeart
 		{
 			constexpr auto STONEHEART_CHEST_3 = STR("Chest_A01_Stoneheart_Loot_03");
 
@@ -320,16 +321,74 @@ namespace ArchipelagoModConfig
 	// Location IDs - Mapping of chest names to location IDs for Archipelago
 	// ============================================================
 	inline std::map<std::wstring, uint32_t> ChestNameToLocationID = {
-		// Chests in Fire Keep Intro
+		// Chests in Fire Keep - Intro
 		{ ChestNames::FireKeepIntro::AMBUSH_CHEST_1, 1 },
 		{ ChestNames::FireKeepIntro::AMBUSH_CHEST_2, 2 },
 
-		// Chests in Fire Keep Hub
+		// Chests in Fire Keep - Hub
 		{ ChestNames::FireKeepHub::SPIN_ATTACK_CHEST, 3 },
 		{ ChestNames::FireKeepHub::LOOT_CHEST_1, 4 },
 		{ ChestNames::FireKeepHub::LOOT_CHEST_2, 5 },
 		{ ChestNames::FireKeepHub::LOOT_CHEST_3, 6 },
 		{ ChestNames::FireKeepHub::DIAMOND_WING_CHEST, 7 },
+
+		// Chests in Arcane Tunnels
+		{ ChestNames::ArcaneTunnels::NORTH_LOOT_CHEST_1, 8 },
+		{ ChestNames::ArcaneTunnels::NORTH_LOOT_CHEST_2, 9 },
+		{ ChestNames::ArcaneTunnels::NORTH_LOOT_CHEST_3, 10 },
+		{ ChestNames::ArcaneTunnels::EAST_LOOT_CHEST_1, 11 },
+		{ ChestNames::ArcaneTunnels::EAST_LOOT_CHEST_4, 12 },
+		{ ChestNames::ArcaneTunnels::EAST_LOOT_CHEST_5, 13 },
+		{ ChestNames::ArcaneTunnels::BLOODSTORM_CHEST, 14 },
+		{ ChestNames::ArcaneTunnels::ARCANE_CHEST, 15 },
+		{ ChestNames::ArcaneTunnels::SOUTH_KEY_CHEST_2, 16 },
+		{ ChestNames::ArcaneTunnels::EAST_LOOT_CHEST_2, 17 },
+		{ ChestNames::ArcaneTunnels::EAST_LOOT_CHEST_3, 18 },
+		{ ChestNames::ArcaneTunnels::SOUTH_LOOT_CHEST, 19 },
+		{ ChestNames::ArcaneTunnels::SOUTH_KEY_CHEST_1, 20 },
+
+		// Chests in Water Ways
+		{ ChestNames::WaterWays::PURE_SHADOW_CHEST, 21 },
+
+		// Chests in Stone Heart
+		{ ChestNames::WaterWays::STONEHEART_CHEST_3, 22 },
+		{ ChestNames::WaterWays::STONEHEART_CHEST_1, 23 },
+		{ ChestNames::WaterWays::STONEHEART_CHEST_2, 24 },
+		{ ChestNames::WaterWays::STONEHEART_CHEST_4, 25 },
+		{ ChestNames::WaterWays::MERCHANTS_ROBE_CHEST, 26 },
+		{ ChestNames::WaterWays::GRAVEYARD_KEY_CHEST_1, 27 },
+		{ ChestNames::WaterWays::GRAVEYARD_KEY_CHEST_2, 28 },
+
+		// Chests in Cross Roads
+		{ ChestNames::CrossRoads::CROSSROADS_LOOT_CHEST_2, 29 },
+		{ ChestNames::CrossRoads::WELL_CROSSROADS_LOOT_CHEST_3, 30 },
+		{ ChestNames::CrossRoads::CROSSROADS_CHEST_LOOT_1, 31 },
+		{ ChestNames::CrossRoads::CROSSROADS_CHEST_LOOT_3, 32 },
+
+		// Chests in Forest Temple - Water
+		{ ChestNames::ForestTempleWater::LOOT_CHEST_1, 33 },
+		{ ChestNames::ForestTempleWater::LOOT_CHEST_2, 34 },
+		{ ChestNames::ForestTempleWater::KEY_CHEST, 35 },
+
+		// Chests in Forest Temple - Ambush 1
+		{ ChestNames::ForestTreeAmbush1::KEY_CHEST, 36 },
+
+		// Chests in Forest Temple - Ambush 2
+		{ ChestNames::ForestTreeAmbush2::KEY_CHEST, 37 },
+
+		// Chests in Forest Temple - Nuos Claw
+		{ ChestNames::ForestTreeNuosClaw::NUOS_CLAW_CHEST, 38 },
+
+		// Chests in Forest Temple - Center Tree
+		{ ChestNames::ForestTempleCenterTree::LOOT_CHEST_1, 39 },
+		{ ChestNames::ForestTempleCenterTree::LOOT_CHEST_2, 40 },
+		{ ChestNames::ForestTempleCenterTree::LOOT_CHEST_3, 41 },
+		{ ChestNames::ForestTempleCenterTree::VOID_CHEST, 42 },
+		{ ChestNames::ForestTempleCenterTree::SILVERBLADES_CHEST, 43 },
+		{ ChestNames::ForestTempleCenterTree::KEY_CHEST, 44 },
+
+		// Chests in Forest Temple - Center Tree
+		{ ChestNames::ForestTempleCenterTreeTrunk::LOOT_CHEST_1, 45 },
 	};
 
 	// ============================================================
@@ -339,7 +398,6 @@ namespace ArchipelagoModConfig
 		// Chests in Fire Keep Intro
 		{ EmoteNames::WINDMILL_EMOTE, 100 },
 	};
-
 
 
 	// ============================================================

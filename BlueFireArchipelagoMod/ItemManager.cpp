@@ -21,9 +21,54 @@ ItemManager::ItemManager()
 
 void ItemManager::itemReceiveCb(int itemID, bool notify)
 {
-    // TODO: Implement item reception callback
-    // This will be used to handle items received from the Archipelago server
-    // std::string itemToRecieve = items[id - gdBaseID];
+    int rebasedItemID = itemID - Archipelago::BF_BASE_ID;
+    if(rebasedItemID < 0)
+    {
+        Output::send<LogLevel::Error>(STR("Item has an ID under the base ID of the game, cannot be mapped to a valid item\n"));
+    }
+
+    // Emote
+    if(rebasedItemID < 100)
+    {
+        givePlayerEmote(rebasedItemID)
+        return;
+    }
+
+    // Weapon
+    if(rebasedItemID < 200)
+    {
+        givePlayerWeapon(rebasedItemID - 100)
+        return;
+    }
+
+    // Tunic
+    if(rebasedItemID < 300)
+    {
+        givePlayerTunic(rebasedItemID - 200)
+        return;
+    }
+
+    // Spirit
+    if(rebasedItemID < 400)
+    {
+        givePlayerSpirit(rebasedItemID - 300)
+        return;
+    }
+
+    // Ability
+    if(rebasedItemID < 500)
+    {
+        givePlayerAbility(rebasedItemID - 300)
+        return;
+    }
+
+    // Regular Item
+    if(rebasedItemID < 600)
+    {
+        return;
+    }
+
+    Output::send<LogLevel::Error>(STR("Item has an ID over the max ID of the game, cannot be mapped to a valid item\n"));
 }
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)

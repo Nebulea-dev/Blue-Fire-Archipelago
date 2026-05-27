@@ -28,7 +28,7 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromChestName(chestName);
 	if (!locationID.has_value())
 	{
-		Output::send<LogLevel::Error>(STR("Chest name {} not found in ChestNameToLocationID mapping\n"), chestName);
+		logIncorrectMapping(chestName);
 		return false;
 	}
 
@@ -110,7 +110,7 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromStatueName(statueName);
 	if (!locationID.has_value())
 	{
-		Output::send<LogLevel::Error>(STR("Emote Statue {} not found in statue name mapping\n"), statueName);
+		logIncorrectMapping(statueName);
 		return false;
 	}
 
@@ -140,4 +140,9 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromStatueName(const std::
 void LocationManager::OnNewItemCreated(const UObjectBase* object, int32 index)
 {
 	Output::send<LogLevel::Verbose>(STR("Hi from OnNewItemCreated!\n"));
+}
+
+void LocationManager::logIncorrectMapping(const std::wstring locationName)
+{
+	Output::send<LogLevel::Error>(STR("Hi ! It looks like the location you just checked was not correctly registered in the location mapping in	ArchipelagoModConfig.hpp. This mod is still very new, and some chests or other locations might be missing. Please open an issue on Github or contact nebulea__ on discord to get this added. Be sure to include a description of where you found this location, and include the following location name in your message : {}\n"), locationName);
 }
