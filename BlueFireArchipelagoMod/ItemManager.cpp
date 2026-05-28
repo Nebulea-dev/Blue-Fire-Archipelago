@@ -30,35 +30,35 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
     // Emote
     if(rebasedItemID < 100)
     {
-        givePlayerEmote(rebasedItemID)
+        givePlayerEmote(rebasedItemID);
         return;
     }
 
     // Weapon
     if(rebasedItemID < 200)
     {
-        givePlayerWeapon(rebasedItemID - 100)
+        givePlayerWeapon(rebasedItemID - 100);
         return;
     }
 
     // Tunic
     if(rebasedItemID < 300)
     {
-        givePlayerTunic(rebasedItemID - 200)
+        givePlayerTunic(rebasedItemID - 200);
         return;
     }
 
     // Spirit
     if(rebasedItemID < 400)
     {
-        givePlayerSpirit(rebasedItemID - 300)
+        givePlayerSpirit(rebasedItemID - 300);
         return;
     }
 
     // Ability
     if(rebasedItemID < 500)
     {
-        givePlayerAbility(rebasedItemID - 300)
+        givePlayerAbility(rebasedItemID - 400);
         return;
     }
 
@@ -84,4 +84,34 @@ bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESU
 
     // Do not prevent the original function from being called
     return false;
+}
+
+void ItemManager::givePlayerEmote(int emoteID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player emote ID: {}\n"), emoteID);
+    // TODO: Implement emote giving logic
+}
+
+void ItemManager::givePlayerWeapon(int weaponID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player weapon ID: {}\n"), weaponID);
+    // TODO: Implement weapon giving logic
+}
+
+void ItemManager::givePlayerTunic(int tunicID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player tunic ID: {}\n"), tunicID);
+    // TODO: Implement tunic giving logic
+}
+
+void ItemManager::givePlayerSpirit(int spiritID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player spirit ID: {}\n"), spiritID);
+    // TODO: Implement spirit giving logic
+}
+
+void ItemManager::givePlayerAbility(int abilityID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player ability ID: {}\n"), abilityID);
+    // TODO: Implement ability giving logic
 }

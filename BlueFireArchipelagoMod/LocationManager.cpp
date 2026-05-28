@@ -1,5 +1,6 @@
 #include <LocationManager.hpp>
 #include <ArchipelagoModConfig.hpp>
+#include <LocationsJsonParser.hpp>
 #include <BlueFireArchipelagoMod.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
 
@@ -9,9 +10,27 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
+// Static maps loaded from JSON
+static std::map<std::wstring, uint32_t> ChestNameToLocationID;
+static std::map<std::wstring, uint32_t> StatueNameToLocationID;
+static bool g_locationsLoaded = false;
+
 LocationManager::LocationManager() {}
 
 void LocationManager::Init(HookHelper* hookManager, ObjectCreateListener* objectListener) {
+	// Load locations from JSON
+	if (!g_locationsLoaded) {
+		std::string jsonPath = "locations.json";  // Local copy in mod directory
+		if (LocationsJsonParser::ParseLocationsJson(jsonPath)) {
+			ChestNameToLocationID = LocationsJsonParser::GetChestNameToLocationIDMap();
+			StatueNameToLocationID = LocationsJsonParser::GetStatueNameToLocationIDMap();
+			g_locationsLoaded = true;
+			Output::send<LogLevel::Verbose>(STR("Successfully loaded locations from JSON\n"));
+		} else {
+			Output::send<LogLevel::Warning>(STR("Failed to load locations from JSON, location mapping may be unavailable\n"));
+		}
+	}
+
 	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:Set Used Chest"), OnChestOpened);
 	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:PressButton"), OnPressButton);
 	hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/EmoteStatue/EmoteStatue_BP.EmoteStatue_BP_C:CustomEvent_5"), OnDialogueWithStatueEnded);
@@ -118,7 +137,7 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 	AP_SendItem(locationID.value());
 
 	// TODO : remove item from inventory
-	emoteInventory->Pop();
+	emoteInventory->Pop(true);
 
 
 	return false;

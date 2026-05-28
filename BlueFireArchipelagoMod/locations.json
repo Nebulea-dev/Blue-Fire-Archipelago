@@ -1,0 +1,272 @@
+{
+  "regions": [
+    {
+      "name": "Menu",
+      "subregions": [],
+      "locations": []
+    },
+    {
+      "name": "Fire Keep",
+      "subregions": [
+        {
+          "name": "Intro",
+          "locations": [
+            {
+              "name": "Ambush chest 1",
+              "chestName": "Chest_A01_Keep_Shield"
+            },
+            {
+              "name": "Ambush chest 2",
+              "chestName": "Chest_A02_Keep_Key_01"
+            }
+          ]
+        },
+        {
+          "name": "Hub",
+          "locations": [
+            {
+              "name": "Spin attack",
+              "chestName": "Chest_A01_TempleGardens_Ability_SpinAttack2"
+            },
+            {
+              "name": "Loot chest 1",
+              "chestName": "Chest_A02_Keep_Loot_01"
+            },
+            {
+              "name": "Loot chest 2",
+              "chestName": "Chest_A02_Keep_Loot_02"
+            },
+            {
+              "name": "Loot chest 3",
+              "chestName": "Chest_A02_GameIntro_44"
+            },
+            {
+              "name": "Diamond Wing Chest",
+              "chestName": "Chest_A02_Sword_DiamondWings"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arcane Tunnels",
+      "subregions": [],
+      "locations": [
+        {
+          "name": "North loot chest 1",
+          "chestName": "Chest_A02_NorthArcane_Loot_01"
+        },
+        {
+          "name": "North loot chest 2",
+          "chestName": "Chest_A02_NorthArcane_Loot_03"
+        },
+        {
+          "name": "North loot chest 3",
+          "chestName": "Chest_A02_NorthArcane_Loot_04"
+        },
+        {
+          "name": "East loot chest 1",
+          "chestName": "Chest_A02_EastArcane_Loot_01"
+        },
+        {
+          "name": "East loot chest 4",
+          "chestName": "Chest_A02_EastArcane_Loot_04"
+        },
+        {
+          "name": "East loot chest 5",
+          "chestName": "Chest_A02_EastArcane_Loot_05"
+        },
+        {
+          "name": "Bloodstorm chest",
+          "chestName": "Chest_A02_NorthArcane_Sword_Bloodstorm"
+        },
+        {
+          "name": "Arcane chest",
+          "chestName": "Chest_A01_Arcane_Spell"
+        },
+        {
+          "name": "South key chest 2",
+          "chestName": "Chest_A02_SouthArcane_Key_02"
+        },
+        {
+          "name": "East loot chest 2",
+          "chestName": "Chest_A02_EastArcane_Loot_02"
+        },
+        {
+          "name": "East loot chest 3",
+          "chestName": "Chest_A02_EastArcane_Loot_03"
+        },
+        {
+          "name": "South loot chest",
+          "chestName": "Chest_A02_SouthArcane_Loot_01"
+        },
+        {
+          "name": "South key chest 1",
+          "chestName": "Chest_A02_SouthArcane_Key_01"
+        }
+      ]
+    },
+    {
+      "name": "Stoneheart City",
+      "subregions": [],
+      "locations": [
+        {
+          "name": "Pure Shadow chest",
+          "chestName": "Chest_A02_Tunic_PureShadow"
+        },
+        {
+          "name": "Stoneheart chest 3",
+          "chestName": "Chest_A01_Stoneheart_Loot_03"
+        },
+        {
+          "name": "Stoneheart chest 1",
+          "chestName": "Chest_A01_Stoneheart_Loot_01"
+        },
+        {
+          "name": "Stoneheart chest 2",
+          "chestName": "Chest_A01_Stoneheart_Loot_02"
+        },
+        {
+          "name": "Stoneheart chest 4",
+          "chestName": "Chest_A01_Stoneheart_Loot_3"
+        },
+        {
+          "name": "Merchants Robe chest",
+          "chestName": "Chest_A01_Stoneheart_Tunic_MerchantsRobe"
+        },
+        {
+          "name": "Graveyard key chest 1",
+          "chestName": "Chest_Master_A01_StoneheartCity_GraveyardKey"
+        },
+        {
+          "name": "Graveyard key chest 2",
+          "chestName": "Chest_Master_A01_StoneheartCity_GraveyardKey2"
+        }
+      ]
+    },
+    {
+      "name": "Crossroads",
+      "subregions": [],
+      "locations": [
+        {
+          "name": "Well Loot Chest 3",
+          "chestName": "Chest_A01_CrossRoads_Loot_3"
+        },
+        {
+          "name": "Loot Chest 1",
+          "chestName": "Chest_A01_CrossRoads_Loot_01"
+        },
+        {
+          "name": "Loot chest 2",
+          "chestName": "Chest_A01_CrossRoads_Loot_02"
+        },
+        {
+          "name": "Loot Chest 3",
+          "chestName": "Chest_A01_CrossRoads_Loot_03"
+        }
+      ]
+    },
+    {
+      "name": "Forest Temple",
+      "subregions": [
+        {
+          "name": "Water",
+          "locations": [
+            {
+              "name": "Loot chest 1",
+              "chestName": "Chest_A01_Nuos_Loot_05"
+            },
+            {
+              "name": "Loot chest 2",
+              "chestName": "Chest_A01_Nuos_Loot_02"
+            },
+            {
+              "name": "Key chest",
+              "chestName": "Chest_A01_Nuos_Key_2"
+            }
+          ]
+        },
+        {
+          "name": "Ambush 1",
+          "locations": [
+            {
+              "name": "Key chest",
+              "chestName": "Chest_A01_Nuos_Key_01"
+            }
+          ]
+        },
+        {
+          "name": "Ambush 2",
+          "locations": [
+            {
+              "name": "Key chest",
+              "chestName": "Chest_A01_Nuos_Key_03"
+            }
+          ]
+        },
+        {
+          "name": "Nuos Claw",
+          "locations": [
+            {
+              "name": "Nuos Claw chest",
+              "chestName": "Chest_A01_Nuos_Ability_WallRun"
+            }
+          ]
+        },
+        {
+          "name": "Center Tree",
+          "locations": [
+            {
+              "name": "Loot chest 1",
+              "chestName": "Chest_A01_Nuos_Loot_03"
+            },
+            {
+              "name": "Loot chest 2",
+              "chestName": "Chest_A01_Nuos_Loot_06"
+            },
+            {
+              "name": "Loot chest 3",
+              "chestName": "Chest_A01_Nuos_Loot_04"
+            },
+            {
+              "name": "Void chest",
+              "chestName": "Chest_Master_2"
+            },
+            {
+              "name": "Silverblades chest",
+              "chestName": "Chest_A01_TempleGardens_Sword_SilverBlades"
+            },
+            {
+              "name": "Key chest",
+              "chestName": "Chest_A01_Nuos_Key_02"
+            }
+          ]
+        },
+        {
+          "name": "Center Tree Trunk",
+          "locations": [
+            {
+              "name": "Loot chest 1",
+              "chestName": "Chest_A01_Nuos_MasterKey"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Victory",
+      "subregions": [],
+      "locations": [
+        {
+          "name": "Victory"
+        }
+      ]
+    }
+  ],
+  "statues": [
+    {
+      "name": "Windmill Emote",
+      "objectName": "A02_Arcane_EmoteStatue_Windmill"
+    }
+  ]
+}

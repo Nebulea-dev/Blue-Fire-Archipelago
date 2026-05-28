@@ -63,6 +63,61 @@ class ItemManager
 	 */
 	bool PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
+	/*******************************************************************************
+	 * @fn      givePlayerEmote
+	 *
+	 * @brief   Give the player an emote item.
+	 *
+	 * @param   emoteID - The emote item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerEmote(int emoteID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerWeapon
+	 *
+	 * @brief   Give the player a weapon item.
+	 *
+	 * @param   weaponID - The weapon item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerWeapon(int weaponID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerTunic
+	 *
+	 * @brief   Give the player a tunic item.
+	 *
+	 * @param   tunicID - The tunic item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerTunic(int tunicID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerSpirit
+	 *
+	 * @brief   Give the player a spirit item.
+	 *
+	 * @param   spiritID - The spirit item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerSpirit(int spiritID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerAbility
+	 *
+	 * @brief   Give the player an ability item.
+	 *
+	 * @param   abilityID - The ability item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerAbility(int abilityID);
+
 	private:
     FText* itemName;
     FText* itemDescription;
