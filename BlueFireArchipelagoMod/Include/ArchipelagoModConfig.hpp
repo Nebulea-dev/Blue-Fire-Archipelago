@@ -336,7 +336,7 @@ namespace ArchipelagoModConfig
 	// ============================================================
 	namespace Archipelago
 	{
-		constexpr uint32_t BF_BASE_ID = 0xB70EF14E;
+		constexpr uint32_t BF_BASE_ID = 437000;
 		constexpr char GAME_NAME[] = "Blue Fire";
 	}
 }

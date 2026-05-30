@@ -63,6 +63,13 @@ void BlueFireArchipelagoMod::on_unreal_init()
         }
     });
 
+    register_keydown_event(Input::Key::F5, {}, [this]() {
+        if (itemManager)
+        {
+            itemManager->itemReceiveCb(Archipelago::BF_BASE_ID + 402, false);
+        }
+    });
+
     // Initialize MainMenuManager hooks and callbacks
     locationManager->Init(hookManager, &ObjectCreateListener);
     mainMenuManager->Init(hookManager, &ObjectCreateListener);

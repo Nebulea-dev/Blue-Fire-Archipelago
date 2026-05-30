@@ -118,6 +118,18 @@ class ItemManager
 	 */
 	void givePlayerAbility(int abilityID);
 
+	/*******************************************************************************
+	 * @fn      givePlayerItem
+	 *
+	 * @brief   Give the player an item.
+	 *
+	 * @param   itemID - The item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerItem(int itemID);
+
+
 	private:
     FText* itemName;
     FText* itemDescription;
