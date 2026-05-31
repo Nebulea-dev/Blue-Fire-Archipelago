@@ -70,3 +70,14 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Rust build artifacts
+target/
+Cargo.lock
+*.rlib
+*.rmeta
+
+# Rust IDE
+.idea/
+*.iml
+*.rs.bk

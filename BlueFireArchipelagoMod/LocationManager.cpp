@@ -1,6 +1,6 @@
 #include <LocationManager.hpp>
 #include <ArchipelagoModConfig.hpp>
-#include <LocationsJsonParser.hpp>
+#include <LocationsData.hpp>
 #include <BlueFireArchipelagoMod.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
 
@@ -10,27 +10,9 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-// Static maps loaded from JSON
-static std::map<std::wstring, uint32_t> ChestNameToLocationID;
-static std::map<std::wstring, uint32_t> StatueNameToLocationID;
-static bool g_locationsLoaded = false;
-
 LocationManager::LocationManager() {}
 
 void LocationManager::Init(HookHelper* hookManager, ObjectCreateListener* objectListener) {
-	// Load locations from JSON
-	if (!g_locationsLoaded) {
-		std::string jsonPath = "locations.json";  // Local copy in mod directory
-		if (LocationsJsonParser::ParseLocationsJson(jsonPath)) {
-			ChestNameToLocationID = LocationsJsonParser::GetChestNameToLocationIDMap();
-			StatueNameToLocationID = LocationsJsonParser::GetStatueNameToLocationIDMap();
-			g_locationsLoaded = true;
-			Output::send<LogLevel::Verbose>(STR("Successfully loaded locations from JSON\n"));
-		} else {
-			Output::send<LogLevel::Warning>(STR("Failed to load locations from JSON, location mapping may be unavailable\n"));
-		}
-	}
-
 	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:Set Used Chest"), OnChestOpened);
 	hookManager->registerPreHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Chest/Chest_Master.Chest_Master_C:PressButton"), OnPressButton);
 	hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/EmoteStatue/EmoteStatue_BP.EmoteStatue_BP_C:CustomEvent_5"), OnDialogueWithStatueEnded);
@@ -59,8 +41,9 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
 }
 
 std::optional<uint32_t> LocationManager::GetLocationIDFromChestName(const std::wstring& chestName) {
-	auto it = ChestNameToLocationID.find(chestName);
-	if (it != ChestNameToLocationID.end())
+	const auto& chestMap = LocationsData::GetChestNameToLocationIDMap();
+	auto it = chestMap.find(chestName);
+	if (it != chestMap.end())
 	{
 		return it->second + Archipelago::BF_BASE_ID;
 	}
@@ -144,8 +127,9 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 }
 
 std::optional<uint32_t> LocationManager::GetLocationIDFromStatueName(const std::wstring& statueName) {
-	auto it = StatueNameToLocationID.find(statueName);
-	if (it != StatueNameToLocationID.end())
+	const auto& statueMap = LocationsData::GetStatueNameToLocationIDMap();
+	auto it = statueMap.find(statueName);
+	if (it != statueMap.end())
 	{
 		return it->second + Archipelago::BF_BASE_ID;
 	}

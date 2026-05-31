@@ -318,17 +318,15 @@ namespace ArchipelagoModConfig
 	}
 
 	// ============================================================
-	// Location IDs - Loaded from JSON via LocationsJsonParser
+	// Location IDs - Compiled from locations.json at build time
 	// ============================================================
-	// NOTE: These maps are now loaded from the unified locations.json file
-	// Initialize them using LocationsJsonParser::GetChestNameToLocationIDMap()
-	// and LocationsJsonParser::GetStatueNameToLocationIDMap()
+	// NOTE: Location data is now embedded in the binary via LocationsData.hpp
+	// Access maps using LocationsData::GetChestNameToLocationIDMap()
+	// and LocationsData::GetStatueNameToLocationIDMap()
 	//
-	// Example initialization in your code:
-	//   std::map<std::wstring, uint32_t> ChestNameToLocationID =
-	//       LocationsJsonParser::GetChestNameToLocationIDMap();
-	//   std::map<std::wstring, uint32_t> StatueNameToLocationID =
-	//       LocationsJsonParser::GetStatueNameToLocationIDMap();
+	// The Rust generator tool converts locations.json into C++ static inline maps
+	// during the CMake build process. This eliminates runtime JSON parsing and
+	// external file dependencies.
 
 
 	// ============================================================
