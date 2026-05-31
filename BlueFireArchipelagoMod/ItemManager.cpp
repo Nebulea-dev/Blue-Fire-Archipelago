@@ -28,49 +28,43 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
         Output::send<LogLevel::Error>(STR("Item has an ID under the base ID of the game, cannot be mapped to a valid item\n"));
     }
 
-    // Emote
-    if(rebasedItemID < 100)
-    {
-        givePlayerEmote(rebasedItemID);
-        return;
-    }
+    uint16_t itemCategory = (rebasedItemID - (rebasedItemID % 100)) / 100;
+    Output::send<LogLevel::Error>(STR("Item {}/{} received with category {}\n"), itemID, rebasedItemID, itemCategory);
 
-    // Weapon
-    if(rebasedItemID < 200)
+    switch(itemCategory)
     {
-        givePlayerWeapon(rebasedItemID - 100);
-        return;
-    }
+        case 0:
+            givePlayerEmote(rebasedItemID);
+            break;
 
-    // Tunic
-    if(rebasedItemID < 300)
-    {
-        givePlayerTunic(rebasedItemID - 200);
-        return;
-    }
+        case 1:
+            givePlayerWeapon(rebasedItemID - 100);
+            break;
 
-    // Spirit
-    if(rebasedItemID < 400)
-    {
-        givePlayerSpirit(rebasedItemID - 300);
-        return;
-    }
+        case 2:
+            givePlayerTunic(rebasedItemID - 200);
+            break;
 
-    // Ability
-    if(rebasedItemID < 500)
-    {
-        givePlayerAbility(rebasedItemID - 400);
-        return;
-    }
+        case 3:
+            givePlayerSpirit(rebasedItemID - 300);
+            break;
 
-    // Regular Item
-    if(rebasedItemID < 600)
-    {
-        givePlayerItem(rebasedItemID - 500);
-        return;
-    }
+        case 4:
+            givePlayerAbility(rebasedItemID - 400);
+            break;
 
-    Output::send<LogLevel::Error>(STR("Item has an ID over the max ID of the game, cannot be mapped to a valid item\n"));
+        case 5:
+            givePlayerItem(rebasedItemID - 500);
+            break;
+
+        case 6:
+            givePlayerPassiveItem(rebasedItemID - 600);
+            break;
+
+        default:
+            Output::send<LogLevel::Error>(STR("Could not map item to a valid category of item\n"));
+            break;
+    }
 }
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
@@ -237,5 +231,123 @@ void ItemManager::givePlayerAbility(int abilityID)
 void ItemManager::givePlayerItem(int itemID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player item ID: {}\n"), itemID);
-    // TODO: Implement item giving logic
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+
+    // Get the "PlayerStats" property
+    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
+    if (!playerStatsProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
+        return;
+    }
+
+    // Get the "PlayerEquipment.Inventory_23_288399C5416269F828550FB7376E7942" property
+    auto playerStatsStruct = playerStatsProperty->GetStruct();
+    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory_23_288399C5416269F828550FB7376E7942"));
+    if (!inventoryProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Tunics_19_8878CF744AF2806994F2E48778F1CC2D property in PlayerStats\n"));
+        return;
+    }
+
+    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+
+    // Go through all items already in inventory, to stack it instead of creating a new item if possible
+    for(int32_t i = 0; i < inventory->Num(); i++)
+    {
+        inventoryItem item = (*inventory)[i];
+
+        // If the inventory item isn't of type "item"
+        if(item.type != 0)
+        {
+            Output::send<LogLevel::Verbose>(STR("Item is of type {}, skipping\n"), item.type);
+            continue;
+        }
+
+        // If not the correct item
+        if(item.item != itemID)
+        {
+            Output::send<LogLevel::Verbose>(STR("Item is of id {}, skipping\n"), item.item);
+            continue;
+        }
+
+        Output::send<LogLevel::Verbose>(STR("Found item in inventory, increasing quantity ..\n"), itemID);
+
+        item.amount += 1;
+        (*inventory)[i] = item;
+
+        return;
+    }
+
+    Output::send<LogLevel::Verbose>(STR("Item not found in inventory, creating it ..\n"), itemID);
+
+    // If item is not already in inventory, add it
+    inventoryItem newItem = {};
+    newItem.item = itemID;
+    newItem.amount = 1;
+    inventory->Push(newItem);
+}
+
+void ItemManager::givePlayerPassiveItem(int itemID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player passive item ID: {}\n"), itemID);
+
+        std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+
+    // Get the "PlayerStats" property
+    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
+    if (!playerStatsProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
+        return;
+    }
+
+    // Get the "PlayerEquipment.PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94" property
+    auto playerStatsStruct = playerStatsProperty->GetStruct();
+    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
+    if (!inventoryProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Tunics_19_8878CF744AF2806994F2E48778F1CC2D property in PlayerStats\n"));
+        return;
+    }
+
+    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+
+    // Go through all items already in inventory, to stack it instead of creating a new item if possible
+    for(int32_t i = 0; i < inventory->Num(); i++)
+    {
+        inventoryItem item = (*inventory)[i];
+
+        // If the inventory item isn't of type "item"
+        if(item.type != 0)
+        {
+            Output::send<LogLevel::Verbose>(STR("Item is of type {}, skipping\n"), item.type);
+            continue;
+        }
+
+        // If not the correct item
+        if(item.item != itemID)
+        {
+            Output::send<LogLevel::Verbose>(STR("Item is of id {}, skipping\n"), item.item);
+            continue;
+        }
+
+        Output::send<LogLevel::Verbose>(STR("Found item in inventory, increasing quantity ..\n"), itemID);
+
+        item.amount += 1;
+        (*inventory)[i] = item;
+
+        return;
+    }
+
+    Output::send<LogLevel::Verbose>(STR("Item not found in inventory, creating it ..\n"), itemID);
+
+    // If item is not already in inventory, add it
+    inventoryItem newItem = {};
+    newItem.item = itemID;
+    newItem.amount = 1;
+    inventory->Push(newItem);
 }

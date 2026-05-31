@@ -129,8 +129,33 @@ class ItemManager
 	 */
 	void givePlayerItem(int itemID);
 
+	/*******************************************************************************
+	 * @fn      givePlayerPassiveItem
+	 *
+	 * @brief   Give the player a passive item.
+	 *
+	 * @param   itemID - The item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerPassiveItem(int itemID);
+
 
 	private:
     FText* itemName;
     FText* itemDescription;
+};
+
+struct inventoryItem
+{
+	uint32_t item;
+	uint32_t amount;
+	uint32_t resets;
+	uint32_t originalAmount;
+	uint8_t type;
+	uint8_t tunic;
+	uint8_t weapon;
+	uint8_t spirit;
+	uint32_t price;
+	uint8_t ability;
 };
