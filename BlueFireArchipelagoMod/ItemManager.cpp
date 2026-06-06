@@ -78,6 +78,8 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+    return false;
+
     // Currently causes a crash for big blue chests (Chest_Master_Child_C) , no idea why.
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);

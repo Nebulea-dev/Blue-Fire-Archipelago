@@ -21,6 +21,8 @@ LocationManager::LocationManager()
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Pickup/Pickup.Pickup_C:Used"), OnItemPickup);
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Pickup/Pickup.Pickup_C:Remove"), OnItemPickupRemove);
 
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Spirit/Spirit.Spirit_C:Used"), OnSpiritPickup);
+
 	// Listen to object creation for EditableTextBox controls
 	// objectListener->registerObjectCallback(std::wstring(L"NewItem_C"), OnNewItemCreated);
 }
@@ -156,7 +158,6 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromStatueName(const std::
 
 bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-
 	// Get the path of the pickup
 	const std::wstring pickupName = Context->GetNamePrivate().ToString();
 
@@ -187,15 +188,19 @@ bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
+    return false;
+
 	// Set the chest content to the default sword
-	//*pickupType = 1; // Item type
-	//*pickupItem = 17; // Book
+	*pickupType = 1; // Item type
+	*pickupItem = 17; // Book
 
     return false;
 }
 
 bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+
+    return false;
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
 
     // Get the "PlayerStats" property
@@ -251,6 +256,39 @@ bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* 
 			return false;
 		}
     }
+
+    return false;
+}
+
+// ============== Spirit related methods ==============
+
+bool LocationManager::OnSpiritPickup(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+
+	// Get the path of the pickup
+	const std::wstring pickupName = Context->GetNamePrivate().ToString();
+
+	// Match the pickup name to a location ID and mark it as checked
+	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromPickupName(pickupName);
+	if (!locationID.has_value())
+	{
+		logIncorrectMapping(pickupName);
+		return false;
+	}
+
+	Output::send<LogLevel::Verbose>(STR("Pickup {} picked up, marking location ID {} as checked in Archipelago\n"), pickupName, locationID.value());
+	AP_SendItem(locationID.value());
+
+	// Get the Type parameter
+	uint8_t* spiritType = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Amulet");
+	if(!spiritType)
+	{
+        Output::send<LogLevel::Error>(STR("Could not find the Amulet parameter of the picked up spirit\n"));
+		return false;
+	}
+
+	// Set the spirit type to an unused spirit
+	*spiritType = 5;
 
     return false;
 }

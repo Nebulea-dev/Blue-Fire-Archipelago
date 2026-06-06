@@ -24,6 +24,8 @@ public:
     static bool OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool OnItemPickupRemove(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
+    static bool OnSpiritPickup(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
 
 private:
     static void OnNewItemCreated(const UObjectBase* object, int32 index);

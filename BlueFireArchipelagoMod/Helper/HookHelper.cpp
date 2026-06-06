@@ -15,7 +15,7 @@ HookHelper::HookHelper()
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
-        if(objectName.find(STR("Collectibles")) != std::string::npos)
+        if(objectName.find(STR("BP_BeiraVesselBase_C")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
         {
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
