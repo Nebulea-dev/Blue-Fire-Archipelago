@@ -135,10 +135,10 @@ namespace ArchipelagoModConfig
 		constexpr uint8_t FILL_EMPTY_SPACE = 0x1;
 
 		// Key item type
-		constexpr uint8_t KEY_ITEM_TYPE = 0x1;
+		constexpr uint8_t KEY_ITEM_TYPE = 0x0;
 
 		// Item amount
-		constexpr uint32_t ITEM_AMOUNT = 0xF;
+		constexpr uint32_t ITEM_AMOUNT = 0x1;
 	}
 
 	// ============================================================

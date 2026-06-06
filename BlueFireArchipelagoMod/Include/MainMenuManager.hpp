@@ -27,27 +27,15 @@ class MainMenuManager
 	/*******************************************************************************
 	 * @fn      MainMenuManager
 	 *
-	 * @brief   Constructor - initializes menu state.
-	 *
-	 * @return  none
-	 */
-	MainMenuManager();
-
-	/*******************************************************************************
-	 * @fn      Init
-	 *
-	 * @brief   Initialize the menu system - register all hooks and callbacks.
+	 * @brief   Constructor - initializes menu hooks and callbacks.
 	 *
 	 *          Registers menu navigation hooks (UP_KEY, DOWN_KEY) and object
 	 *          creation callbacks (EditableTextBox). Must be called after
 	 *          HookHelper is initialized.
 	 *
-	 * @param   hookManager     - HookHelper instance for registering hooks
-	 * @param   objectListener  - ObjectCreateListener for registering object callbacks
-	 *
 	 * @return  none
 	 */
-	void Init(HookHelper* hookManager, ObjectCreateListener* objectListener);
+	MainMenuManager();
 
 	// ============================================================
 	// Menu Navigation - Handle user input and menu navigation

@@ -39,21 +39,14 @@ void BlueFireArchipelagoMod::on_unreal_init()
     Output::send<LogLevel::Verbose>(STR("BlueFireArchipelagoMod says hello from on_unreal_init ♥\n"));
 
     // Create and initialize all manager instances
-    mainMenuManager = new MainMenuManager();
+    objectListener = new ObjectCreateListener();
     hookManager = new HookHelper();
     itemManager = new ItemManager();
     arcManager = new ArchipelagoManager();
     locationManager = new LocationManager();
-
-    // Initialize managers that have initialization logic
-    hookManager->Init();
-    arcManager->init();
+    mainMenuManager = new MainMenuManager();
 
     Output::send<LogLevel::Verbose>(STR("All managers initialized\n"));
-
-    // Listen to object creation for ItemManager
-    UObjectArray::AddUObjectCreateListener(&ObjectCreateListener);
-    ObjectCreateListener.registerObjectCallback(std::wstring(L"NewItem_C"), ObjectCreatedNewItem);
 
     // Hook the RETURN key for menu submission
     register_keydown_event(Input::Key::RETURN, {}, [this]() {
@@ -63,31 +56,11 @@ void BlueFireArchipelagoMod::on_unreal_init()
         }
     });
 
+    // TODO : remove this
     register_keydown_event(Input::Key::F5, {}, [this]() {
         if (itemManager)
         {
-            itemManager->itemReceiveCb(Archipelago::BF_BASE_ID + 520, false);
+            itemManager->itemReceiveCb(Archipelago::BF_BASE_ID + 522, false);
         }
     });
-
-    // Initialize MainMenuManager hooks and callbacks
-    locationManager->Init(hookManager, &ObjectCreateListener);
-    mainMenuManager->Init(hookManager, &ObjectCreateListener);
-
-    // Register the ItemManager hook
-    // TODO : Move to a NewItemDisplay class
-    hookManager->registerPreHook(Hooks::PLAY_NEW_ITEM, [](UObject* Context, FFrame& Stack, void* RESULT_DECL) {
-        if (BlueFireArchipelagoMod::itemManager)
-        {
-            return BlueFireArchipelagoMod::itemManager->PlayNewItemPreHook(Context, Stack, RESULT_DECL);
-        }
-        return false;
-    });
-}
-
-void BlueFireArchipelagoMod::ObjectCreatedNewItem(const UObjectBase* object, int32 index)
-{
-    // Called when a NewItem_C object is created
-    // This is where we could hook into item creation if needed
-    Output::send<LogLevel::Verbose>(STR("NewItem_C object created\n"));
 }

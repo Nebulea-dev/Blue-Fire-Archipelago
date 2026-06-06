@@ -14,16 +14,11 @@ using namespace ArchipelagoModConfig;
 
 ArchipelagoManager::ArchipelagoManager()
 {
-	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
-}
-
-void ArchipelagoManager::init()
-{
 	AP_SetItemClearCallback(StaticItemClearCallback);
 	AP_SetItemRecvCallback(StaticItemReceiveCallback);
 	AP_SetLocationCheckedCallback(StaticLocationCheckCallback);
 
-	Output::send<LogLevel::Verbose>(STR("Archipelago callbacks set\n"));
+	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
 }
 
 void ArchipelagoManager::StaticItemClearCallback()

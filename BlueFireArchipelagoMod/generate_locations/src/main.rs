@@ -6,9 +6,7 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize)]
 struct Location {
     name: String,
-    #[serde(default)]
-    #[serde(skip_serializing_if = "String::is_empty")]
-    chestName: String,
+    objectName: String,
 }
 
 #[allow(non_snake_case)]
@@ -20,8 +18,8 @@ struct Subregion {
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
-struct Region {
-    name: String,
+struct Item {
+    region: String,
     #[serde(default)]
     subregions: Vec<Subregion>,
     #[serde(default)]
@@ -30,15 +28,10 @@ struct Region {
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
-struct Statue {
-    name: String,
-    objectName: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 struct LocationsJson {
-    regions: Vec<Region>,
-    statues: Vec<Statue>,
+    chests: Vec<Item>,
+    statues: Vec<Item>,
+    pickups: Vec<Item>,
 }
 
 fn escape_string(s: &str) -> String {
@@ -47,6 +40,35 @@ fn escape_string(s: &str) -> String {
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\t', "\\t")
+}
+
+fn add_locations(locations: &[Item], location_id: &mut u32, header: &mut String) {
+    for region in locations {
+        // Skip the "Menu" and "Victory" regions since they don't have any locations
+        if region.region == "Menu" || region.region == "Victory" {
+            continue;
+        }
+
+        // Add subregions
+        for subregion in &region.subregions {
+            for location in &subregion.locations {
+                if !location.objectName.is_empty() {
+                    let escaped_name = escape_string(&location.objectName);
+                    header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                }
+                *location_id += 1;
+            }
+        }
+
+        // Add direct locations
+        for location in &region.locations {
+            if !location.objectName.is_empty() {
+                let escaped_name = escape_string(&location.objectName);
+                header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+            }
+            *location_id += 1;
+        }
+    }
 }
 
 fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
@@ -88,47 +110,39 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_statueNameToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
+    header.push_str("    /**\n");
+    header.push_str("     * Get the pickup name to location ID map\n");
+    header.push_str("     * @return A map of pickup names to location IDs\n");
+    header.push_str("     */\n");
+    header.push_str("    static const std::map<std::wstring, uint32_t>& GetPickupNameToLocationIDMap()\n");
+    header.push_str("    {\n");
+    header.push_str("        return s_pickupNameToLocationID;\n");
+    header.push_str("    }\n");
+    header.push_str("\n");
     header.push_str("private:\n");
-    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {\n");
 
     let mut location_id: u32 = 0;
 
-    // Add locations from regions
-    for region in &data.regions {
-        // Add subregions
-        for subregion in &region.subregions {
-            for location in &subregion.locations {
-                if !location.chestName.is_empty() {
-                    let escaped_name = escape_string(&location.chestName);
-                    header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
-                }
-                location_id += 1;
-            }
-        }
 
-        // Add direct locations
-        for location in &region.locations {
-            if !location.chestName.is_empty() {
-                let escaped_name = escape_string(&location.chestName);
-                header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
-            }
-            location_id += 1;
-        }
-    }
+    // Add chest locations
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {\n");
+    add_locations(&data.chests, &mut location_id, &mut header);
+    header.push_str("    };\n\n");
 
-    header.push_str("    };\n");
-    header.push_str("\n");
+    // Add statue locations
     header.push_str("    static inline const std::map<std::wstring, uint32_t> s_statueNameToLocationID = {\n");
+    add_locations(&data.statues, &mut location_id, &mut header);
+    header.push_str("    };\n\n");
 
-    // Add statues
-    for statue in &data.statues {
-        let escaped_name = escape_string(&statue.objectName);
-        header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
-        location_id += 1;
-    }
-
+    // Add pickup locations
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_pickupNameToLocationID = {\n");
+    add_locations(&data.pickups, &mut location_id, &mut header);
     header.push_str("    };\n");
+
+
+    // Close the class declaration
     header.push_str("};\n");
+
 
     // Create output directory if it doesn't exist
     if let Some(parent) = output_path.parent() {

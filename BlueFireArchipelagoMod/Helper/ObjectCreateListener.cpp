@@ -6,6 +6,12 @@
 using namespace RC;
 using namespace Unreal;
 
+ObjectCreateListener::ObjectCreateListener()
+{
+	UObjectArray::AddUObjectCreateListener(this);
+	Output::send<LogLevel::Verbose>(STR("ObjectCreateListener initialized\n"));
+}
+
 void ObjectCreateListener::NotifyUObjectCreated(const UObjectBase* object, int32 index)
 {
 	// Get name of the object that was created

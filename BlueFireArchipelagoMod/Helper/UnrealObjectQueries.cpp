@@ -5,6 +5,7 @@
 std::optional<UObject*> UnrealObjectQueries::FindArchipelagoTextbox(std::wstring_view boxName)
 {
 	return FindWidget(L"EditableTextBox", STR("EditableTextBox /Engine/"), boxName);
+
 }
 
 std::optional<UObject*> UnrealObjectQueries::FindGameMenuController()

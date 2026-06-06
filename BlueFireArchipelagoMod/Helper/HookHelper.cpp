@@ -10,20 +10,14 @@ using namespace Unreal;
 HookHelper::HookHelper()
     : prehooksRegistered(), posthooksRegistered(), functionsToExecuteInGameThread()
 {
-    Output::send<LogLevel::Verbose>(STR("HookHelper instance created\n"));
-}
-
-void HookHelper::Init()
-{
     Hook::RegisterProcessLocalScriptFunctionPreCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
     {
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
-        if(objectName.find(STR("Ubergraph")) == std::string::npos &&
-           objectName.find(STR("InputAxis")) == std::string::npos)
+        if(objectName.find(STR("Collectibles")) != std::string::npos)
         {
-            // Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
 
         // Find in the Map the object with the right name
@@ -64,6 +58,8 @@ void HookHelper::Init()
             CallbackIterationData.PreventOriginalFunctionCall();
         }
     }, { false, false, STR("NebuleasMod"), STR("NebuleasPostHookWrapper") });
+
+    Output::send<LogLevel::Verbose>(STR("HookHelper instance created\n"));
 }
 
 bool HookHelper::registerPreHook(std::wstring objectName, HookFunctionSignature callback)

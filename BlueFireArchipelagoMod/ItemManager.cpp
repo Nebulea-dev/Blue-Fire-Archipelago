@@ -5,8 +5,9 @@
 #include <Helper/ObjectFinder.hpp>
 #include <Helper/HookHelper.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
-#include <ItemManager.hpp>
+#include <BlueFireArchipelagoMod.hpp>
 #include <ArchipelagoModConfig.hpp>
+#include <ItemManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -18,6 +19,15 @@ ItemManager::ItemManager()
 
     itemName = new FText(Strings::ITEM_NAME);
     itemDescription = new FText(Strings::ITEM_DESCRIPTION);
+
+    // Register the ItemManager hook
+    BlueFireArchipelagoMod::hookManager->registerPreHook(Hooks::PLAY_NEW_ITEM, [](UObject* Context, FFrame& Stack, void* RESULT_DECL) {
+        if (BlueFireArchipelagoMod::itemManager)
+        {
+            return BlueFireArchipelagoMod::itemManager->PlayNewItemPreHook(Context, Stack, RESULT_DECL);
+        }
+        return false;
+    });
 }
 
 void ItemManager::itemReceiveCb(int itemID, bool notify)
@@ -29,7 +39,6 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
     }
 
     uint16_t itemCategory = (rebasedItemID - (rebasedItemID % 100)) / 100;
-    Output::send<LogLevel::Error>(STR("Item {}/{} received with category {}\n"), itemID, rebasedItemID, itemCategory);
 
     switch(itemCategory)
     {
@@ -69,14 +78,11 @@ void ItemManager::itemReceiveCb(int itemID, bool notify)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-    // Do not prevent the original function from being called
-    return false;
-
     // Currently causes a crash for big blue chests (Chest_Master_Child_C) , no idea why.
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
     HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
     HookHelper::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
-    HookHelper::setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
+    BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
 
     // Do not prevent the original function from being called
     return false;
@@ -248,7 +254,7 @@ void ItemManager::givePlayerItem(int itemID)
     FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory_23_288399C5416269F828550FB7376E7942"));
     if (!inventoryProperty)
     {
-        Output::send<LogLevel::Error>(STR("Could not find Tunics_19_8878CF744AF2806994F2E48778F1CC2D property in PlayerStats\n"));
+        Output::send<LogLevel::Error>(STR("Could not find Inventory_23_288399C5416269F828550FB7376E7942 property in PlayerStats\n"));
         return;
     }
 
@@ -324,26 +330,20 @@ void ItemManager::givePlayerPassiveItem(int itemID)
         // If the inventory item isn't of type "item"
         if(item.type != 0)
         {
-            Output::send<LogLevel::Verbose>(STR("Item is of type {}, skipping\n"), item.type);
             continue;
         }
 
         // If not the correct item
         if(item.item != itemID)
         {
-            Output::send<LogLevel::Verbose>(STR("Item is of id {}, skipping\n"), item.item);
             continue;
         }
-
-        Output::send<LogLevel::Verbose>(STR("Found item in inventory, increasing quantity ..\n"), itemID);
 
         item.amount += 1;
         (*inventory)[i] = item;
 
         return;
     }
-
-    Output::send<LogLevel::Verbose>(STR("Item not found in inventory, creating it ..\n"), itemID);
 
     // If item is not already in inventory, add it
     inventoryItem newItem = {};

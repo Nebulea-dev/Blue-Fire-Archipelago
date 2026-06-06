@@ -18,6 +18,9 @@ using ProcessLocalScriptFunctionSignature = void(*)(const UObjectBase* object, i
  */
 struct ObjectCreateListener : public FUObjectCreateListener {
 public:
+    // TODO : add documentation
+    ObjectCreateListener();
+
     /*******************************************************************************
      * @fn      registerObjectCallback
      *

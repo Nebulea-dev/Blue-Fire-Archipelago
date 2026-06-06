@@ -24,15 +24,6 @@ class ArchipelagoManager
 	 *
 	 * @brief   Constructor - initializes Archipelago manager state.
 	 *
-	 * @return  none
-	 */
-	ArchipelagoManager();
-
-	/*******************************************************************************
-	 * @fn      init
-	 *
-	 * @brief   Initialize the Archipelago event system.
-	 *
 	 *          Registers all event callbacks with the Archipelago library
 	 *          (item receive, item clear, location check). Must be called
 	 *          once during mod initialization before any server connections
@@ -40,7 +31,7 @@ class ArchipelagoManager
 	 *
 	 * @return  none
 	 */
-	void init();
+	ArchipelagoManager();
 
 	/*******************************************************************************
 	 * @fn      connectToArchipelagoServer

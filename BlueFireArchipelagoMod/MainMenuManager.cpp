@@ -2,14 +2,14 @@
 #include <Unreal/Hooks.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
 
-#include <MainMenuManager.hpp>
 #include <Helper/HookHelper.hpp>
 #include <Helper/ObjectCreateListener.hpp>
 #include <Helper/ObjectFinder.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
+#include <MainMenuManager.hpp>
 #include <ArchipelagoManager.hpp>
 #include <ArchipelagoModConfig.hpp>
-#include <BlueFireArchipelagoMod.hpp>  // For mainMenuManager static pointer
+#include <BlueFireArchipelagoMod.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -18,30 +18,24 @@ using namespace ArchipelagoModConfig;
 MainMenuManager::MainMenuManager()
 	: bMenuTextboxesCreated(false), menuFocusIndex(0)
 {
-	Output::send<LogLevel::Verbose>(STR("MainMenuManager instance created\n"));
-}
-
-void MainMenuManager::Init(HookHelper* hookManager, ObjectCreateListener* objectListener)
-{
-	if (!hookManager || !objectListener)
+	if (!BlueFireArchipelagoMod::hookManager || !BlueFireArchipelagoMod::objectListener)
 	{
 		Output::send<LogLevel::Error>(STR("MainMenuManager::Init - Invalid hookManager or objectListener\n"));
 		return;
 	}
 
-	Output::send<LogLevel::Verbose>(STR("Initializing MainMenuManager hooks and callbacks\n"));
-
 	// Listen to object creation for EditableTextBox controls
-	objectListener->registerObjectCallback(std::wstring(L"EditableTextBox"), OnEditableTextBoxCreated);
+	BlueFireArchipelagoMod::objectListener->registerObjectCallback(std::wstring(L"EditableTextBox"), OnEditableTextBoxCreated);
 
 	// Register menu navigation hooks
-	hookManager->registerPreHook(Hooks::UP_KEY, UpKeyHook);
-	hookManager->registerPreHook(Hooks::DOWN_KEY, DownKeyHook);
-	hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame", StartGameHook);
-	hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenu.GameMenu_C:CancelWrite", CancelWriteHook);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(Hooks::UP_KEY, UpKeyHook);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(Hooks::DOWN_KEY, DownKeyHook);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame", StartGameHook);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenu.GameMenu_C:CancelWrite", CancelWriteHook);
 
-	Output::send<LogLevel::Verbose>(STR("MainMenuManager initialization complete\n"));
+	Output::send<LogLevel::Verbose>(STR("MainMenuManager instance created\n"));
 }
+
 
 bool MainMenuManager::UpdateMenuFocus()
 {
@@ -53,18 +47,21 @@ bool MainMenuManager::UpdateMenuFocus()
     std::optional<UObject*> IPEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_IP);
     if (!IPEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the IP textbox\n"));
         return false;
     }
 
     std::optional<UObject*> UsernameEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_USERNAME);
     if (!UsernameEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the username textbox\n"));
         return false;
     }
 
     std::optional<UObject*> PasswordEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_PASSWORD);
     if (!PasswordEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the password textbox\n"));
         return false;
     }
 
@@ -405,6 +402,7 @@ void MainMenuManager::DeleteOriginalTextbox()
 	std::optional<UObject*> editableTextBoxOriginal = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::ORIGINAL_TEXTBOX_NAME);
 	if (!editableTextBoxOriginal.has_value())
 	{
+	    Output::send<LogLevel::Error>(STR("Could not find original EditableTextBox to delete them\n"));
 		return;
 	}
 
@@ -553,18 +551,21 @@ void MainMenuManager::SubmitMenuConnection()
     std::optional<UObject*> IPEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_IP);
     if (!IPEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the IP textbox\n"));
         return;
     }
 
     std::optional<UObject*> UsernameEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_USERNAME);
     if (!UsernameEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the username textbox\n"));
         return;
     }
 
     std::optional<UObject*> PasswordEditableTextBox = UnrealObjectQueries::FindArchipelagoTextbox(GameObjects::TEXTBOX_PASSWORD);
     if (!PasswordEditableTextBox.has_value())
     {
+        Output::send<LogLevel::Error>(STR("Could not find the password textbox\n"));
         return;
     }
 

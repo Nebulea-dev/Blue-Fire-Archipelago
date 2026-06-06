@@ -35,7 +35,7 @@ class BlueFireArchipelagoMod : public RC::CppUserModBase
 {
 public:
 	/// Object creation listener for detecting Unreal object instantiation
-	static inline ObjectCreateListener ObjectCreateListener{};
+	static inline ObjectCreateListener* objectListener = nullptr;
 
 	/// Menu manager instance - handles UI creation and navigation
 	static inline MainMenuManager* mainMenuManager = nullptr;

@@ -26,23 +26,14 @@ public:
     /*******************************************************************************
      * @fn      HookHelper
      *
-     * @brief   Constructor - initializes the hook helper state.
-     *
-     * @return  none
-     */
-    HookHelper();
-
-    /*******************************************************************************
-     * @fn      Init
-     *
-     * @brief   Initialize the Unreal Engine hooks infrastructure.
+     * @brief   Constructor - initializes the hook helper infrastructure.
      *
      *          Must be called after Unreal has initialized and before any
      *          hooks are registered.
      *
      * @return  none
      */
-    void Init();
+    HookHelper();
 
     /*******************************************************************************
      * @fn      registerPreHook

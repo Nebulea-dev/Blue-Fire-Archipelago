@@ -31,6 +31,15 @@ public:
         return s_statueNameToLocationID;
     }
 
+    /**
+     * Get the pickup name to location ID map
+     * @return A map of pickup names to location IDs
+     */
+    static const std::map<std::wstring, uint32_t>& GetPickupNameToLocationIDMap()
+    {
+        return s_pickupNameToLocationID;
+    }
+
 private:
     static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {
         {L"Chest_A01_Keep_Shield", 0},
@@ -78,9 +87,26 @@ private:
         {L"Chest_A01_TempleGardens_Sword_SilverBlades", 42},
         {L"Chest_A01_Nuos_Key_02", 43},
         {L"Chest_A01_Nuos_MasterKey", 44},
+        {L"Chest_A02_Tunic_HolyAttire", 45},
+        {L"Chest_A01_Graveyard_Loot_01", 46},
+        {L"Chest_A01_Graveyard_Loot_02", 47},
+        {L"Chest_A01_Graveyard_Loot_03", 48},
+        {L"Chest_A01_Graveyard_IceDestroyers", 49},
     };
 
     static inline const std::map<std::wstring, uint32_t> s_statueNameToLocationID = {
-        {L"A02_Arcane_EmoteStatue_Windmill", 46},
+        {L"A02_Arcane_EmoteStatue_Windmill", 50},
+    };
+
+    static inline const std::map<std::wstring, uint32_t> s_pickupNameToLocationID = {
+        {L"Pickup_Rose", 51},
+        {L"Pickup_Rose2", 52},
+        {L"Pickup_Necklace", 53},
+        {L"Pickup_BremurPicture", 54},
+        {L"Pickup_Book", 55},
+        {L"Pickup_Book2", 56},
+        {L"Pickup_Book3", 57},
+        {L"Pickup_Book4", 58},
+        {L"Pickup_Book5", 59},
     };
 };
