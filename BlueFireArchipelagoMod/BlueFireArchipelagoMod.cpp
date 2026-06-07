@@ -60,7 +60,7 @@ void BlueFireArchipelagoMod::on_unreal_init()
     register_keydown_event(Input::Key::F5, {}, [this]() {
         if (itemManager)
         {
-            itemManager->itemReceiveCb(Archipelago::BF_BASE_ID + 522, false);
+            itemManager->itemReceiveCb(Archipelago::BF_BASE_ID + 311, false);
         }
     });
 }

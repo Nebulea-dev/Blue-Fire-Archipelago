@@ -1,9 +1,7 @@
 {
   "chests": [
     {
-      "region": "Menu",
-      "subregions": [],
-      "locations": []
+      "region": "Menu"
     },
     {
       "region": "Fire Keep",
@@ -137,61 +135,102 @@
     },
     {
       "region": "Stoneheart City",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "Pure Shadow chest",
-          "objectName": "Chest_A02_Tunic_PureShadow"
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Stoneheart chest 3",
+              "objectName": "Chest_A01_Stoneheart_Loot_03"
+            },
+            {
+              "name": "Stoneheart chest 2",
+              "objectName": "Chest_A01_Stoneheart_Loot_02"
+            },
+            {
+              "name": "Stoneheart chest 4",
+              "objectName": "Chest_A01_Stoneheart_Loot_3"
+            },
+            {
+              "name": "Merchants Robe chest",
+              "objectName": "Chest_A01_Stoneheart_Tunic_MerchantsRobe"
+            },
+            {
+              "name": "Graveyard key chest 1",
+              "objectName": "Chest_Master_A01_StoneheartCity_GraveyardKey"
+            },
+            {
+              "name": "Graveyard key chest 2",
+              "objectName": "Chest_Master_A01_StoneheartCity_GraveyardKey2"
+            }
+          ]
         },
         {
-          "name": "Stoneheart chest 3",
-          "objectName": "Chest_A01_Stoneheart_Loot_03"
+          "name": "Top",
+          "locations": [
+            {
+              "name": "Chest",
+              "objectName": "Chest_A01_Stoneheart_Loot_01"
+            }
+          ]
         },
         {
-          "name": "Stoneheart chest 1",
-          "objectName": "Chest_A01_Stoneheart_Loot_01"
-        },
+          "name": "Void Gate",
+          "locations": [
+            {
+              "name": "chest",
+              "objectName": "Chest_Master_Loot_04_V2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Water Ways",
+      "subregions": [
         {
-          "name": "Stoneheart chest 2",
-          "objectName": "Chest_A01_Stoneheart_Loot_02"
-        },
-        {
-          "name": "Stoneheart chest 4",
-          "objectName": "Chest_A01_Stoneheart_Loot_3"
-        },
-        {
-          "name": "Merchants Robe chest",
-          "objectName": "Chest_A01_Stoneheart_Tunic_MerchantsRobe"
-        },
-        {
-          "name": "Graveyard key chest 1",
-          "objectName": "Chest_Master_A01_StoneheartCity_GraveyardKey"
-        },
-        {
-          "name": "Graveyard key chest 2",
-          "objectName": "Chest_Master_A01_StoneheartCity_GraveyardKey2"
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Pure Shadow chest",
+              "objectName": "Chest_A02_Tunic_PureShadow"
+            }
+          ]
         }
       ]
     },
     {
       "region": "Crossroads",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "Well Loot Chest 3",
-          "objectName": "Chest_A01_CrossRoads_Loot_3"
+          "name": "Left Area",
+          "locations": [
+            {
+              "name": "Stairs Chest",
+              "objectName": "Chest_A01_CrossRoads_Loot_03"
+            },
+            {
+              "name": "Ambush Chest",
+              "objectName": "Chest_A01_Well_SpinAttack"
+            }
+          ]
         },
         {
-          "name": "Loot Chest 1",
-          "objectName": "Chest_A01_CrossRoads_Loot_01"
-        },
-        {
-          "name": "Loot chest 2",
-          "objectName": "Chest_A01_CrossRoads_Loot_02"
-        },
-        {
-          "name": "Loot Chest 3",
-          "objectName": "Chest_A01_CrossRoads_Loot_03"
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Well Loot Chest 3",
+              "objectName": "Chest_A01_CrossRoads_Loot_3"
+            },
+            {
+              "name": "Bottom Chest",
+              "objectName": "Chest_A01_CrossRoads_Loot_01"
+            },
+            {
+              "name": "Loot chest 2",
+              "objectName": "Chest_A01_CrossRoads_Loot_02"
+            }
+          ]
         }
       ]
     },
@@ -445,6 +484,80 @@
             {
               "name": "Fourth Floor Right Chest",
               "objectName": "Chest_A01_TempleGardens_Loot_06"
+            },
+            {
+              "name": "Fourth Floor Left Chest",
+              "objectName": "Chest_A01_TempleGardens_Loot_05"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Firefall River",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Right Chest",
+              "objectName": "Chest_A06_River_Loot_01"
+            },
+            {
+              "name": "Spirit Hunter Chest",
+              "objectName": "Chest_A06_River_Loot_03"
+            },
+            {
+              "name": "The Alchemist Void Gate Chest 1",
+              "objectName": "Chest_Master_Void_Santi_03"
+            },
+            {
+              "name": "The Alchemist Void Gate Chest 2",
+              "objectName": "Chest_Master_Void_Santi_02"
+            },
+            {
+              "name": "Beira Vessel Chest",
+              "objectName": "Chest_A06_Lake_Loot_01_0"
+            },
+            {
+              "name": "Steam House Entrance Chest",
+              "objectName": "Chest_A06_Lake_Loot_03"
+            }
+          ]
+        },
+        {
+          "name": "Party Dance",
+          "locations": [
+            {
+              "name": "Chest",
+              "objectName": "Dance_Platform_Party_Chest_Spirit_HammerKing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Rust Village",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": []
+        },
+        {
+          "name": "Aggressive Dance",
+          "locations": [
+            {
+              "name": "Chest",
+              "objectName": "Dance_Platform_Aggresive_Chest"
+            }
+          ]
+        },
+        {
+          "name": "No Dance",
+          "locations": [
+            {
+              "name": "Chest",
+              "objectName": "Dance_Platform_No_Chest"
             }
           ]
         }
@@ -452,41 +565,85 @@
     },
     {
       "region": "Victory",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
           "name": "Victory",
-          "objectName": ""
+          "locations": [
+            {
+              "name": "Victory",
+              "objectName": ""
+            }
+          ]
         }
       ]
     }
   ],
   "statues": [
     {
+      "region": "Fire Keep",
+      "subregions": [
+        {
+          "name": "Hub",
+          "locations": [
+            {
+              "name": "Levitation Emote Statue",
+              "objectName": "A01_FireKeep_EmoteStatue_Levitation"
+            },
+            {
+              "name": "Techno Emote Statue",
+              "objectName": "A01_FireKeep_EmoteStatue_Techno"
+            },
+            {
+              "name": "Celebration Emote Statue",
+              "objectName": "A02_FireKeep_EmoteStatue_Celebration"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "region": "Arcane Tunnels",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "Windmill Emote Statue",
-          "objectName": "A02_Arcane_EmoteStatue_Windmill"
-        },
+          "name": "Main Room",
+          "locations": [
+            {
+              "name": "Windmill Emote Statue",
+              "objectName": "A02_Arcane_EmoteStatue_Windmill"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Water Ways",
+      "subregions": [
         {
-          "name": "Water Way Emote Statue",
-          "objectName": "A02_Arcane_EmoteStatue_HatKid"
+          "name": "Stoneheart Entrance",
+          "locations": [
+            {
+              "name": "Hat Kid Emote Statue",
+              "objectName": "A02_Arcane_EmoteStatue_HatKid"
+            }
+          ]
         }
       ]
     },
     {
       "region": "Abandoned Path",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "No Emote Statue",
-          "objectName": "A01_Graveyard_EmoteStatue_No"
-        },
-        {
-          "name": "Graveyard key chest 1",
-          "objectName": "A01_Graveyard_EmoteStatue_Aggressive"
+          "name": "Entrance",
+          "locations": [
+            {
+              "name": "No Emote Statue",
+              "objectName": "A01_Graveyard_EmoteStatue_No"
+            },
+            {
+              "name": "Aggressive Emote Statue",
+              "objectName": "A01_Graveyard_EmoteStatue_Aggressive"
+            }
+          ]
         }
       ]
     },
@@ -503,6 +660,38 @@
             {
               "name": "Tower Left Side Emote Statue",
               "objectName": "A01_Uthas_EmoteStatue_Party"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Firefall River",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Kungu Fu Emote Statue",
+              "objectName": "A06_Firefall_EmoteStatue_KungFu"
+            },
+            {
+              "name": "Triceps Emote Statue",
+              "objectName": "A06_Firefall_EmoteStatue_Triceps"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Rust Village",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Applause Emote Statue",
+              "objectName": "A06_RustCity_EmoteStatue_Applause"
             }
           ]
         }
@@ -526,74 +715,241 @@
     },
     {
       "region": "Abandoned Path",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "Rose 1",
-          "objectName": "Pickup_Rose"
-        },
-        {
-          "name": "Rose 2",
-          "objectName": "Pickup_Rose2"
-        },
-        {
-          "name": "Necklace",
-          "objectName": "Pickup_Necklace"
-        },
-        {
-          "name": "Breemur Picture",
-          "objectName": "Pickup_BremurPicture"
+          "name": "Entrance",
+          "locations": [
+            {
+              "name": "Rose 1",
+              "objectName": "Pickup_Rose"
+            },
+            {
+              "name": "Rose 2",
+              "objectName": "Pickup_Rose2"
+            },
+            {
+              "name": "Necklace",
+              "objectName": "Pickup_Necklace"
+            },
+            {
+              "name": "Breemur Picture",
+              "objectName": "Pickup_BremurPicture"
+            }
+          ]
         }
       ]
     },
     {
       "region": "Stoneheart City",
-      "subregions": [],
-      "locations": [
+      "subregions": [
         {
-          "name": "Books 1",
-          "objectName": "Pickup_Book"
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Books 1",
+              "objectName": "Pickup_Book"
+            },
+            {
+              "name": "Books 2",
+              "objectName": "Pickup_Book2"
+            },
+            {
+              "name": "Books 3",
+              "objectName": "Pickup_Book3"
+            },
+            {
+              "name": "Books 4",
+              "objectName": "Pickup_Book4"
+            }
+          ]
         },
         {
-          "name": "Books 2",
-          "objectName": "Pickup_Book2"
+          "name": "Boy's Room",
+          "locations": [
+            {
+              "name": "Spirit",
+              "objectName": "Spirit_A01_FarasGrace"
+            }
+          ]
         },
         {
-          "name": "Books 3",
-          "objectName": "Pickup_Book3"
-        },
-        {
-          "name": "Books 4",
-          "objectName": "Pickup_Book4"
-        },
-        {
-          "name": "Books 5",
-          "objectName": "Pickup_Book5"
+          "name": "Top",
+          "locations": [
+            {
+              "name": "Books 5",
+              "objectName": "Pickup_Book5"
+            }
+          ]
         }
       ]
     },
     {
       "region": "Uthas Temple",
-      "locations": [
+      "subregions": [
         {
-          "name": "Entrance Spirit",
-          "objectName": "TODO"
+          "name": "Top of Entrance",
+          "locations": [
+            {
+              "name": "Entrance Spirit",
+              "objectName": "TODO"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Abandoned Path",
+      "subregions": [
+        {
+          "name": "Beira's Room",
+          "locations": [
+            {
+              "name": "Spirit",
+              "objectName": "Spirit_A01_AngryAmbusher"
+            }
+          ]
         }
       ]
     }
   ],
   "void_gates": [
     {
-      "region": "Abandoned Path",
-      "subregions": [],
-      "locations": [
+      "region": "Fire Keep",
+      "subregions": [
         {
-          "name": "Fall of Death Void Gate",
-          "objectName": "Void_Gate_Mariano"
+          "name": "Hub",
+          "locations": [
+            {
+              "name": "Grace of Lula Void Gate",
+              "objectName": "Void_Gate_Matias"
+            },
+            {
+              "name": "Umbert's Secret Void Gate",
+              "objectName": "Void_Gate_Ricardo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Abandoned Path",
+      "subregions": [
+          {
+            "name": "Main Room",
+            "locations": [
+              {
+                "name": "Fall of Death Void Gate",
+                "objectName": "Void_Gate_Mariano"
+              },
+              {
+                "name": "Luis Void Gate",
+                "objectName": "Void_Gate_Luis"
+              }
+            ]
+          },
+          {
+            "name": "Beira's Room",
+            "locations": [
+              {
+                "name": "Gerardo's Anger Void Gate",
+                "objectName": "Void_Gate_Gerardo"
+              }
+            ]
+          }
+      ]
+    },
+    {
+      "region": "Arcane Tunnels",
+      "subregions": [
+        {
+          "name": "Main Room",
+          "locations": [
+            {
+              "name": "Path of Victory Void Gate",
+              "objectName": "Void_Gate_Paul"
+            },
+            {
+              "name": "Fara's Dream Void Gate",
+              "objectName": "Void_Gate_Esteban"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Stoneheart City",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Ura's Glide Void Gate",
+              "objectName": "Void_Gate_Rail"
+            }
+          ]
         },
         {
-          "name": "??",
-          "objectName": "Void_Gate_Luis"
+          "name": "Bottom Corridor",
+          "locations": [
+            {
+              "name": "Borisa's Fate Void Gate",
+              "objectName": "Void_Gate_04_V2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Temple Gardens",
+      "subregions": [
+        {
+          "name": "Entrance",
+          "locations": [
+            {
+              "name": "Goerbord's Piece Void Gate",
+              "objectName": "Void_Gate_Julian"
+            },
+            {
+              "name": "Julian's Song Void Gate",
+              "objectName": "Void_Gate_Flauta"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Firefall River",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Oriane's Saw Void Gate",
+              "objectName": "Void_Gate_Saw"
+            },
+            {
+              "name": "The Alchemist Void Gate",
+              "objectName": "Void_Gate_Santi"
+            },
+            {
+              "name": "Fury of Heraldo Void Gate",
+              "objectName": "Void_Gate_Augustina"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "region": "Rust Village",
+      "subregions": [
+        {
+          "name": "Main Area",
+          "locations": [
+            {
+              "name": "Douklan's Leap Void Gate",
+              "objectName": "Void_Gate_Jesica"
+            }
+          ]
         }
       ]
     }

@@ -32,6 +32,7 @@ struct LocationsJson {
     chests: Vec<Item>,
     statues: Vec<Item>,
     pickups: Vec<Item>,
+    void_gates: Vec<Item>,
 }
 
 fn escape_string(s: &str) -> String {
@@ -119,6 +120,15 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_pickupNameToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
+    header.push_str("    /**\n");
+    header.push_str("     * Get the void gate name to location ID map\n");
+    header.push_str("     * @return A map of void gate names to location IDs\n");
+    header.push_str("     */\n");
+    header.push_str("    static const std::map<std::wstring, uint32_t>& GetVoidGateNameToLocationIDMap()\n");
+    header.push_str("    {\n");
+    header.push_str("        return s_voidGateNameToLocationID;\n");
+    header.push_str("    }\n");
+    header.push_str("\n");
     header.push_str("private:\n");
 
     let mut location_id: u32 = 0;
@@ -137,6 +147,11 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     // Add pickup locations
     header.push_str("    static inline const std::map<std::wstring, uint32_t> s_pickupNameToLocationID = {\n");
     add_locations(&data.pickups, &mut location_id, &mut header);
+    header.push_str("    };\n");
+
+    // Add void gate locations
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_voidGateNameToLocationID = {\n");
+    add_locations(&data.void_gates, &mut location_id, &mut header);
     header.push_str("    };\n");
 
 

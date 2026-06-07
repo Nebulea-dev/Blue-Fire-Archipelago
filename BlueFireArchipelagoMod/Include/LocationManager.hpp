@@ -14,6 +14,7 @@ public:
     std::optional<uint32_t> GetLocationIDFromChestName(const std::wstring& chestName);
     std::optional<uint32_t> GetLocationIDFromStatueName(const std::wstring& statueName);
     std::optional<uint32_t> GetLocationIDFromPickupName(const std::wstring& pickupName);
+    std::optional<uint32_t> GetLocationIDFromVoidGateName(const std::wstring& voidGateName);
 
 
     static bool OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL);
@@ -25,6 +26,8 @@ public:
     static bool OnItemPickupRemove(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
     static bool OnSpiritPickup(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
+    static bool OnVoidGateCompleted(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 
 private:

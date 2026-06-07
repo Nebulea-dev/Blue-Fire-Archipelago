@@ -23,6 +23,8 @@ LocationManager::LocationManager()
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Collectibles/Spirit/Spirit.Spirit_C:Used"), OnSpiritPickup);
 
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Bounds/Void/Void_Gate.Void_Gate_C:Glow Eyes"), OnVoidGateCompleted);
+
 	// Listen to object creation for EditableTextBox controls
 	// objectListener->registerObjectCallback(std::wstring(L"NewItem_C"), OnNewItemCreated);
 }
@@ -299,6 +301,42 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromPickupName(const std::
 	const auto& pickupMap = LocationsData::GetPickupNameToLocationIDMap();
 	auto it = pickupMap.find(pickupName);
 	if (it != pickupMap.end())
+	{
+		return it->second + Archipelago::BF_BASE_ID;
+	}
+	else
+	{
+		return std::nullopt;
+	}
+}
+
+// ============== Void Gate related methods ==============
+
+bool LocationManager::OnVoidGateCompleted(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+	// Get the path of the gate
+	const std::wstring gateName = Context->GetNamePrivate().ToString();
+
+	// Match the gate name to a location ID and mark it as checked
+	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromVoidGateName(gateName);
+	if (!locationID.has_value())
+	{
+		logIncorrectMapping(gateName);
+		return false;
+	}
+
+	Output::send<LogLevel::Verbose>(STR("Void Gate {} completed, marking location ID {} as checked in Archipelago\n"), gateName, locationID.value());
+	AP_SendItem(locationID.value());
+
+    return false;
+}
+
+
+std::optional<uint32_t> LocationManager::GetLocationIDFromVoidGateName(const std::wstring& voidGateName)
+{
+	const auto& voidGateMap = LocationsData::GetVoidGateNameToLocationIDMap();
+	auto it = voidGateMap.find(voidGateName);
+	if (it != voidGateMap.end())
 	{
 		return it->second + Archipelago::BF_BASE_ID;
 	}

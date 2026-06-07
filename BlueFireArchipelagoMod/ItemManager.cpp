@@ -167,7 +167,30 @@ void ItemManager::givePlayerTunic(int tunicID)
 void ItemManager::givePlayerSpirit(int spiritID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player spirit ID: {}\n"), spiritID);
-    // TODO: Implement spirit giving logic
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+
+    // Get the "PlayerEquipment" property
+    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
+    if (!playerEquipmentProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
+        return;
+    }
+
+    // Get the "PlayerEquipment.SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A" property
+    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
+    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    FStructProperty* spiritsProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A"));
+    if (!spiritsProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A property in PlayerEquipment\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = spiritsProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+
+    spirits->Push(spiritID);
 }
 
 
