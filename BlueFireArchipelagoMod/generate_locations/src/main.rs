@@ -6,6 +6,9 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize)]
 struct Location {
     name: String,
+    #[serde(default)]
+    chestName: String,
+    #[serde(default)]
     objectName: String,
     #[serde(default)]
     dance: String,
@@ -13,28 +16,38 @@ struct Location {
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
+struct Shop {
+    name: String,
+    items: u32,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Subregion {
     name: String,
-    locations: Vec<Location>,
+    #[serde(default)]
+    chests: Vec<Location>,
+    #[serde(default)]
+    statues: Vec<Location>,
+    #[serde(default)]
+    pickups: Vec<Location>,
+    #[serde(default)]
+    void_gates: Vec<Location>,
+    #[serde(default)]
+    shops: Vec<Shop>,
 }
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
-struct Item {
-    region: String,
+struct Region {
+    name: String,
     #[serde(default)]
     subregions: Vec<Subregion>,
-    #[serde(default)]
-    locations: Vec<Location>,
 }
 
-#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 struct LocationsJson {
-    chests: Vec<Item>,
-    statues: Vec<Item>,
-    pickups: Vec<Item>,
-    void_gates: Vec<Item>,
+    regions: Vec<Region>,
 }
 
 fn escape_string(s: &str) -> String {
@@ -43,35 +56,6 @@ fn escape_string(s: &str) -> String {
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\t', "\\t")
-}
-
-fn add_locations(locations: &[Item], location_id: &mut u32, header: &mut String) {
-    for region in locations {
-        // Skip the "Menu" and "Victory" regions since they don't have any locations
-        if region.region == "Menu" || region.region == "Victory" {
-            continue;
-        }
-
-        // Add subregions
-        for subregion in &region.subregions {
-            for location in &subregion.locations {
-                if !location.objectName.is_empty() {
-                    let escaped_name = escape_string(&location.objectName);
-                    header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
-                }
-                *location_id += 1;
-            }
-        }
-
-        // Add direct locations
-        for location in &region.locations {
-            if !location.objectName.is_empty() {
-                let escaped_name = escape_string(&location.objectName);
-                header.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
-            }
-            *location_id += 1;
-        }
-    }
 }
 
 fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
@@ -131,39 +115,109 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_voidGateNameToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
-    header.push_str("private:\n");
+
+    header.push_str("public:\n");
+    header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
+    // We'll add shop defines here after processing
+
+    header.push_str("\nprivate:\n");
 
     let mut location_id: u32 = 0;
+    let mut shop_defines = String::new();
+    let mut chest_entries = String::new();
+    let mut statue_entries = String::new();
+    let mut pickup_entries = String::new();
+    let mut void_gate_entries = String::new();
 
+    // NEW STRUCTURE: Region-first hierarchy
+    // Iterate: regions -> subregions -> location_types -> locations
+    // Location types order: chests, statues, pickups, void_gates, shops
+    // All locations get sequential IDs regardless of type
+    for region in &data.regions {
+        for subregion in &region.subregions {
+            // Process chests
+            for location in &subregion.chests {
+                if !location.chestName.is_empty() {
+                    let escaped_name = escape_string(&location.chestName);
+                    chest_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                }
+                location_id += 1;
+            }
 
-    // Add chest locations
+            // Process statues
+            for location in &subregion.statues {
+                if !location.objectName.is_empty() {
+                    let escaped_name = escape_string(&location.objectName);
+                    statue_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                }
+                location_id += 1;
+            }
+
+            // Process pickups
+            for location in &subregion.pickups {
+                if !location.objectName.is_empty() {
+                    let escaped_name = escape_string(&location.objectName);
+                    pickup_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                }
+                location_id += 1;
+            }
+
+            // Process void_gates
+            for location in &subregion.void_gates {
+                if !location.objectName.is_empty() {
+                    let escaped_name = escape_string(&location.objectName);
+                    void_gate_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                }
+                location_id += 1;
+            }
+
+            // Process shops - reserve IDs but don't add to map
+            // Instead, create defines for other code to reference
+            for shop in &subregion.shops {
+                let shop_name_normalized = shop.name.to_uppercase().replace(" ", "_");
+                let define_name = format!("{}_START", shop_name_normalized);
+                shop_defines.push_str(&format!("    static constexpr uint32_t {} = {};\n", define_name, location_id));
+
+                // Reserve IDs for all shop items
+                for _ in 0..shop.items {
+                    location_id += 1;
+                }
+            }
+        }
+    }
+
+    // Build all the maps
     header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {\n");
-    add_locations(&data.chests, &mut location_id, &mut header);
-    header.push_str("    };\n\n");
-
-    // Add statue locations
-    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_statueNameToLocationID = {\n");
-    add_locations(&data.statues, &mut location_id, &mut header);
-    header.push_str("    };\n\n");
-
-    // Add pickup locations
-    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_pickupNameToLocationID = {\n");
-    add_locations(&data.pickups, &mut location_id, &mut header);
+    header.push_str(&chest_entries);
     header.push_str("    };\n");
-
-    // Add void gate locations
-    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_voidGateNameToLocationID = {\n");
-    add_locations(&data.void_gates, &mut location_id, &mut header);
-    header.push_str("    };\n");
-
-
-    // Close the class declaration
-    header.push_str("};\n\n");
-
-    // Create a define for the max amount of locations
-    header.push_str(&format!("#define SHOP_LOCATIONS_OFFSET {}\n", location_id));
     header.push_str("\n");
 
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_statueNameToLocationID = {\n");
+    header.push_str(&statue_entries);
+    header.push_str("    };\n");
+    header.push_str("\n");
+
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_pickupNameToLocationID = {\n");
+    header.push_str(&pickup_entries);
+    header.push_str("    };\n");
+    header.push_str("\n");
+
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_voidGateNameToLocationID = {\n");
+    header.push_str(&void_gate_entries);
+    header.push_str("    };\n");
+
+    header.push_str("};\n");
+
+    // Insert shop defines before the closing brace
+    if !shop_defines.is_empty() {
+        // Find the last public: section and insert there
+        if let Some(pos) = header.rfind("public:") {
+            // Find the closing brace of this section and insert before the private section
+            if let Some(private_pos) = header.rfind("\nprivate:") {
+                header.insert_str(private_pos, &format!("\n{}", shop_defines));
+            }
+        }
+    }
 
     // Create output directory if it doesn't exist
     if let Some(parent) = output_path.parent() {
