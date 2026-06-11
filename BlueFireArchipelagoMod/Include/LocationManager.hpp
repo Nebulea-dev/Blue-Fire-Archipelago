@@ -29,6 +29,9 @@ public:
 
     static bool OnVoidGateCompleted(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
+    static bool OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+    static bool OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
 
 private:
     static void OnNewItemCreated(const UObjectBase* object, int32 index);

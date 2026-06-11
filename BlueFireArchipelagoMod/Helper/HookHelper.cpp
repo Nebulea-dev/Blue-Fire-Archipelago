@@ -15,10 +15,37 @@ HookHelper::HookHelper()
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
-        if(objectName.find(STR("BP_BeiraVesselBase_C")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
+        if(objectName.find(STR("Input")) == std::string::npos &&
+           objectName.find(STR("Ubergraph")) == std::string::npos &&
+           objectName.find(STR("Tick")) == std::string::npos &&
+           objectName.find(STR("Player_Character_BP")) == std::string::npos &&
+           objectName.find(STR("Camera")) == std::string::npos &&
+           objectName.find(STR("Update")) == std::string::npos &&
+           objectName.find(STR("HUD")) == std::string::npos &&
+           objectName.find(STR("Life")) == std::string::npos &&
+           objectName.find(STR("ChangeIdle1")) == std::string::npos &&
+           objectName.find(STR("Fog")) == std::string::npos &&
+           objectName.find(STR("Animation")) == std::string::npos)
         {
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
+
+        /*
+        if(objectName.find(STR("TunicMaker")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
+        {
+            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+        }
+
+        if(objectName.find(STR("Shop")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
+        {
+            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+        }
+
+        if(objectName.find(STR("MainDialogWB")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos && objectName.find(STR("Tick")) == std::string::npos)
+        {
+            Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
+        }
+        */
 
         // Find in the Map the object with the right name
         std::map<std::wstring, HookFunctionSignature>::iterator objectCallbackIt = prehooksRegistered.find(objectName);

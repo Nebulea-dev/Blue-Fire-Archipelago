@@ -118,15 +118,11 @@
             {
               "name": "Chest",
               "objectName": "Chest_A02_SouthArcane_Key_01"
-            }
-          ]
-        },
-        {
-          "name": "Center Top Dance",
-          "locations": [
+            },
             {
-              "name": "Chest",
-              "objectName": "Dance_Platform_Celebration_Chest"
+              "name": "Dance Chest",
+              "objectName": "Dance_Platform_Celebration_Chest",
+              "dance": "Celebration"
             }
           ]
         }
@@ -522,15 +518,11 @@
             {
               "name": "Steam House Entrance Chest",
               "objectName": "Chest_A06_Lake_Loot_03"
-            }
-          ]
-        },
-        {
-          "name": "Party Dance",
-          "locations": [
+            },
             {
               "name": "Chest",
-              "objectName": "Dance_Platform_Party_Chest_Spirit_HammerKing"
+              "objectName": "Dance_Platform_Party_Chest_Spirit_HammerKing",
+              "dance": "Party"
             }
           ]
         }
@@ -541,23 +533,16 @@
       "subregions": [
         {
           "name": "Main Area",
-          "locations": []
-        },
-        {
-          "name": "Aggressive Dance",
           "locations": [
             {
               "name": "Chest",
-              "objectName": "Dance_Platform_Aggresive_Chest"
-            }
-          ]
-        },
-        {
-          "name": "No Dance",
-          "locations": [
+              "objectName": "Dance_Platform_Aggresive_Chest",
+              "dance": "Aggressive"
+            },
             {
               "name": "Chest",
-              "objectName": "Dance_Platform_No_Chest"
+              "objectName": "Dance_Platform_No_Chest",
+              "dance": "No"
             }
           ]
         }

@@ -337,4 +337,141 @@ namespace ArchipelagoModConfig
 		constexpr uint32_t BF_BASE_ID = 437000;
 		constexpr char GAME_NAME[] = "Blue Fire";
 	}
+
+
+
+	namespace Shops
+	{
+		constexpr uint8_t MORK = 0;
+		constexpr uint8_t ONROM = 1;
+		constexpr uint8_t SPIRIT_HUNTER = 2;
+		constexpr uint8_t ARI = 3;
+		constexpr uint8_t POTI = 4;
+		constexpr uint8_t POI = 5;
+
+		constexpr uint8_t OFFSET_MORK = 0;
+		constexpr uint8_t OFFSET_ONROM = 5;
+		constexpr uint8_t OFFSET_SPIRIT_HUNTER = 8;
+		constexpr uint8_t OFFSET_ARI = 12;
+		constexpr uint8_t OFFSET_POTI = 23;
+		constexpr uint8_t OFFSET_POI = 27;
+
+		namespace Mork
+		{
+			constexpr uint8_t POSSESED_BOOK = 12;
+			constexpr uint8_t GOLDEN_LUST = 16;
+			constexpr uint8_t LIFE_STEAL = 25;
+			constexpr uint8_t LARGE_POUCH = 0;
+			constexpr uint8_t RARE_SNOW = 67;
+
+			const std::map<uint8_t, uint32_t> spiritInventory =
+			{
+				{POSSESED_BOOK, 0},
+				{GOLDEN_LUST, 1},
+				{LIFE_STEAL, 2},
+			};
+
+			const std::map<uint8_t, uint32_t> itemInventory =
+			{
+				{LARGE_POUCH, 3},
+				{RARE_SNOW, 4},
+			};
+		}
+
+		namespace Onrom
+		{
+			constexpr uint8_t RARE_GLASSES = 66;
+			constexpr uint8_t MANDOLINE = 65;
+			constexpr uint8_t BOOT = 18;
+
+			const std::map<uint8_t, uint32_t> inventory =
+			{
+				{RARE_GLASSES, 0},
+				{MANDOLINE, 1},
+				{BOOT, 2},
+			};
+		}
+
+		namespace SpiritHunter
+		{
+			constexpr uint8_t STORM_CENTRY = 10;
+			constexpr uint8_t BLOOD_PHANTOM = 11;
+			constexpr uint8_t FROZEN_SOUL = 7;
+			constexpr uint8_t SHADOW_GRU = 27;
+
+			const std::map<uint8_t, uint32_t> inventory =
+			{
+				{STORM_CENTRY, 0},
+				{BLOOD_PHANTOM, 1},
+				{FROZEN_SOUL, 2},
+				{SHADOW_GRU, 3},
+			};
+		}
+
+		namespace Ari
+		{
+			constexpr uint8_t ORANGE = 27;
+			constexpr uint8_t AQUA = 26;
+			constexpr uint8_t ROYAL = 25;
+			constexpr uint8_t LILA = 24;
+			constexpr uint8_t RAINBOW = 23;
+			constexpr uint8_t LIGHT_BLUE = 22;
+			constexpr uint8_t VIOLET = 21;
+			constexpr uint8_t GREY = 20;
+			constexpr uint8_t GREEN = 19;
+			constexpr uint8_t YELLOW = 18;
+			constexpr uint8_t RED = 17;
+
+			const std::map<uint8_t, uint32_t> inventory =
+			{
+				{ORANGE, 0},
+				{AQUA, 1},
+				{ROYAL, 2},
+				{LILA, 3},
+				{RAINBOW, 4},
+				{LIGHT_BLUE, 5},
+				{VIOLET, 6},
+				{GREY, 7},
+				{GREEN, 8},
+				{YELLOW, 9},
+				{RED, 10},
+			};
+		}
+
+		namespace Poti
+		{
+			constexpr uint8_t ONOP_SIBLINGS = 18;
+			constexpr uint8_t MOI_THE_DREADFUL = 14;
+			constexpr uint8_t SHADOW_CASTERS = 3;
+			constexpr uint8_t EXTRA_LARGE_POUCH = 75;
+
+			const std::map<uint8_t, uint32_t> spiritInventory =
+			{
+				{ONOP_SIBLINGS, 0},
+				{MOI_THE_DREADFUL, 1},
+			};
+
+			const std::map<uint8_t, uint32_t> weaponInventory =
+			{
+				{SHADOW_CASTERS, 2},
+			};
+
+			const std::map<uint8_t, uint32_t> itemInventory =
+			{
+				{EXTRA_LARGE_POUCH, 3},
+			};
+		}
+
+		namespace Poi
+		{
+			constexpr uint8_t FIRE_ESSENCE = 16;
+			constexpr uint8_t FIRE_ESSENCE_SLOT = 73;
+
+			const std::map<uint8_t, uint32_t> inventory =
+			{
+				{FIRE_ESSENCE, 0},
+				{FIRE_ESSENCE_SLOT, 1},
+			};
+		}
+	}
 }

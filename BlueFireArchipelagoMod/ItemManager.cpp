@@ -325,7 +325,7 @@ void ItemManager::givePlayerPassiveItem(int itemID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player passive item ID: {}\n"), itemID);
 
-        std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
 
     // Get the "PlayerStats" property
     FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));

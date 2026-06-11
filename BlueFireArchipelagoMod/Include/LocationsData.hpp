@@ -186,3 +186,6 @@ private:
         {L"Void_Gate_Jesica", 124},
     };
 };
+
+#define SHOP_LOCATIONS_OFFSET 125
+

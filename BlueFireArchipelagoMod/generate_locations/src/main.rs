@@ -7,6 +7,8 @@ use std::path::PathBuf;
 struct Location {
     name: String,
     objectName: String,
+    #[serde(default)]
+    dance: String,
 }
 
 #[allow(non_snake_case)]
@@ -156,7 +158,11 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
 
 
     // Close the class declaration
-    header.push_str("};\n");
+    header.push_str("};\n\n");
+
+    // Create a define for the max amount of locations
+    header.push_str(&format!("#define SHOP_LOCATIONS_OFFSET {}\n", location_id));
+    header.push_str("\n");
 
 
     // Create output directory if it doesn't exist
