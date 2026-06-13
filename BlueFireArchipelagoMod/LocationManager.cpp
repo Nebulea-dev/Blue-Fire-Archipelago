@@ -88,8 +88,8 @@ bool LocationManager::OnPressButton(UObject* Context, FFrame& Stack, void* RESUL
 	}
 
 	// Set the chest content to the default sword
-	//*chestType = 1;
-	//*chestWeapon = 0;
+	*chestType = 1;
+	*chestWeapon = 0;
 
     return false;
 }
@@ -205,8 +205,6 @@ bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT
 
 bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-
-    return false;
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
 
     // Get the "PlayerStats" property
@@ -545,44 +543,34 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
-	inventoryItem itemBought = (*ShopInventory)[*SelectedShopItem];
-	uint32_t archipelagoShopLocationID = SHOP_LOCATIONS_OFFSET + itemBought.originalAmount;
-
-	switch (*WorldShop)
+	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromShopID(*WorldShop);
+	if (!locationID.has_value())
 	{
-	case Shops::MORK:
-		archipelagoShopLocationID += Shops::OFFSET_MORK;
-		break;
-
-	case Shops::ONROM:
-		archipelagoShopLocationID += Shops::OFFSET_ONROM;
-		break;
-
-	case Shops::SPIRIT_HUNTER:
-		archipelagoShopLocationID += Shops::OFFSET_SPIRIT_HUNTER;
-		break;
-
-	case Shops::ARI:
-		archipelagoShopLocationID += Shops::OFFSET_ARI;
-		break;
-
-	case Shops::POTI:
-		archipelagoShopLocationID += Shops::OFFSET_POTI;
-		break;
-
-	case Shops::POI:
-		archipelagoShopLocationID += Shops::OFFSET_POI;
-		break;
-
-	default:
-		Output::send<LogLevel::Error>(STR("Could not map out the WorldShop value : {}\n"), *WorldShop);
-		break;
+		logIncorrectMapping(std::to_wstring(*WorldShop));
+		return false;
 	}
+
+	inventoryItem itemBought = (*ShopInventory)[*SelectedShopItem];
+	uint32_t archipelagoShopLocationID = locationID.value() + itemBought.originalAmount;
 
 	Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
 	AP_SendItem(archipelagoShopLocationID);
 
     return false;
+}
+
+std::optional<uint32_t> LocationManager::GetLocationIDFromShopID(const uint32_t shopID)
+{
+	const auto& shopMap = LocationsData::GetShopIDToLocationIDMap();
+	auto it = shopMap.find(shopID);
+	if (it != shopMap.end())
+	{
+		return it->second + Archipelago::BF_BASE_ID;
+	}
+	else
+	{
+		return std::nullopt;
+	}
 }
 
 // ============== Logs methods ==============

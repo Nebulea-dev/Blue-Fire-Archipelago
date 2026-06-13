@@ -7,6 +7,7 @@
 #include <ArchipelagoManager.hpp>
 #include <BlueFireArchipelagoMod.hpp>
 #include <ArchipelagoModConfig.hpp>
+#include <ItemManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -52,7 +53,11 @@ void ArchipelagoManager::OnItemClear()
 
 void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 {
+	// If the item was already given
+	if(!notifyPlayer) return;
+
 	Output::send<LogLevel::Verbose>(STR("Received item with id {} from Archipelago, notifyPlayer = {}\n"), item, notifyPlayer);
+	BlueFireArchipelagoMod::itemManager->itemReceiveCb((int)item);
 }
 
 void ArchipelagoManager::OnLocationCheck(int64_t location)

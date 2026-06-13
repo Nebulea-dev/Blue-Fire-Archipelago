@@ -39,11 +39,10 @@ class ItemManager
 	 *          Used to track item reception events and trigger notifications.
 	 *
 	 * @param   itemID  - The Archipelago item ID being received
-	 * @param   notify  - Whether to show a notification to the player
 	 *
 	 * @return  none
 	 */
-	void itemReceiveCb(int itemID, bool notify);
+	void itemReceiveCb(int itemID);
 
 	/*******************************************************************************
 	 * @fn      PlayNewItemPreHook
@@ -130,15 +129,15 @@ class ItemManager
 	void givePlayerItem(int itemID);
 
 	/*******************************************************************************
-	 * @fn      givePlayerPassiveItem
+	 * @fn      givePlayerKeyItem
 	 *
-	 * @brief   Give the player a passive item.
+	 * @brief   Give the player a key item.
 	 *
 	 * @param   itemID - The item ID (0-based index)
 	 *
 	 * @return  none
 	 */
-	void givePlayerPassiveItem(int itemID);
+	void givePlayerKeyItem(int itemID);
 
 
 	private:

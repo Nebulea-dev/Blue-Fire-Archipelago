@@ -15,6 +15,7 @@ public:
     std::optional<uint32_t> GetLocationIDFromStatueName(const std::wstring& statueName);
     std::optional<uint32_t> GetLocationIDFromPickupName(const std::wstring& pickupName);
     std::optional<uint32_t> GetLocationIDFromVoidGateName(const std::wstring& voidGateName);
+    std::optional<uint32_t> GetLocationIDFromShopID(const uint32_t shopID);
 
 
     static bool OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL);

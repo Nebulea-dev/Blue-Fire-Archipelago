@@ -349,13 +349,6 @@ namespace ArchipelagoModConfig
 		constexpr uint8_t POTI = 4;
 		constexpr uint8_t POI = 5;
 
-		constexpr uint8_t OFFSET_MORK = 0;
-		constexpr uint8_t OFFSET_ONROM = 5;
-		constexpr uint8_t OFFSET_SPIRIT_HUNTER = 8;
-		constexpr uint8_t OFFSET_ARI = 12;
-		constexpr uint8_t OFFSET_POTI = 23;
-		constexpr uint8_t OFFSET_POI = 27;
-
 		namespace Mork
 		{
 			constexpr uint8_t POSSESED_BOOK = 12;
