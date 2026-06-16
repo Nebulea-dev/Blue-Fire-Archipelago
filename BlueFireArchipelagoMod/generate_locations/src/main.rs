@@ -30,6 +30,14 @@ struct Shop {
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
+struct Event {
+    name: String,
+    #[serde(default)]
+    requiredItems: Vec<String>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Subregion {
     name: String,
     #[serde(default)]
@@ -42,6 +50,8 @@ struct Subregion {
     void_gates: Vec<Location>,
     #[serde(default)]
     shops: Vec<Shop>,
+    #[serde(default)]
+    events: Vec<Event>,
 }
 
 #[allow(non_snake_case)]
@@ -65,10 +75,10 @@ fn escape_string(s: &str) -> String {
         .replace('\t', "\\t")
 }
 
-fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
-    // Read the JSON file
-    let json_content = fs::read_to_string(json_path)?;
-    let data: LocationsJson = serde_json::from_str(&json_content)?;
+fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    // Read the YAML file
+    let yaml_content = fs::read_to_string(yaml_path)?;
+    let data: LocationsJson = serde_yaml::from_str(&yaml_content)?;
 
     let mut header = String::new();
     header.push_str("#pragma once\n");
@@ -131,6 +141,7 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_shopIDToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
+
 
     header.push_str("public:\n");
     header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
@@ -196,6 +207,9 @@ fn generate_header(json_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
                     location_id += 1;
                 }
             }
+
+            // Events are parsed but not exposed in the C++ header
+            // They are used by the Python Archipelago mod parser only
         }
     }
 
@@ -242,15 +256,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // When running from CMake, the current directory should be the project root
     let project_dir = std::env::current_dir()?;
 
-    let json_path = project_dir.join("locations.json");
+    let yaml_path = project_dir.join("Locations.yaml");
     let output_path = project_dir.join("Include").join("LocationsData.hpp");
 
-    if !json_path.exists() {
-        eprintln!("Error: {} not found", json_path.display());
+    if !yaml_path.exists() {
+        eprintln!("Error: {} not found", yaml_path.display());
         std::process::exit(1);
     }
 
-    if let Err(e) = generate_header(&json_path, &output_path) {
+    if let Err(e) = generate_header(&yaml_path, &output_path) {
         eprintln!("Error: {}", e);
         std::process::exit(1);
     }

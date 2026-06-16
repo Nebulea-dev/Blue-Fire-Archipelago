@@ -1,0 +1,458 @@
+regions:
+- name: Menu
+  subregions: []
+- name: Fire Keep
+  subregions:
+  - name: Intro
+    chests:
+    - name: Ambush chest 1
+      objectName: Chest_A01_Keep_Shield
+    - name: Ambush chest 2
+      objectName: Chest_A02_Keep_Key_01
+    events:
+    - name: Capture Beira Shards 1
+      requiredItems:
+      - Beira Vessel
+  - name: High Spot
+    chests:
+    - name: Right Side Chest
+      objectName: Chest_A01_TempleGardens_Ability_SpinAttack2
+    - name: Left Side Chest
+      objectName: Chest_A02_Keep_Loot_02
+  - name: Hub
+    chests:
+    - name: Loot chest 1
+      objectName: Chest_A02_Keep_Loot_01
+    - name: Loot chest 3
+      objectName: Chest_A02_GameIntro_44
+    - name: Diamond Wing Chest
+      objectName: Chest_A02_Sword_DiamondWings
+    statues:
+    - name: Levitation Emote Statue
+      objectName: A01_FireKeep_EmoteStatue_Levitation
+    - name: Techno Emote Statue
+      objectName: A01_FireKeep_EmoteStatue_Techno
+    - name: Celebration Emote Statue
+      objectName: A02_FireKeep_EmoteStatue_Celebration
+    void_gates:
+    - name: Grace of Lula Void Gate
+      objectName: Void_Gate_Matias
+    - name: Umbert's Secret Void Gate
+      objectName: Void_Gate_Ricardo
+- name: Arcane Tunnels
+  subregions:
+  - name: Main Room
+    chests:
+    - name: North loot chest 1
+      objectName: Chest_A02_NorthArcane_Loot_01
+    - name: North loot chest 2
+      objectName: Chest_A02_NorthArcane_Loot_03
+    - name: North loot chest 3
+      objectName: Chest_A02_NorthArcane_Loot_04
+    - name: East loot chest 1
+      objectName: Chest_A02_EastArcane_Loot_01
+    - name: East loot chest 5
+      objectName: Chest_A02_EastArcane_Loot_05
+    - name: Bloodstorm chest
+      objectName: Chest_A02_NorthArcane_Sword_Bloodstorm
+    - name: Arcane chest
+      objectName: Chest_A01_Arcane_Spell
+    - name: South key chest 2
+      objectName: Chest_A02_SouthArcane_Key_02
+    - name: East loot chest 2
+      objectName: Chest_A02_EastArcane_Loot_02
+    - name: East loot chest 3
+      objectName: Chest_A02_EastArcane_Loot_03
+    - name: South loot chest
+      objectName: Chest_A02_SouthArcane_Loot_01
+    statues:
+    - name: Windmill Emote Statue
+      objectName: A02_Arcane_EmoteStatue_Windmill
+    void_gates:
+    - name: Path of Victory Void Gate
+      objectName: Void_Gate_Paul
+    - name: Fara's Dream Void Gate
+      objectName: Void_Gate_Esteban
+    shops:
+    - name: Spirit Hunter's Shop
+      shopId: 2
+      items: 4
+  - name: Pipes
+    chests:
+    - name: Jail Cell Chest
+      objectName: Chest_A02_EastArcane_Loot_04
+  - name: Center Top
+    chests:
+    - name: Chest
+      objectName: Chest_A02_SouthArcane_Key_01
+    - name: Celebration Emote Chest
+      dance: Celebration
+      objectName: Dance_Platform_Celebration_Chest
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A02_ToxicRat
+- name: Stoneheart City
+  subregions:
+  - name: Main Area
+    chests:
+    - name: Stoneheart chest 3
+      objectName: Chest_A01_Stoneheart_Loot_03
+    - name: Stoneheart chest 2
+      objectName: Chest_A01_Stoneheart_Loot_02
+    - name: Stoneheart chest 4
+      objectName: Chest_A01_Stoneheart_Loot_3
+    - name: Merchants Robe chest
+      objectName: Chest_A01_Stoneheart_Tunic_MerchantsRobe
+    - name: Graveyard key chest 1
+      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey
+    - name: Graveyard key chest 2
+      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey2
+    - name: Chest
+      objectName: Chest_A01_Stoneheart_Loot_01
+    pickups:
+    - name: Books 1
+      objectName: Pickup_Book
+    - name: Books 2
+      objectName: Pickup_Book2
+    - name: Books 3
+      objectName: Pickup_Book3
+    - name: Books 4
+      objectName: Pickup_Book4
+    - name: Books 5
+      objectName: Pickup_Book5
+    - name: Ancient Relic
+      objectName: Pickup_SandRelic
+    void_gates:
+    - name: Ura's Glide Void Gate
+      objectName: Void_Gate_Rail
+    shops:
+    - name: Ari's Shop
+      shopId: 3
+      items: 11
+    - name: Mork's Shop
+      shopId: 0
+      items: 5
+  - name: Top
+    chests:
+    - name: chest
+      objectName: Chest_A01_Tunic_AlphaTunic
+  - name: Boy's Room
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A01_FarasGrace
+  - name: Bottom Corridor
+    void_gates:
+    - name: Borisa's Fate Void Gate
+      objectName: Void_Gate_04_V2
+- name: Water Ways
+  subregions:
+  - name: Main Area
+    chests:
+    - name: Pure Shadow chest
+      objectName: Chest_A02_Tunic_PureShadow
+  - name: Arcane Tunnels Main Entrance
+    statues:
+    - name: Hat Kid Emote Statue
+      objectName: A02_Arcane_EmoteStatue_HatKid
+    events:
+    - name: Unlock Arcane Tunnels Main Gate
+      requiredItems:
+      - Sanctuary Stone
+  - name: Arcane Tunnels Pipes Entrance
+    events:
+    - name: Unlock Arcane Tunnels Pipes Gate
+      requiredItems:
+      - Sanctuary Stone
+  - name: Abandoned Path Entrance
+    events:
+    - name: Unlock Abandoned Path Gate
+      requiredItems:
+      - Sanctuary Stone
+  - name: Firefall River Entrance
+    events:
+    - name: Unlock Firefall River Gate
+      requiredItems:
+      - Sanctuary Stone
+  - name: Samuel's Room
+    events:
+    - name: Beat Samuel
+      requiredItems: []
+- name: Crossroads
+  subregions:
+  - name: Left Area
+    chests:
+    - name: Stairs Chest
+      objectName: Chest_A01_CrossRoads_Loot_03
+    - name: Ambush Chest
+      objectName: Chest_A01_Well_SpinAttack
+  - name: Main Area
+    chests:
+    - name: Well Loot Chest 3
+      objectName: Chest_A01_CrossRoads_Loot_3
+    - name: Bottom Chest
+      objectName: Chest_A01_CrossRoads_Loot_01
+    - name: Loot chest 2
+      objectName: Chest_A01_CrossRoads_Loot_02
+    - name: Techno Emote Chest
+      objectName: Dance_Platform_Techno_Chest
+      dance: Techno
+- name: Forest Temple
+  subregions:
+  - name: High Level
+    chests:
+    - name: Loot chest 1
+      objectName: Chest_A01_Nuos_Loot_05
+    - name: Loot chest 2
+      objectName: Chest_A01_Nuos_Loot_02
+    - name: Key chest
+      objectName: Chest_A01_Nuos_Key_2
+  - name: Middle Level
+  - name: Ambush 1
+    chests:
+    - name: Key chest
+      objectName: Chest_A01_Nuos_Key_01
+  - name: Ambush 2
+    chests:
+    - name: Key chest
+      objectName: Chest_A01_Nuos_Key_03
+  - name: Nuos Claw
+    chests:
+    - name: Nuos Claw chest
+      objectName: Chest_A01_Nuos_Ability_WallRun
+  - name: Low Level
+    chests:
+    - name: Loot chest 1
+      objectName: Chest_A01_Nuos_Loot_03
+    - name: Loot chest 2
+      objectName: Chest_A01_Nuos_Loot_06
+    - name: Loot chest 3
+      objectName: Chest_A01_Nuos_Loot_04
+    - name: Void chest
+      objectName: Chest_Master_2
+    - name: Silverblades chest
+      objectName: Chest_A01_TempleGardens_Sword_SilverBlades
+    - name: Key chest
+      objectName: Chest_A01_Nuos_Key_02
+    - name: Hello Emote Chest
+      objectName: Dance_Platform_Hello2_Chest
+    pickup:
+    - name: Spirit
+      objectName: Spirit_A01_ForestGuardian
+    void_gates:
+    - name: TODO Void Gate
+      objectName: Void_Gate_Easy
+  - name: Center Room Trunk
+    chests:
+    - name: Loot chest 1
+      objectName: Chest_A01_Nuos_MasterKey
+- name: Abandoned Path
+  subregions:
+  - name: Entrance
+  - name: Main Room
+    statues:
+    - name: No Emote Statue
+      objectName: A01_Graveyard_EmoteStatue_No
+    pickups:
+    - name: Rose 1
+      objectName: Pickup_Rose
+    - name: Rose 2
+      objectName: Pickup_Rose2
+    - name: Necklace
+      objectName: Pickup_Necklace
+    - name: Breemur Picture
+      objectName: Pickup_BremurPicture
+  - name: Entrance Ravin
+    chests:
+    - name: Ravin Chest
+      objectName: Chest_A01_Graveyard_Loot_03
+  - name: Graveyard Balcony
+    void_gates:
+    - name: Fall of Death Void Gate
+      objectName: Void_Gate_Mariano
+    statues:
+    - name: Aggressive Emote Statue
+      objectName: A01_Graveyard_EmoteStatue_Aggressive
+  - name: Heights
+    chests:
+    - name: Tower Chest
+      objectName: Chest_A01_Graveyard_IceDestroyers
+    - name: High Pillar Chest
+      objectName: Chest_A02_Tunic_HolyAttire
+    - name: Low Pillar Chest 1
+      objectName: Chest_A01_Graveyard_Loot_01
+    - name: Loot Low Pillar Chest 2
+      objectName: Chest_A01_Graveyard_Loot_02
+    events:
+    - name: Capture Beira Shards 2
+      requiredItems:
+      - Beira Vessel
+  - name: Beira's Room
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A01_AngryAmbusher
+    void_gates:
+    - name: Gerardo's Anger Void Gate
+      objectName: Void_Gate_Gerardo
+    events:
+    - name: Beat Beira
+      requiredItems: []
+  - name: End of Main Room
+    void_gates:
+    - name: Lucua's Climb
+      objectName: Void_Gate_Luis
+- name: Uthas Temple
+  subregions:
+  - name: Entrance
+    chests:
+    - name: Right Side Chest
+      objectName: Chest_A01_Uthas_Key_04
+    - name: Left Side Chest
+      objectName: Chest_A01_Uthas_Loot_03
+  - name: Main Room
+    chests:
+    - name: Antechamber Left Side chest
+      objectName: Chest_A01_Uthas_Loot_02
+    - name: Tower bottom chest
+      objectName: Chest_A01_Uthas_Loot_04
+    - name: Statue Puzzle Chest
+      objectName: Chest_A01_Uthas_Key_01
+    - name: Left Side Chest
+      objectName: Chest_A01_Uthas_Key_02_1
+    - name: Emote Statue Chest
+      objectName: Chest_A01_Uthas_Loot_05
+    - name: Drop down Chest
+      objectName: Chest_A01_Uthas_Loot_6
+    statues:
+    - name: Tower floor emote statue
+      objectName: A01_Uthas_EmoteStatue_Photo
+    - name: Tower Left Side Emote Statue
+      objectName: A01_Uthas_EmoteStatue_Party
+  - name: Ambush Room
+    chests:
+    - name: Ambush Chest
+      objectName: Chest_A01_Uthas_MasterKey
+  - name: Holy Tower Chest
+    chests:
+    - name: Holy Chest
+      objectName: Chest_A01_Uthas_Loot_01
+  - name: Main Room 2nd side
+    chests:
+    - name: Vertical Platforming Chest
+      objectName: Chest_A01_Uthas_Key_03
+    - name: Entrance Chest
+      objectName: Chest_A01_Uthas_Loot_06
+  - name: Final Floor
+    chests:
+    - name: Chest
+      objectName: Chest_A01_Uthas_Key_05
+    - name: Holy Chest
+      objectName: Chest_A01_Uthas_MasterKey2_5
+  - name: Top of Entrance
+    pickups:
+    - name: Entrance Spirit
+      objectName: TODO
+- name: Temple Gardens
+  subregions:
+  - name: Entrance
+    chests:
+    - name: Entrance Chest
+      objectName: Chest_A01_TempleGardens_Loot_04
+    - name: First Floor Chest
+      objectName: Chest_A01_TempleGardens_Loot_08
+    - name: Second Floor Chest
+      objectName: Chest_A01_TempleGardens_Loot_03
+    - name: Third Floor Chest
+      objectName: Chest_A01_TempleGardens_RareSnow
+    - name: Right Tower Chest 1
+      objectName: Chest_A01_TempleGardens_Loot_02
+    - name: Right Tower Chest 2
+      objectName: Chest_A01_TempleGardens_Loot_01
+    - name: Left Temple Of Gods Door Chest
+      objectName: Chest_A01_TempleGardens_Loot_07
+    - name: Fourth Floor Right Chest
+      objectName: Chest_A01_TempleGardens_Loot_06
+    - name: Fourth Floor Left Chest
+      objectName: Chest_A01_TempleGardens_Loot_05
+    void_gates:
+    - name: Goerbord's Piece Void Gate
+      objectName: Void_Gate_Julian
+    - name: Julian's Song Void Gate
+      objectName: Void_Gate_Flauta
+    events:
+    - name: Capture Beira Shards 3
+      requiredItems:
+      - Beira Vessel
+  - name: Middle Balcony
+  - name: Temple of Gods
+- name: Firefall River
+  subregions:
+  - name: Main Area
+    chests:
+    - name: Right Chest
+      objectName: Chest_A06_River_Loot_01
+    - name: Spirit Hunter Chest
+      objectName: Chest_A06_River_Loot_03
+    - name: The Alchemist Void Gate Chest 1
+      objectName: Chest_Master_Void_Santi_03
+    - name: The Alchemist Void Gate Chest 2
+      objectName: Chest_Master_Void_Santi_02
+    - name: Beira Vessel Chest
+      objectName: Chest_A06_Lake_Loot_01_0
+    - name: Steam House Entrance Chest
+      objectName: Chest_A06_Lake_Loot_03
+    - name: Party Emote Chest
+      dance: Party
+      objectName: Dance_Platform_Party_Chest_Spirit_HammerKing
+    statues:
+    - name: Kungu Fu Emote Statue
+      objectName: A06_Firefall_EmoteStatue_KungFu
+    - name: Triceps Emote Statue
+      objectName: A06_Firefall_EmoteStatue_Triceps
+    void_gates:
+    - name: Oriane's Saw Void Gate
+      objectName: Void_Gate_Saw
+    - name: The Alchemist Void Gate
+      objectName: Void_Gate_Santi
+    - name: Fury of Heraldo Void Gate
+      objectName: Void_Gate_Augustina
+    events:
+    - name: Capture Beira Shards 4
+      requiredItems:
+      - Beira Vessel
+  - name: Steam House
+    events:
+    - name: Repair Generator 1
+      requiredItems:
+      - Iron Justice
+    - name: Repair Generator 2
+      requiredItems:
+      - Iron Justice
+    - name: Repair Generator 3
+      requiredItems:
+      - Iron Justice
+  - name: Fire Boss Room
+    events:
+    - name: Beat Fire Boss
+      requiredItems: []
+- name: Rust Village
+  subregions:
+  - name: Main Area
+    chests:
+    - name: Aggressive Emote Chest
+      dance: Aggressive
+      objectName: Dance_Platform_Aggresive_Chest
+    - name: No Emote Chest
+      dance: 'No'
+      objectName: Dance_Platform_No_Chest
+    statues:
+    - name: Applause Emote Statue
+      objectName: A06_RustCity_EmoteStatue_Applause
+    void_gates:
+    - name: Douklan's Leap Void Gate
+      objectName: Void_Gate_Jesica
+- name: Victory
+  subregions:
+  - name: Victory
+    chests:
+    - name: Victory
+      objectName: ''
