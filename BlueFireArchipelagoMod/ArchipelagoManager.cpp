@@ -56,6 +56,12 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 	// If the item was already given
 	if(!notifyPlayer) return;
 
+	if (!BlueFireArchipelagoMod::itemManager)
+	{
+		Output::send<LogLevel::Error>(STR("itemManager is null in OnItemReceive\n"));
+		return;
+	}
+
 	Output::send<LogLevel::Verbose>(STR("Received item with id {} from Archipelago, notifyPlayer = {}\n"), item, notifyPlayer);
 	BlueFireArchipelagoMod::itemManager->itemReceiveCb((int)item);
 }

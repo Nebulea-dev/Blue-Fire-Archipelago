@@ -101,6 +101,11 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 
 	// Get the emote of the statue
 	uint8_t* emoteEnum = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Emote");
+	if (!emoteEnum)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find the Emote parameter of the statue\n"));
+		return false;
+	}
 
 	// Check the game inventory
 	std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
@@ -206,6 +211,11 @@ bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT
 bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return false;
+    }
 
     // Get the "PlayerStats" property
     FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
@@ -217,7 +227,19 @@ bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* 
 
     // Get the "PlayerEquipment.PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94" property
     auto playerStatsStruct = playerStatsProperty->GetStruct();
+    if (!playerStatsStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+        return false;
+    }
+
     auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerStats)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
+        return false;
+    }
+
     FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
     if (!inventoryProperty)
     {
@@ -226,6 +248,11 @@ bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* 
     }
 
     TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    if (!inventory)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        return false;
+    }
 
     // Go through all items already in inventory
     for(int32_t i = 0; i < inventory->Num(); i++)
@@ -353,24 +380,57 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromVoidGateName(const std
 bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return false;
+    }
+
 	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
 
     TArray<inventoryItem>* shopMork = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop0-Mork");
-    TArray<inventoryItem>* shopOnrom = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop1-Onrom");
-    TArray<inventoryItem>* shopSpiritHunter = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop2-SpiritHunter");
-    TArray<inventoryItem>* shopAri = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop3-Ari");
-    TArray<inventoryItem>* shopPoti = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop4-Poti");
-    TArray<inventoryItem>* shopPOI = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop5-POI");
-	TArray<inventoryItem>* shops[6] = {shopMork, shopOnrom, shopSpiritHunter, shopAri, shopPoti, shopPOI};
+    if(!shopMork)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop0-Mork property\n"));
+        return false;
+    }
 
-	for(TArray<inventoryItem>* inventoryPointer : shops)
-	{
-		if(!inventoryPointer)
-		{
-			Output::send<LogLevel::Error>(STR("Could not find one of the shop parameter of the game instance\n"));
-			return false;
-		}
-	}
+    TArray<inventoryItem>* shopOnrom = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop1-Onrom");
+    if(!shopOnrom)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop1-Onrom property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopSpiritHunter = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop2-SpiritHunter");
+    if(!shopSpiritHunter)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop2-SpiritHunter property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopAri = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop3-Ari");
+    if(!shopAri)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop3-Ari property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopPoti = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop4-Poti");
+    if(!shopPoti)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop4-Poti property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopPOI = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop5-POI");
+    if(!shopPOI)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop5-POI property\n"));
+        return false;
+    }
+
+	TArray<inventoryItem>* shops[6] = {shopMork, shopOnrom, shopSpiritHunter, shopAri, shopPoti, shopPOI};
 
 	// Mork
 	for(int32_t i = 0; i < shopMork->Num(); i++)

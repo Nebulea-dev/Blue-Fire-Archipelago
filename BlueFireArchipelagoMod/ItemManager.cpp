@@ -92,6 +92,11 @@ void ItemManager::givePlayerEmote(int emoteID)
     Output::send<LogLevel::Verbose>(STR("Giving player emote ID: {}\n"), emoteID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     TArray<uint8_t>* emoteInventory = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<uint8_t>>(L"Emotes");
 	if(!emoteInventory)
@@ -108,6 +113,11 @@ void ItemManager::givePlayerWeapon(int weaponID)
     Output::send<LogLevel::Verbose>(STR("Giving player weapon ID: {}\n"), weaponID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerEquipment" property
     FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
@@ -119,7 +129,19 @@ void ItemManager::givePlayerWeapon(int weaponID)
 
     // Get the "PlayerEquipment.Weapons_18_409D783242E4CBDA66AAB6A252C7A317" property
     auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
+    if (!playerEquipmentStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
+        return;
+    }
+
     auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerEquipment)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
+        return;
+    }
+
     FStructProperty* weaponProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317"));
     if (!weaponProperty)
     {
@@ -128,6 +150,11 @@ void ItemManager::givePlayerWeapon(int weaponID)
     }
 
     TArray<uint8_t>* weapons = weaponProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    if (!weapons)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get weapons value pointer\n"));
+        return;
+    }
 
     weapons->Push(weaponID);
 }
@@ -137,6 +164,11 @@ void ItemManager::givePlayerTunic(int tunicID)
     Output::send<LogLevel::Verbose>(STR("Giving player tunic ID: {}\n"), tunicID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerEquipment" property
     FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
@@ -148,7 +180,19 @@ void ItemManager::givePlayerTunic(int tunicID)
 
     // Get the "PlayerEquipment.Tunics_19_8878CF744AF2806994F2E48778F1CC2D" property
     auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
+    if (!playerEquipmentStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
+        return;
+    }
+
     auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerEquipment)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
+        return;
+    }
+
     FStructProperty* tunicProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Tunics_19_8878CF744AF2806994F2E48778F1CC2D"));
     if (!tunicProperty)
     {
@@ -157,6 +201,11 @@ void ItemManager::givePlayerTunic(int tunicID)
     }
 
     TArray<uint8_t>* tunics = tunicProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    if (!tunics)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get tunics value pointer\n"));
+        return;
+    }
 
     tunics->Push(tunicID);
 }
@@ -166,6 +215,11 @@ void ItemManager::givePlayerSpirit(int spiritID)
     Output::send<LogLevel::Verbose>(STR("Giving player spirit ID: {}\n"), spiritID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerEquipment" property
     FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
@@ -177,7 +231,19 @@ void ItemManager::givePlayerSpirit(int spiritID)
 
     // Get the "PlayerEquipment.SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A" property
     auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
+    if (!playerEquipmentStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
+        return;
+    }
+
     auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerEquipment)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
+        return;
+    }
+
     FStructProperty* spiritsProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A"));
     if (!spiritsProperty)
     {
@@ -186,6 +252,11 @@ void ItemManager::givePlayerSpirit(int spiritID)
     }
 
     TArray<uint8_t>* spirits = spiritsProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits value pointer\n"));
+        return;
+    }
 
     spirits->Push(spiritID);
 }
@@ -197,6 +268,11 @@ void ItemManager::givePlayerAbility(int abilityID)
 
     wchar_t propertyName[50];
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerAbilities" property
     FStructProperty* playerAbilitiesProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerAbilities"));
@@ -243,7 +319,19 @@ void ItemManager::givePlayerAbility(int abilityID)
 
 
     auto playerAbilitiesStruct = playerAbilitiesProperty->GetStruct();
+    if (!playerAbilitiesStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerAbilities property\n"));
+        return;
+    }
+
     auto playerAbilities = playerAbilitiesProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerAbilities)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerAbilities value pointer\n"));
+        return;
+    }
+
     FStructProperty* abilityProperty = static_cast<FStructProperty*>(playerAbilitiesStruct->GetPropertyByNameInChain(propertyName));
     if (!abilityProperty)
     {
@@ -252,6 +340,11 @@ void ItemManager::givePlayerAbility(int abilityID)
     }
 
     uint8_t* ability = abilityProperty->ContainerPtrToValuePtr<uint8_t>(playerAbilities);
+    if (!ability)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get ability value pointer\n"));
+        return;
+    }
 
     *ability = true;
 }
@@ -261,6 +354,11 @@ void ItemManager::givePlayerItem(int itemID)
     Output::send<LogLevel::Verbose>(STR("Giving player item ID: {}\n"), itemID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerStats" property
     FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
@@ -272,7 +370,19 @@ void ItemManager::givePlayerItem(int itemID)
 
     // Get the "PlayerEquipment.Inventory_23_288399C5416269F828550FB7376E7942" property
     auto playerStatsStruct = playerStatsProperty->GetStruct();
+    if (!playerStatsStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+        return;
+    }
+
     auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerStats)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
+        return;
+    }
+
     FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory_23_288399C5416269F828550FB7376E7942"));
     if (!inventoryProperty)
     {
@@ -281,6 +391,11 @@ void ItemManager::givePlayerItem(int itemID)
     }
 
     TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    if (!inventory)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        return;
+    }
 
     // Go through all items already in inventory, to stack it instead of creating a new item if possible
     for(int32_t i = 0; i < inventory->Num(); i++)
@@ -323,6 +438,11 @@ void ItemManager::givePlayerKeyItem(int itemID)
     Output::send<LogLevel::Verbose>(STR("Giving player passive item ID: {}\n"), itemID);
 
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
 
     // Get the "PlayerStats" property
     FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
@@ -334,15 +454,32 @@ void ItemManager::givePlayerKeyItem(int itemID)
 
     // Get the "PlayerEquipment.PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94" property
     auto playerStatsStruct = playerStatsProperty->GetStruct();
+    if (!playerStatsStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+        return;
+    }
+
     auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerStats)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
+        return;
+    }
+
     FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
     if (!inventoryProperty)
     {
-        Output::send<LogLevel::Error>(STR("Could not find Tunics_19_8878CF744AF2806994F2E48778F1CC2D property in PlayerStats\n"));
+        Output::send<LogLevel::Error>(STR("Could not find PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94 property in PlayerStats\n"));
         return;
     }
 
     TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    if (!inventory)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        return;
+    }
 
     // Go through all items already in inventory, to stack it instead of creating a new item if possible
     for(int32_t i = 0; i < inventory->Num(); i++)

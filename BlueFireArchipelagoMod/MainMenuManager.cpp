@@ -310,7 +310,19 @@ bool MainMenuManager::ConfigureTextboxStyles(const TArray<UObject*>& textboxes, 
 
         // Get the "WidgetStyle.Font" property
         auto StyleWidgetStruct = StyleWidgetProperty->GetStruct();
+        if (!StyleWidgetStruct)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get struct from WidgetStyle property\n"));
+            return false;
+        }
+
         auto StyleWidget = StyleWidgetProperty->ContainerPtrToValuePtr<void>(textBox);
+        if (!StyleWidget)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get StyleWidget value pointer\n"));
+            return false;
+        }
+
         FStructProperty* FontProperty = static_cast<FStructProperty*>(StyleWidgetStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT));
         if (!FontProperty)
         {
@@ -319,7 +331,18 @@ bool MainMenuManager::ConfigureTextboxStyles(const TArray<UObject*>& textboxes, 
         }
 
         auto FontStruct = FontProperty->GetStruct();
+        if (!FontStruct)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get struct from Font property\n"));
+            return false;
+        }
+
         auto Font = FontProperty->ContainerPtrToValuePtr<void>(StyleWidget);
+        if (!Font)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get Font value pointer\n"));
+            return false;
+        }
 
         // Get the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
         FProperty* FontSizeProperty = static_cast<FProperty*>(FontStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT_SIZE));
@@ -332,6 +355,18 @@ bool MainMenuManager::ConfigureTextboxStyles(const TArray<UObject*>& textboxes, 
 
         uint32_t* widgetFontSize = FontSizeProperty->ContainerPtrToValuePtr<uint32_t>(Font);
         UObject** widgetFontObject = FontObjectProperty->ContainerPtrToValuePtr<UObject*>(Font);
+
+        if (!widgetFontSize)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get font size value pointer for textbox %d\n"), i);
+            return false;
+        }
+
+        if (!widgetFontObject)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get font object value pointer for textbox %d\n"), i);
+            return false;
+        }
 
         // Set the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
         *widgetFontObject = fontObject;
@@ -408,6 +443,11 @@ void MainMenuManager::DeleteOriginalTextbox()
 
 	// Call the "RemoveFromParent" method on the original EditableTextBox to remove it from the menu
 	UFunction* RemoveFromParentFunc = static_cast<UFunction*>(UObjectGlobals::StaticFindObject(nullptr, nullptr, UnrealClasses::FUNC_WIDGET_REMOVE_FROM_PARENT));
+	if (!RemoveFromParentFunc)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find RemoveFromParent function\n"));
+		return;
+	}
 	editableTextBoxOriginal.value()->ProcessEvent(RemoveFromParentFunc, nullptr);
 }
 
@@ -573,6 +613,24 @@ void MainMenuManager::SubmitMenuConnection()
     FText* Username = UsernameEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
     FText* Password = PasswordEditableTextBox.value()->GetValuePtrByPropertyNameInChain<FText>(STR("Text"));
 
+    if (!IP)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get IP text property\n"));
+        return;
+    }
+
+    if (!Username)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get Username text property\n"));
+        return;
+    }
+
+    if (!Password)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get Password text property\n"));
+        return;
+    }
+
     if (BlueFireArchipelagoMod::arcManager)
     {
         BlueFireArchipelagoMod::arcManager->connectToArchipelagoServer(IP, Username, Password);
@@ -597,6 +655,12 @@ void MainMenuManager::SubmitMenuConnection()
     }
 
     bool* bIsAlreadyUsedSaveSlot = gameMenu.value()->GetValuePtrByPropertyNameInChain<bool>(STR("SaveGameExists"));
+    if (!bIsAlreadyUsedSaveSlot)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get SaveGameExists property\n"));
+        return;
+    }
+
     if(*bIsAlreadyUsedSaveSlot)
     {
         UFunction* StartGameFunc = UObjectGlobals::StaticFindObject<UFunction*>(nullptr, nullptr, L"/Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame");
@@ -638,6 +702,12 @@ void MainMenuManager::SubmitMenuConnection()
 
 bool MainMenuManager::StartGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+    if(!BlueFireArchipelagoMod::mainMenuManager)
+    {
+        Output::send<LogLevel::Error>(STR("mainMenuManager is null in StartGameHook\n"));
+        return false;
+    }
+
     if(BlueFireArchipelagoMod::mainMenuManager->bNoHookGameStartOnce)
     {
         BlueFireArchipelagoMod::mainMenuManager->bNoHookGameStartOnce = false;
@@ -672,6 +742,11 @@ bool MainMenuManager::StartGameHook(UObject* Context, FFrame& Stack, void* RESUL
 bool MainMenuManager::CancelWriteHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     Output::send<LogLevel::Verbose>(STR("CancelWriteHook called!\n"));
+    if(!BlueFireArchipelagoMod::mainMenuManager)
+    {
+        Output::send<LogLevel::Error>(STR("mainMenuManager is null in CancelWriteHook\n"));
+        return false;
+    }
     BlueFireArchipelagoMod::mainMenuManager->SetMenuFocusIndex(0);
     return false;
 }
