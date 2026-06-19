@@ -184,6 +184,8 @@ class MainMenuManager
 	/// Loading state: 0 initial - 1 loading - 2 loaded
 	int mainMenuLoadingState;
 
+	static void ArchipelagoConnected();
+
 	/*******************************************************************************
 	 * @fn      HandleUpKeyPress
 	 *

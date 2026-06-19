@@ -633,9 +633,13 @@ void MainMenuManager::SubmitMenuConnection()
 
     if (BlueFireArchipelagoMod::arcManager)
     {
+        BlueFireArchipelagoMod::arcManager->setSuccessfulConnectionCallback(&(MainMenuManager::ArchipelagoConnected));
         BlueFireArchipelagoMod::arcManager->connectToArchipelagoServer(IP, Username, Password);
     }
+}
 
+void MainMenuManager::ArchipelagoConnected()
+{
     // TODO : change the name of the save file to "Archipelago" here
     // TODO : Move this to a callback of the ArchipelagoManager that checks the connection status
 
@@ -742,12 +746,21 @@ bool MainMenuManager::StartGameHook(UObject* Context, FFrame& Stack, void* RESUL
 bool MainMenuManager::CancelWriteHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     Output::send<LogLevel::Verbose>(STR("CancelWriteHook called!\n"));
+
     if(!BlueFireArchipelagoMod::mainMenuManager)
     {
         Output::send<LogLevel::Error>(STR("mainMenuManager is null in CancelWriteHook\n"));
         return false;
     }
     BlueFireArchipelagoMod::mainMenuManager->SetMenuFocusIndex(0);
+
+    if(!BlueFireArchipelagoMod::arcManager)
+    {
+        Output::send<LogLevel::Error>(STR("arcManager is null in CancelWriteHook\n"));
+        return false;
+    }
+    BlueFireArchipelagoMod::arcManager->cancelConnection();
+
     return false;
 }
 

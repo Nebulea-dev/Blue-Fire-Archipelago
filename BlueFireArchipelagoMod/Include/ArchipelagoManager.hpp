@@ -24,11 +24,6 @@ class ArchipelagoManager
 	 *
 	 * @brief   Constructor - initializes Archipelago manager state.
 	 *
-	 *          Registers all event callbacks with the Archipelago library
-	 *          (item receive, item clear, location check). Must be called
-	 *          once during mod initialization before any server connections
-	 *          are attempted.
-	 *
 	 * @return  none
 	 */
 	ArchipelagoManager();
@@ -51,6 +46,27 @@ class ArchipelagoManager
 	void connectToArchipelagoServer(const FText* IP, const FText* Username, const FText* Password);
 
 	/*******************************************************************************
+	 * @fn      cancelConnection
+	 *
+	 * @brief   Cancels the attempts to establish an Archipelago connection.
+	 * 			Should be called upon the user exiting the Archipelago menu.
+	 *
+	 * @return  none
+	 */
+	void cancelConnection();
+
+	/*******************************************************************************
+	 * @fn      setSuccessfulConnectionCallback
+	 *
+	 * @brief   Sets the function to be called upon a successful connection
+	 * 			established with the Archipelago server. Is used to start the
+	 * 			game once the connection is successful.
+	 *
+	 * @return  none
+	 */
+	void setSuccessfulConnectionCallback(void (*callback)(void));
+
+	/*******************************************************************************
 	 * @fn      ReleaseWorld
 	 *
 	 * @brief   Releases all the Archipelago locations.
@@ -60,6 +76,24 @@ class ArchipelagoManager
 	void ReleaseWorld();
 
 	private:
+
+	void (*successfulConnectionCallback)(void);
+	bool bResetConnectionStatusLoop;
+
+	/*******************************************************************************
+	 * @fn      initCallbacks
+	 *
+	 * @brief   initializes Archipelago callbacks.
+	 *
+	 *          Registers all event callbacks with the Archipelago library
+	 *          (item receive, item clear, location check). Must be called
+	 *          once during mod initialization before any server connections
+	 *          are attempted and after calling AP_Shutdown.
+	 *
+	 * @return  none
+	 */
+	void initCallbacks();
+
 	/*******************************************************************************
 	 * @fn      OnItemClear
 	 *

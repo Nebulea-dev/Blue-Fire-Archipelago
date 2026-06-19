@@ -13,14 +13,19 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-ArchipelagoManager::ArchipelagoManager()
+ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false)
+{
+	this->initCallbacks();
+	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
+}
+
+void ArchipelagoManager::initCallbacks()
 {
 	AP_SetItemClearCallback(StaticItemClearCallback);
 	AP_SetItemRecvCallback(StaticItemReceiveCallback);
 	AP_SetLocationCheckedCallback(StaticLocationCheckCallback);
-
-	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
 }
+
 
 void ArchipelagoManager::StaticItemClearCallback()
 {
@@ -95,6 +100,55 @@ void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText
     Output::send<LogLevel::Verbose>(STR("Connecting to Archipelago server...\n"));
     AP_Init(IPCstr, Archipelago::GAME_NAME, UsernameCstr, PasswordCstr);
     AP_Start();
+
+	/// Loop until the connection is successful
+	AP_ConnectionStatus status;
+	bool bConnectionSuccessful = false;
+
+	while(!bConnectionSuccessful && !bResetConnectionStatusLoop)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+		status = AP_GetConnectionStatus();
+		switch (status)
+		{
+		case AP_ConnectionStatus::Disconnected:
+			Output::send<LogLevel::Error>(STR("Connection to Archipelago server failed, check your login details.\n"));
+			break;
+
+		case AP_ConnectionStatus::ConnectionRefused:
+			Output::send<LogLevel::Error>(STR("Connection to Archipelago server refused, check the IP details\n"));
+			break;
+
+		case AP_ConnectionStatus::Connected:
+			Output::send<LogLevel::Verbose>(STR("Connection to Archipelago server successful, authenticating ...\n"));
+			break;
+
+		case AP_ConnectionStatus::Authenticated:
+			Output::send<LogLevel::Verbose>(STR("Authentication to Archipelago server successful, starting game ...\n"));
+			this->successfulConnectionCallback();
+			bConnectionSuccessful = true;
+			break;
+
+		default:
+			Output::send<LogLevel::Error>(STR("Connection status is not recognized, open a Github issue please!\n"));
+			break;
+		}
+	}
+
+	bResetConnectionStatusLoop = false;
+}
+
+void ArchipelagoManager::cancelConnection()
+{
+	AP_Shutdown();
+	this->bResetConnectionStatusLoop = true;
+	this->initCallbacks();
+}
+
+void ArchipelagoManager::setSuccessfulConnectionCallback(void (*callback)(void))
+{
+	this->successfulConnectionCallback = callback;
 }
 
 void ArchipelagoManager::ReleaseWorld()
