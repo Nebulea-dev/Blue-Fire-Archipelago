@@ -137,9 +137,9 @@ regions:
     - name: chest
       objectName: Chest_A01_Tunic_AlphaTunic
   - name: Boy's Room
-    pickups:
-    - name: Spirit
-      objectName: Spirit_A01_FarasGrace
+#    pickups:
+#    - name: Spirit
+#      objectName: Spirit_A01_FarasGrace
   - name: Bottom Corridor
     void_gates:
     - name: Borisa's Fate Void Gate
