@@ -50,6 +50,15 @@ class ArchipelagoManager
 	 */
 	void connectToArchipelagoServer(const FText* IP, const FText* Username, const FText* Password);
 
+	/*******************************************************************************
+	 * @fn      ReleaseWorld
+	 *
+	 * @brief   Releases all the Archipelago locations.
+	 *
+	 * @return  none
+	 */
+	void ReleaseWorld();
+
 	private:
 	/*******************************************************************************
 	 * @fn      OnItemClear

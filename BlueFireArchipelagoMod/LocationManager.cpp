@@ -1,5 +1,6 @@
 #include <LocationManager.hpp>
 #include <ItemManager.hpp>
+#include <ArchipelagoManager.hpp>
 #include <ArchipelagoModConfig.hpp>
 #include <LocationsData.hpp>
 #include <BlueFireArchipelagoMod.hpp>
@@ -27,6 +28,8 @@ LocationManager::LocationManager()
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Player/Logic/FrameWork/Global_Controller.Global_Controller_C:LoadAllLevels"), OnLevelLoaded);
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/HUD/Dialog/MainDialogWB.MainDialogWB_C:WriteShopArrayToGI"), OnItemBought);
+
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Enemies/Master/BP_BossDoor_Queen.BP_BossDoor_Queen_C:Kill Goddess"), OnKillGoddess);
 
 
 	// Listen to object creation for EditableTextBox controls
@@ -631,6 +634,24 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromShopID(const uint32_t 
 	}
 }
 
+
+// ============== Release methods ==============
+
+
+bool LocationManager::OnKillGoddess(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+	if(!BlueFireArchipelagoMod::arcManager)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find the Archipelago manager"));
+		return false;
+	}
+
+	BlueFireArchipelagoMod::arcManager->ReleaseWorld();
+
+	return false;
+}
+
+
 // ============== Logs methods ==============
 
 void LocationManager::OnNewItemCreated(const UObjectBase* object, int32 index)
@@ -640,7 +661,7 @@ void LocationManager::OnNewItemCreated(const UObjectBase* object, int32 index)
 
 void LocationManager::logIncorrectMapping(const std::wstring locationName)
 {
-	Output::send<LogLevel::Error>(STR("Hi ! It looks like the location you just checked was not correctly registered in the location mapping in	ArchipelagoModConfig.hpp."));
+	Output::send<LogLevel::Error>(STR("Hi ! It looks like the location you just checked was not correctly registered in the location mapping in	LocationsData.hpp."));
 	Output::send<LogLevel::Error>(STR("This mod is still very new, and some chests or other locations might be missing."));
 	Output::send<LogLevel::Error>(STR("Please open an issue on Github or contact nebulea__ on discord to get this added."));
 	Output::send<LogLevel::Error>(STR("Be sure to include a description of where you found this location, and include the following location name in your message :"));

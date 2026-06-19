@@ -15,7 +15,6 @@ HookHelper::HookHelper()
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
-        /*
         if(objectName.find(STR("Input")) == std::string::npos &&
            objectName.find(STR("Ubergraph")) == std::string::npos &&
            objectName.find(STR("Tick")) == std::string::npos &&
@@ -26,10 +25,13 @@ HookHelper::HookHelper()
            objectName.find(STR("Life")) == std::string::npos &&
            objectName.find(STR("ChangeIdle1")) == std::string::npos &&
            objectName.find(STR("Fog")) == std::string::npos &&
+           objectName.find(STR("Random_MoveTo")) == std::string::npos &&
+           objectName.find(STR("PerformConditionCheck")) == std::string::npos &&
            objectName.find(STR("Animation")) == std::string::npos)
         {
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
+        /*
 
         if(objectName.find(STR("TunicMaker")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
         {

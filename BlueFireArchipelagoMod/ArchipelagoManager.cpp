@@ -96,3 +96,9 @@ void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText
     AP_Init(IPCstr, Archipelago::GAME_NAME, UsernameCstr, PasswordCstr);
     AP_Start();
 }
+
+void ArchipelagoManager::ReleaseWorld()
+{
+    Output::send<LogLevel::Verbose>(STR("Game completed, releasing world...\n"));
+	AP_StoryComplete();
+}
