@@ -439,17 +439,19 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 		itemIndex = Shops::Mork::spiritInventory.end();
         inventoryItem item = (*shopMork)[i];
 
-		if(item.type == 3)
-		{
-			itemIndex = Shops::Mork::spiritInventory.find(item.spirit);
-		}
+		if(item.type == 1 && item.weapon == 0) continue;
 
 		if(item.type == 0)
 		{
 			itemIndex = Shops::Mork::itemInventory.find(item.item);
 		}
 
-		if (itemIndex == Shops::Mork::itemInventory.end())
+		if(item.type == 3)
+		{
+			itemIndex = Shops::Mork::spiritInventory.find(item.spirit);
+		}
+
+		if (itemIndex == Shops::Mork::itemInventory.end() || itemIndex == Shops::Mork::spiritInventory.end())
 		{
 			Output::send<LogLevel::Error>(STR("Could not find the item in Mork's shop\n"));
 			return false;
@@ -464,6 +466,8 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 	for(int32_t i = 0; i < shopOnrom->Num(); i++)
     {
         inventoryItem item = (*shopOnrom)[i];
+
+		if(item.type == 1 && item.weapon == 0) continue;
 
 		itemIndex = Shops::Onrom::inventory.find(item.item);
 		if (itemIndex == Shops::Onrom::inventory.end())
@@ -482,6 +486,8 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
     {
         inventoryItem item = (*shopSpiritHunter)[i];
 
+		if(item.type == 1 && item.weapon == 0) continue;
+
 		itemIndex = Shops::SpiritHunter::inventory.find(item.spirit);
 		if (itemIndex == Shops::SpiritHunter::inventory.end())
 		{
@@ -498,6 +504,8 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 	for(int32_t i = 0; i < shopAri->Num(); i++)
     {
         inventoryItem item = (*shopAri)[i];
+
+		if(item.type == 1 && item.weapon == 0) continue;
 
 		itemIndex = Shops::Ari::inventory.find(item.tunic);
 		if (itemIndex == Shops::Ari::inventory.end())
@@ -517,6 +525,8 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 		itemIndex = Shops::Mork::spiritInventory.end();
         inventoryItem item = (*shopPoti)[i];
 
+		if(item.type == 1 && item.weapon == 0) continue;
+
 		if(item.type == 0)
 		{
 			itemIndex = Shops::Poti::itemInventory.find(item.item);
@@ -532,7 +542,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 			itemIndex = Shops::Poti::spiritInventory.find(item.spirit);
 		}
 
-		if (itemIndex == Shops::Poti::itemInventory.end())
+		if (itemIndex == Shops::Poti::itemInventory.end() || itemIndex == Shops::Poti::weaponInventory.end() || itemIndex == Shops::Poti::spiritInventory.end())
 		{
 			Output::send<LogLevel::Error>(STR("Could not find the item in Poti's shop\n"));
 			return false;
@@ -549,6 +559,8 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 	for(int32_t i = 0; i < shopPOI->Num(); i++)
     {
         inventoryItem item = (*shopPOI)[i];
+
+		if(item.type == 1 && item.weapon == 0) continue;
 
 		itemIndex = Shops::Poi::inventory.find(item.item);
 		if (itemIndex == Shops::Poi::inventory.end())

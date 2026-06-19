@@ -18,6 +18,16 @@ using namespace Unreal;
 class UnrealObjectQueries
 {
 public:
+
+	/*******************************************************************************
+	 * @fn      FindPlayerCharacter
+	 *
+	 * @brief   Find the player character instance.
+	 *
+	 * @return  optional containing character pointer, empty if not found
+	 */
+	static std::optional<UObject*> FindPlayerCharacter();
+
 	/*******************************************************************************
 	 * @fn      FindArchipelagoTextbox
 	 *

@@ -32,6 +32,32 @@ std::optional<UObject*> UnrealObjectQueries::FindWidget(
 	return result;
 }
 
+std::optional<UObject*> UnrealObjectQueries::FindPlayerCharacter()
+{
+	std::vector<UObject*> foundObjects;
+
+	UObjectGlobals::FindAllOf(L"Player_Character_BP_C", foundObjects);
+
+	for(UObject* foundObj : foundObjects)
+	{
+		// Find the one WidgetSwitcher object that:
+		// - has full path starting with /Game/
+		// - contains "Master_DLC_VoidMaster" in its full path
+		const std::wstring fullPath = foundObj->GetFullName();
+
+		// Check all criteria
+		bool startsWithEngine = fullPath.starts_with(STR("WidgetSwitcher /Engine/"));
+		bool hasVoidDLC = fullPath.find(STR("Master_DLC_VoidMaster")) != std::string::npos;
+
+		if (startsWithEngine && hasVoidDLC)
+		{
+			return foundObj;
+		}
+	}
+
+	return std::nullopt;
+}
+
 std::optional<UObject*> UnrealObjectQueries::FindGameMenuWidgetSwitcher()
 {
 	// Find the one WidgetSwitcher object that:

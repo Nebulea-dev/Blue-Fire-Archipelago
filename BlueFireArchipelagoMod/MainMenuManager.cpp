@@ -485,9 +485,7 @@ bool MainMenuManager::IsUserInArchipelagoMenu()
 
 void MainMenuManager::OnReturnPressed()
 {
-    if(!bMainMenuLoaded) return;
-
-    Output::send<LogLevel::Verbose>(STR("RETURN was pressed\n"));
+    if(!bMainMenuLoaded || UnrealObjectQueries::FindPlayerCharacter().has_value()) return;
 
     if (!IsUserInArchipelagoMenu())
     {

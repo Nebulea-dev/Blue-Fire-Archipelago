@@ -67,13 +67,12 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 		return;
 	}
 
-	Output::send<LogLevel::Verbose>(STR("Received item with id {} from Archipelago, notifyPlayer = {}\n"), item, notifyPlayer);
 	BlueFireArchipelagoMod::itemManager->itemReceiveCb((int)item - ArchipelagoModConfig::Archipelago::BF_BASE_ID);
 }
 
 void ArchipelagoManager::OnLocationCheck(int64_t location)
 {
-	Output::send<LogLevel::Verbose>(STR("Checked location with id {} from Archipelago\n"), location);
+	Output::send<LogLevel::Verbose>(STR("Checked location with id {} from Archipelago\n"), location - ArchipelagoModConfig::Archipelago::BF_BASE_ID);
 }
 
 void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText* Username, const FText* Password)
