@@ -1,9 +1,9 @@
 set(TARGET BlueFireArchipelagoMod)
 
 # Ensure LocationsData.hpp is generated before building
-# This script runs the Rust generator to create the header from locations.json
+# This script runs the Rust generator to create the header from Locations.yaml
 set(LOCATIONS_DATA_HPP "${CMAKE_CURRENT_SOURCE_DIR}/Include/LocationsData.hpp")
-set(LOCATIONS_JSON "${CMAKE_CURRENT_SOURCE_DIR}/locations.json")
+set(LOCATIONS_YAML "${CMAKE_CURRENT_SOURCE_DIR}/Locations.yaml")
 set(GENERATOR_SRC "${CMAKE_CURRENT_SOURCE_DIR}/generate_locations/src/main.rs")
 set(GENERATOR_CARGO "${CMAKE_CURRENT_SOURCE_DIR}/generate_locations/Cargo.toml")
 
@@ -12,14 +12,14 @@ find_program(CARGO_EXECUTABLE cargo)
 if(NOT CARGO_EXECUTABLE)
     message(WARNING "cargo not found. Please install Rust/Cargo. LocationsData.hpp must be pre-generated.")
 else()
-    # Custom command to generate LocationsData.hpp from locations.json
+    # Custom command to generate LocationsData.hpp from Locations.yaml
     add_custom_command(
         OUTPUT "${LOCATIONS_DATA_HPP}"
         COMMAND "${CARGO_EXECUTABLE}" build --manifest-path "${GENERATOR_CARGO}" --release
         COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate_locations/target/release/generate_locations$<$<PLATFORM_ID:Windows>:.exe>"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         DEPENDS "${LOCATIONS_JSON}" "${GENERATOR_SRC}" "${GENERATOR_CARGO}"
-        COMMENT "Generating LocationsData.hpp from locations.json using Rust generator"
+        COMMENT "Generating LocationsData.hpp from Locations.yaml using Rust generator"
         VERBATIM
     )
 endif()

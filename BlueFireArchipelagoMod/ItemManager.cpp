@@ -77,11 +77,27 @@ void ItemManager::itemReceiveCb(int itemID)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-    // Currently causes a crash for big blue chests (Chest_Master_Child_C) , no idea why.
-    //HookHelper::setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
-    //HookHelper::setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
-    // HookHelper::setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
-    //BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
+    // Currently causes a crash at random for some chest, even though all chest have the same content, no idea why.
+    if (!BlueFireArchipelagoMod::hookManager)
+    {
+        Output::send<LogLevel::Error>(STR("hookManager is null in PlayNewItemPreHook\n"));
+        return false;
+    }
+
+    // Stack parameter manipulation can corrupt memory. Only attempt if safe
+    // TODO : fix out why does sometime the address become 0xFFFFFFFF
+    try
+    {
+
+        BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
+        BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
+        BlueFireArchipelagoMod::hookManager->setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
+        BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
+    }
+    catch (...)
+    {
+        Output::send<LogLevel::Error>(STR("Exception caught in setParamValue during PlayNewItemPreHook\n"));
+    }
 
     // Do not prevent the original function from being called
     return false;

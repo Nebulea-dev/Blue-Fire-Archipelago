@@ -91,7 +91,7 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str(" * LocationsData\n");
     header.push_str(" *\n");
     header.push_str(" * @brief Compiled-in location data for the Archipelago mod.\n");
-    header.push_str(" *        Generated at build time from locations.json.\n");
+    header.push_str(" *        Generated at build time from Locations.yaml.\n");
     header.push_str(" */\n");
     header.push_str("class LocationsData\n");
     header.push_str("{\n");

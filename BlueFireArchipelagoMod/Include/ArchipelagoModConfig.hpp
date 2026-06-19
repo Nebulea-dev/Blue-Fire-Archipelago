@@ -318,13 +318,13 @@ namespace ArchipelagoModConfig
 	}
 
 	// ============================================================
-	// Location IDs - Compiled from locations.json at build time
+	// Location IDs - Compiled from Locations.yaml at build time
 	// ============================================================
 	// NOTE: Location data is now embedded in the binary via LocationsData.hpp
 	// Access maps using LocationsData::GetChestNameToLocationIDMap()
 	// and LocationsData::GetStatueNameToLocationIDMap()
 	//
-	// The Rust generator tool converts locations.json into C++ static inline maps
+	// The Rust generator tool converts Locations.yaml into C++ static inline maps
 	// during the CMake build process. This eliminates runtime JSON parsing and
 	// external file dependencies.
 
