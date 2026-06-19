@@ -262,14 +262,12 @@ bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* 
         // If the inventory item isn't of type "item"
         if(item.type != 0)
         {
-            Output::send<LogLevel::Verbose>(STR("Item is of type {}, skipping\n"), item.type);
             continue;
         }
 
         // If not the correct item
         if(item.item != 17)
         {
-            Output::send<LogLevel::Verbose>(STR("Item is of id {}, skipping\n"), item.item);
             continue;
         }
 

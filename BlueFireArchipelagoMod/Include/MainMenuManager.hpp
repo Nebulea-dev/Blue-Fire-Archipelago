@@ -178,6 +178,12 @@ class MainMenuManager
 	/// Menu state: Current menu item index with focus (1-4, 0 for none)
 	int menuFocusIndex;
 
+	/// Main menu done loading
+	bool bMainMenuLoaded;
+
+	/// Loading state: 0 initial - 1 loading - 2 loaded
+	int mainMenuLoadingState;
+
 	/*******************************************************************************
 	 * @fn      HandleUpKeyPress
 	 *
@@ -325,6 +331,7 @@ class MainMenuManager
 	//TODO : Make this pretty docs
 	static bool StartGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 	static bool CancelWriteHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+	static bool MainMenuDoneLoading(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 	bool bNoHookGameStartOnce{false};
 };

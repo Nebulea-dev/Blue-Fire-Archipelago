@@ -96,23 +96,6 @@ public:
     static std::optional<T> readParamValue(std::wstring paramName, FFrame& Stack);
 
     /*******************************************************************************
-     * @fn      setParamValue
-     *
-     * @brief   Modify the value of a function parameter from within a hook.
-     *
-     *          Must be called only from within a registered hook callback.
-     *          Modifies the parameter value that will be passed to the function.
-     *
-     * @param   paramName - Name of the parameter to modify
-     * @param   Stack     - Function stack frame from the hook callback
-     * @param   object    - New value for the parameter
-     *
-     * @return  true if parameter was modified successfully, false if not found
-     */
-    template <class T>
-    static bool setParamValue(std::wstring paramName, FFrame& Stack, T object);
-
-    /*******************************************************************************
      * @fn      setParamValue (pointer overload)
      *
      * @brief   Modify the value of a pointer parameter from within a hook.
@@ -124,10 +107,10 @@ public:
      * @param   Stack     - Function stack frame from the hook callback
      * @param   object    - Pointer to copy to the parameter
      *
-     * @return  true if parameter was modified successfully, false if not found
+     * @return  none
      */
     template <class T>
-    static bool setParamValue(std::wstring paramName, FFrame& Stack, T* object);
+    static void setParamValue(std::wstring paramName, FFrame& Stack, T* object);
 
     /*******************************************************************************
      * @fn      executeInGameThread
@@ -183,28 +166,7 @@ std::optional<T> HookHelper::readParamValue(std::wstring paramName, FFrame& Stac
 
 // Changes the value of a parameter of the function
 template <class T>
-bool HookHelper::setParamValue(std::wstring paramName, FFrame& Stack, T object)
-{
-    UFunction* function = Stack.Node();
-    uint8_t* paramsStack = Stack.Locals();
-
-    for (const FProperty* param : TFieldRange<FProperty>(function))
-    {
-        if (param->GetName() == paramName)
-        {
-            int32_t offset = param->GetOffset_ForInternal();
-            memcpy(paramsStack + offset, &object, sizeof(T));
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// Changes the value of a parameter of the function
-template <class T>
-bool HookHelper::setParamValue(std::wstring paramName, FFrame& Stack, T* object)
+void HookHelper::setParamValue(std::wstring paramName, FFrame& Stack, T* object)
 {
     UFunction* function = Stack.Node();
     uint8_t* paramsStack = Stack.Locals();
@@ -216,9 +178,9 @@ bool HookHelper::setParamValue(std::wstring paramName, FFrame& Stack, T* object)
             int32_t offset = param->GetOffset_ForInternal();
             memcpy(paramsStack + offset, object, sizeof(T));
 
-            return true;
+            return;
         }
     }
 
-    return false;
+    Output::send<LogLevel::Error>(STR("Could not find param {}\n"), paramName);
 }

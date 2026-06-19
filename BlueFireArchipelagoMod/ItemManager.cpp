@@ -17,9 +17,6 @@ ItemManager::ItemManager()
 {
 	Output::send<LogLevel::Verbose>(STR("ItemManager instance created\n"));
 
-    itemName = new FText(Strings::ITEM_NAME);
-    itemDescription = new FText(Strings::ITEM_DESCRIPTION);
-
     // Register the ItemManager hook
     BlueFireArchipelagoMod::hookManager->registerPreHook(Hooks::PLAY_NEW_ITEM, [](UObject* Context, FFrame& Stack, void* RESULT_DECL) {
         if (BlueFireArchipelagoMod::itemManager)
@@ -84,20 +81,16 @@ bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESU
         return false;
     }
 
-    // Stack parameter manipulation can corrupt memory. Only attempt if safe
-    // TODO : fix out why does sometime the address become 0xFFFFFFFF
-    try
-    {
+    // TODO : Fix leak
+    FText* itemName = new FText(Strings::ITEM_NAME);
+    FText* itemDescription = new FText(Strings::ITEM_DESCRIPTION);
+    uint8_t* keyItem = new uint8_t(UI::KEY_ITEM_TYPE);
+    uint32_t* itemAmount = new uint32_t(UI::ITEM_AMOUNT);
 
-        BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
-        BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
-        BlueFireArchipelagoMod::hookManager->setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, UI::KEY_ITEM_TYPE);
-        BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, UI::ITEM_AMOUNT);
-    }
-    catch (...)
-    {
-        Output::send<LogLevel::Error>(STR("Exception caught in setParamValue during PlayNewItemPreHook\n"));
-    }
+    BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
+    BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
+    BlueFireArchipelagoMod::hookManager->setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, keyItem);
+    BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, itemAmount);
 
     // Do not prevent the original function from being called
     return false;

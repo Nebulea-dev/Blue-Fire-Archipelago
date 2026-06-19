@@ -16,7 +16,7 @@ using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
 MainMenuManager::MainMenuManager()
-	: bMenuTextboxesCreated(false), menuFocusIndex(0)
+	: bMenuTextboxesCreated(false), bMainMenuLoaded(false), menuFocusIndex(0), mainMenuLoadingState(0)
 {
 	if (!BlueFireArchipelagoMod::hookManager || !BlueFireArchipelagoMod::objectListener)
 	{
@@ -32,6 +32,7 @@ MainMenuManager::MainMenuManager()
 	BlueFireArchipelagoMod::hookManager->registerPreHook(Hooks::DOWN_KEY, DownKeyHook);
 	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartGame", StartGameHook);
 	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenu.GameMenu_C:CancelWrite", CancelWriteHook);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/Maps/Menu/MainMenuSub.MainMenuSub_C:OpenSettingsSave", MainMenuDoneLoading);
 
 	Output::send<LogLevel::Verbose>(STR("MainMenuManager instance created\n"));
 }
@@ -484,10 +485,9 @@ bool MainMenuManager::IsUserInArchipelagoMenu()
 
 void MainMenuManager::OnReturnPressed()
 {
-    Output::send<LogLevel::Verbose>(STR("RETURN was pressed in menu\n"));
+    if(!bMainMenuLoaded) return;
 
-    // TODO : Do this somewhere else this is horrible
-    DeleteOriginalTextbox();
+    Output::send<LogLevel::Verbose>(STR("RETURN was pressed\n"));
 
     if (!IsUserInArchipelagoMenu())
     {
@@ -748,5 +748,28 @@ bool MainMenuManager::CancelWriteHook(UObject* Context, FFrame& Stack, void* RES
         return false;
     }
     BlueFireArchipelagoMod::mainMenuManager->SetMenuFocusIndex(0);
+    return false;
+}
+
+
+bool MainMenuManager::MainMenuDoneLoading(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+    // Is only done loading when called a 2nd time
+    BlueFireArchipelagoMod::mainMenuManager->mainMenuLoadingState += 1;
+    if(BlueFireArchipelagoMod::mainMenuManager->mainMenuLoadingState < 2)
+    {
+        return false;
+    }
+
+    Output::send<LogLevel::Verbose>(STR("MainMenuDoneLoading called!\n"));
+    if(!BlueFireArchipelagoMod::mainMenuManager)
+    {
+        Output::send<LogLevel::Error>(STR("mainMenuManager is null in CancelWriteHook\n"));
+        return false;
+    }
+
+    BlueFireArchipelagoMod::mainMenuManager->DeleteOriginalTextbox();
+    BlueFireArchipelagoMod::mainMenuManager->bMainMenuLoaded = true;
+
     return false;
 }

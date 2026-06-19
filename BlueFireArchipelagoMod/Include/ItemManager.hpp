@@ -138,11 +138,6 @@ class ItemManager
 	 * @return  none
 	 */
 	void givePlayerKeyItem(int itemID);
-
-
-	private:
-    FText* itemName;
-    FText* itemDescription;
 };
 
 struct inventoryItem
