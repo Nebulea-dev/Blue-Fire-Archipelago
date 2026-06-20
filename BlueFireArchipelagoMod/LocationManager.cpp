@@ -548,8 +548,6 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 			return false;
 		}
 
-		Output::send<LogLevel::Verbose>(STR("Setting id {} for item {}\n"), itemIndex->second, i);
-
 		item.originalAmount = itemIndex->second;
 
         (*shopPoti)[i] = item;

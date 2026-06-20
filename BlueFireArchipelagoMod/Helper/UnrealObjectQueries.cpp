@@ -40,13 +40,13 @@ std::optional<UObject*> UnrealObjectQueries::FindPlayerCharacter()
 
 	for(UObject* foundObj : foundObjects)
 	{
-		// Find the one WidgetSwitcher object that:
+		// Find the one Player_Character_BP_C object that:
 		// - has full path starting with /Game/
 		// - contains "Master_DLC_VoidMaster" in its full path
 		const std::wstring fullPath = foundObj->GetFullName();
 
 		// Check all criteria
-		bool startsWithEngine = fullPath.starts_with(STR("WidgetSwitcher /Engine/"));
+		bool startsWithEngine = fullPath.starts_with(STR("Player_Character_BP_C /Game/"));
 		bool hasVoidDLC = fullPath.find(STR("Master_DLC_VoidMaster")) != std::string::npos;
 
 		if (startsWithEngine && hasVoidDLC)
@@ -60,25 +60,46 @@ std::optional<UObject*> UnrealObjectQueries::FindPlayerCharacter()
 
 std::optional<UObject*> UnrealObjectQueries::FindGameMenuWidgetSwitcher()
 {
-	// Find the one WidgetSwitcher object that:
-	// - has full path starting with /Engine/
-	// - ends with WidgetSwitcher_0
-	// - contains only the substring "WidgetSwitcher_0" once (ensures uniqueness)
-	// - contains "GameMenu_C" in its full path
-	std::optional<UObject*> result = ObjectFinder::FindObject(L"WidgetSwitcher", [](UObject* obj) {
-		const std::wstring fullPath = obj->GetFullName();
+	// Find the one GameMenuController_C object that:
+	// - ends with GameMenuController_2
+	std::optional<UObject*> gameMenuController = ObjectFinder::FindObject(L"GameMenuController_C", [](UObject* obj) {
 		const std::wstring objectName = obj->GetNamePrivate().ToString();
 
-		// Check all criteria
-		bool startsWithEngine = fullPath.starts_with(STR("WidgetSwitcher /Engine/"));
-		bool endsWithWidgetSwitcher = objectName.ends_with(STR("WidgetSwitcher_0"));
-		bool uniqueOccurrence = fullPath.find(STR("WidgetSwitcher_0")) == fullPath.rfind(STR("WidgetSwitcher_0"));
-		bool hasGameMenu = fullPath.find(STR("GameMenu_C")) != std::string::npos;
-
-		return startsWithEngine && endsWithWidgetSwitcher && uniqueOccurrence && hasGameMenu;
+		return objectName.ends_with(STR("GameMenuController_2"));
 	});
 
-	return result;
+	// Couldn't find the GameMenuController_C
+	if(!gameMenuController.has_value())
+	{
+		return std::nullopt;
+	}
+
+	// We CANNOT find the WidgetSwitcher object directly.
+	// The reason for this is that upon loading a game and exiting to main menu,
+	// Blue Fire will re-create a WidgetSwitcher but with different numbers, see :
+	// WidgetSwitcher /Engine/Transient.GameEngine_2147482624:BlueFire_Game_Instance_C_2147482618.GameMenu_C_2147482108.WidgetTree_0.WidgetSwitcher_0
+    // WidgetSwitcher /Engine/Transient.GameEngine_2147482624:BlueFire_Game_Instance_C_2147482618.GameMenu_C_2147482538.WidgetTree_0.WidgetSwitcher_0
+
+	// The correct way is to look for the GameMenuController_C object and look
+	// for the GameMenu property
+
+	// Get the "GameMenu" property of the GameMenuController_C
+	UObject** gameMenu = gameMenuController.value()->GetValuePtrByPropertyNameInChain<UObject*>(L"GameMenu");
+	if (gameMenu == nullptr)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find GameMenu property in GameMenuController_C\n"));
+		return std::nullopt;
+	}
+
+	// Get the "WidgetSwitcher_0" property of the GameMenu
+	UObject** widgetSwitcher = (*gameMenu)->GetValuePtrByPropertyNameInChain<UObject*>(L"WidgetSwitcher_0");
+	if (widgetSwitcher == nullptr)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find WidgetSwitcher_0 property in GameMenu\n"));
+		return std::nullopt;
+	}
+
+	return *widgetSwitcher;
 }
 
 std::optional<UObject*> UnrealObjectQueries::FindGameMenuWrapBox()

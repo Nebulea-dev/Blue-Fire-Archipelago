@@ -507,12 +507,12 @@ void MainMenuManager::OnReturnPressed()
 
 bool MainMenuManager::HandleUpKeyPress()
 {
-    Output::send<LogLevel::Verbose>(STR("UP key pressed in menu\n"));
-
     if (!IsUserInArchipelagoMenu())
     {
         return false;
     }
+
+    Output::send<LogLevel::Verbose>(STR("UP key pressed in menu\n"));
 
     // Move focus up (decrease index, staying within 1-3 range)
     int currentIndex = GetMenuFocusIndex();
@@ -523,12 +523,12 @@ bool MainMenuManager::HandleUpKeyPress()
 
 bool MainMenuManager::HandleDownKeyPress()
 {
-    Output::send<LogLevel::Verbose>(STR("DOWN key pressed in menu\n"));
-
     if (!IsUserInArchipelagoMenu())
     {
         return false;
     }
+
+    Output::send<LogLevel::Verbose>(STR("DOWN key pressed in menu\n"));
 
     int currentIndex = GetMenuFocusIndex();
     if (currentIndex == 3)
@@ -759,6 +759,7 @@ bool MainMenuManager::CancelWriteHook(UObject* Context, FFrame& Stack, void* RES
     }
     BlueFireArchipelagoMod::arcManager->cancelConnection();
 
+
     return false;
 }
 
@@ -779,6 +780,7 @@ bool MainMenuManager::MainMenuDoneLoading(UObject* Context, FFrame& Stack, void*
         return false;
     }
 
+    BlueFireArchipelagoMod::mainMenuManager->SetMenuFocusIndex(0);
     BlueFireArchipelagoMod::mainMenuManager->DeleteOriginalTextbox();
     BlueFireArchipelagoMod::mainMenuManager->bMainMenuLoaded = true;
 

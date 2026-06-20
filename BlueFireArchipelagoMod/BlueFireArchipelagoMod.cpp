@@ -48,12 +48,14 @@ void BlueFireArchipelagoMod::on_unreal_init()
 
     Output::send<LogLevel::Verbose>(STR("All managers initialized\n"));
 
-    // Hook the RETURN key for menu submission
+    // Hook the RETURN and TAB key for menu submission
     register_keydown_event(Input::Key::RETURN, {}, [this]() {
-        if (mainMenuManager)
-        {
-            mainMenuManager->OnReturnPressed();
-        }
+        mainMenuManager->OnReturnPressed();
+    });
+
+    // Hook the RETURN and TAB key for menu submission
+    register_keydown_event(Input::Key::TAB, {}, [this]() {
+        mainMenuManager->OnReturnPressed();
     });
 
     // TODO : remove this

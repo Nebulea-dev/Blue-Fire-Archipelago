@@ -103,6 +103,7 @@ void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText
 	/// Loop until the connection is successful
 	AP_ConnectionStatus status;
 	bool bConnectionSuccessful = false;
+	bResetConnectionStatusLoop = false;
 
 	while(!bConnectionSuccessful && !bResetConnectionStatusLoop)
 	{
