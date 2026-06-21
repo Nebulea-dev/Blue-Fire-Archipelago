@@ -12,3 +12,7 @@
 ## Archipelago
 
 - The locations checked are not saved in a file dynamically. This is required by the Archipelago spec to make sure that no locations are lost during a disconnection
+
+## General
+
+- Closing the game though the exit game option causes a UE crash because not all object listeners are unregistered. Very low priority
