@@ -25,7 +25,7 @@ The game is completed when the queen is slayed.
 
 ## Adding the Archipelago Mod to Blue Fire
 
-1. Download the latest release of the mod and its dependencies from the [Archipelago-Bluefire Github Releases Page](https://github.com/Nebulea-dev/Blue-Fire-Archipelago)
+1. Download the latest release of the mod and its dependencies from the [Archipelago-Bluefire Github Releases Page](https://github.com/Nebulea-dev/Blue-Fire-Archipelago/releases)
 2. Go to the Blue Fire installation folder. You can access it on Steam by right-clicking the game and selecting `Manage > Browse local files`
 3. Move the content of the archive inside the Blue Fire installation folder. You should now have a `ue4ss` folder at `<installation path>\Blue Fire\Binaries\Win64\`
 
