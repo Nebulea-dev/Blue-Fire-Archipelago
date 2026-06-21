@@ -74,7 +74,6 @@ void ItemManager::itemReceiveCb(int itemID)
 
 bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-    // Currently causes a crash at random for some chest, even though all chest have the same content, no idea why.
     if (!BlueFireArchipelagoMod::hookManager)
     {
         Output::send<LogLevel::Error>(STR("hookManager is null in PlayNewItemPreHook\n"));
