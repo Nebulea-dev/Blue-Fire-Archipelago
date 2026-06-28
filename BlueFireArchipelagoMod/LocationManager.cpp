@@ -28,7 +28,7 @@ LocationManager::LocationManager()
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Bounds/Void/Void_Gate.Void_Gate_C:Glow Eyes"), OnVoidGateCompleted);
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Player/Logic/FrameWork/Global_Controller.Global_Controller_C:LoadAllLevels"), OnLevelLoaded);
-	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/HUD/Dialog/MainDialogWB.MainDialogWB_C:WriteShopArrayToGI"), OnItemBought);
+	BlueFireArchipelagoMod::hookManager->registerPreHook(STR("Function /Game/BlueFire/HUD/Dialog/MainDialogWB.MainDialogWB_C:WriteShopArrayToGI"), OnItemBought);
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Enemies/Master/BP_BossDoor_Queen.BP_BossDoor_Queen_C:Kill Goddess"), OnKillGoddess);
 
@@ -441,6 +441,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopMork)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		if(item.type == 0)
 		{
@@ -469,6 +470,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopOnrom)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		itemIndex = Shops::Onrom::inventory.find(item.item);
 		if (itemIndex == Shops::Onrom::inventory.end())
@@ -488,6 +490,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopSpiritHunter)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		itemIndex = Shops::SpiritHunter::inventory.find(item.spirit);
 		if (itemIndex == Shops::SpiritHunter::inventory.end())
@@ -507,6 +510,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopAri)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		itemIndex = Shops::Ari::inventory.find(item.tunic);
 		if (itemIndex == Shops::Ari::inventory.end())
@@ -527,6 +531,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopPoti)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		if(item.type == 0)
 		{
@@ -560,6 +565,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         inventoryItem item = (*shopPOI)[i];
 
 		if(item.type == 1 && item.weapon == 0) continue;
+		if(item.type == 0 && item.item == 43) continue;
 
 		itemIndex = Shops::Poi::inventory.find(item.item);
 		if (itemIndex == Shops::Poi::inventory.end())
@@ -594,39 +600,111 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 
 bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-	uint32_t* SelectedShopItem = Context->GetValuePtrByPropertyNameInChain<uint32_t>(L"SelectedShopItem");
-	if(!SelectedShopItem)
-	{
-        Output::send<LogLevel::Error>(STR("Could not find the SelectedShopItem parameter of the MainDialogWB_C object\n"));
-		return false;
-	}
 
-	uint32_t* WorldShop = Context->GetValuePtrByPropertyNameInChain<uint32_t>(L"WorldShop");
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return false;
+    }
+
+	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
+
+    TArray<inventoryItem>* shopMork = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop0-Mork");
+    if(!shopMork)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop0-Mork property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopOnrom = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop1-Onrom");
+    if(!shopOnrom)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop1-Onrom property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopSpiritHunter = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop2-SpiritHunter");
+    if(!shopSpiritHunter)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop2-SpiritHunter property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopAri = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop3-Ari");
+    if(!shopAri)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop3-Ari property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopPoti = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop4-Poti");
+    if(!shopPoti)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop4-Poti property\n"));
+        return false;
+    }
+
+    TArray<inventoryItem>* shopPOI = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop5-POI");
+    if(!shopPOI)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Shop5-POI property\n"));
+        return false;
+    }
+
+	TArray<inventoryItem>* shops[6] = {shopMork, shopOnrom, shopSpiritHunter, shopAri, shopPoti, shopPOI};
+
+	// Get the global shop
+	int32_t* WorldShop = Context->GetValuePtrByPropertyNameInChain<int32_t>(L"WorldShop");
 	if(!WorldShop)
 	{
-        Output::send<LogLevel::Error>(STR("Could not find the SelectedShopItem parameter of the MainDialogWB_C object\n"));
+        Output::send<LogLevel::Error>(STR("Could not find the WorldShop parameter of the MainDialogWB_C object\n"));
 		return false;
 	}
 
+	// Get the local updated shop
     TArray<inventoryItem>* ShopInventory = Context->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"ShopInventory");
 	if(!ShopInventory)
 	{
-        Output::send<LogLevel::Error>(STR("Could not find the SelectedShopItem parameter of the MainDialogWB_C object\n"));
+        Output::send<LogLevel::Error>(STR("Could not find the ShopInventory parameter of the MainDialogWB_C object\n"));
 		return false;
 	}
 
-	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromShopID(*WorldShop);
-	if (!locationID.has_value())
-	{
-		logIncorrectMapping(std::to_wstring(*WorldShop));
-		return false;
-	}
+	// Find the missing item
+	bool match;
+	for(int32_t i = 0; i < (shops[*WorldShop])->Num(); i++)
+    {
+		match = false;
+        inventoryItem globalItem = (*shops[*WorldShop])[i];
 
-	inventoryItem itemBought = (*ShopInventory)[*SelectedShopItem];
-	uint32_t archipelagoShopLocationID = locationID.value() + itemBought.originalAmount;
+		for(int32_t i = 0; i < ShopInventory->Num(); i++)
+		{
+			inventoryItem localItem = (*ShopInventory)[i];
 
-	Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
-	AP_SendItem(archipelagoShopLocationID);
+			if(globalItem.originalAmount == localItem.originalAmount)
+			{
+				match = true;
+			}
+		}
+
+		// We found the missing item
+		if(!match)
+		{
+			std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromShopID(*WorldShop);
+			if (!locationID.has_value())
+			{
+				logIncorrectMapping(std::to_wstring(*WorldShop));
+				return false;
+			}
+
+			uint32_t archipelagoShopLocationID = locationID.value() + globalItem.originalAmount;
+
+			Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
+			AP_SendItem(archipelagoShopLocationID);
+		}
+    }
+
+
 
     return false;
 }

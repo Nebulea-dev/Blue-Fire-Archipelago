@@ -16,18 +16,38 @@ HookHelper::HookHelper()
         const std::wstring objectName = Stack.Node()->GetFullName();
 
         /*
-        if(objectName.find(STR("Input")) == std::string::npos &&
-           objectName.find(STR("Ubergraph")) == std::string::npos &&
+        if(objectName.find(STR("Ubergraph")) == std::string::npos &&
            objectName.find(STR("Tick")) == std::string::npos &&
-           objectName.find(STR("Player_Character_BP")) == std::string::npos &&
+           objectName.find(STR("ReceiveTraceHandler")) == std::string::npos &&
+           objectName.find(STR("ReceivePlayerHandler")) == std::string::npos &&
+           objectName.find(STR("TraceReplace")) == std::string::npos &&
+           objectName.find(STR("K2Node")) == std::string::npos &&
            objectName.find(STR("Camera")) == std::string::npos &&
-           objectName.find(STR("Update")) == std::string::npos &&
-           objectName.find(STR("HUD")) == std::string::npos &&
+           objectName.find(STR("UpdatePlayerLoc")) == std::string::npos &&
+           objectName.find(STR("UpdateFootOffset")) == std::string::npos &&
+           objectName.find(STR("UpdateIK")) == std::string::npos &&
+           objectName.find(STR("UpdateSurface")) == std::string::npos &&
+           objectName.find(STR(":UpdateSize")) == std::string::npos &&
+           objectName.find(STR("ReceiveDrawHUD")) == std::string::npos &&
+           objectName.find(STR("Global_Controller_C:Timer")) == std::string::npos &&
+           objectName.find(STR("CheckDistance")) == std::string::npos &&
+           objectName.find(STR(":GetHeadRotActors")) == std::string::npos &&
+           objectName.find(STR(":MusicCallback2")) == std::string::npos &&
+           objectName.find(STR("Inventory_C:Move")) == std::string::npos &&
+           objectName.find(STR("changertpcvalue")) == std::string::npos &&
+           objectName.find(STR("BreathSound")) == std::string::npos &&
+           objectName.find(STR("OnopFlute")) == std::string::npos &&
+           objectName.find(STR("AlreadyOutOfVolume")) == std::string::npos &&
+           //objectName.find(STR("BlueFireHUD")) == std::string::npos &&
+           //objectName.find(STR("BlueFireHud")) == std::string::npos &&
+           //objectName.find(STR("HUD/Inventory")) == std::string::npos &&
+           objectName.find(STR("CheckDash")) == std::string::npos &&
            objectName.find(STR("Life")) == std::string::npos &&
            objectName.find(STR("ChangeIdle1")) == std::string::npos &&
            objectName.find(STR("Fog")) == std::string::npos &&
            objectName.find(STR("Random_MoveTo")) == std::string::npos &&
            objectName.find(STR("PerformConditionCheck")) == std::string::npos &&
+           objectName.find(STR("Cutscenes")) == std::string::npos &&
            objectName.find(STR("Animation")) == std::string::npos)
         {
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
