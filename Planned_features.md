@@ -9,6 +9,7 @@
 - Turn movement spirits into a progressive item
 - Turn abilities into a progressive item with their associated spirit
 - Turn pouch into a progressive item
+- Add spirits slots, money and fire essences as an archipelago item
 
 ## Mid priority
 
