@@ -9,6 +9,9 @@ regions:
       objectName: Chest_A01_Keep_Shield
     - name: Ambush chest 2
       objectName: Chest_A02_Keep_Key_01
+    statues:
+    - name: Levitation Emote Statue
+      objectName: A01_FireKeep_EmoteStatue_Levitation
     events:
     - name: Capture Beira Shards 1
       requiredItems:
@@ -21,15 +24,13 @@ regions:
       objectName: Chest_A02_Keep_Loot_02
   - name: Hub
     chests:
-    - name: Loot chest 1
+    - name: Corridor Right Chest
       objectName: Chest_A02_Keep_Loot_01
-    - name: Loot chest 3
+    - name: Right Backside Chest
       objectName: Chest_A02_GameIntro_44
-    - name: Diamond Wing Chest
+    - name: Left Side Chest
       objectName: Chest_A02_Sword_DiamondWings
     statues:
-    - name: Levitation Emote Statue
-      objectName: A01_FireKeep_EmoteStatue_Levitation
     - name: Techno Emote Statue
       objectName: A01_FireKeep_EmoteStatue_Techno
     - name: Celebration Emote Statue
@@ -43,28 +44,26 @@ regions:
   subregions:
   - name: Main Room
     chests:
-    - name: North loot chest 1
+    - name: Left Room Chest
       objectName: Chest_A02_NorthArcane_Loot_01
-    - name: North loot chest 2
+    - name: Corridor Chest
       objectName: Chest_A02_NorthArcane_Loot_03
-    - name: North loot chest 3
-      objectName: Chest_A02_NorthArcane_Loot_04
-    - name: East loot chest 1
-      objectName: Chest_A02_EastArcane_Loot_01
-    - name: East loot chest 5
-      objectName: Chest_A02_EastArcane_Loot_05
-    - name: Bloodstorm chest
-      objectName: Chest_A02_NorthArcane_Sword_Bloodstorm
-    - name: Arcane chest
-      objectName: Chest_A01_Arcane_Spell
-    - name: South key chest 2
-      objectName: Chest_A02_SouthArcane_Key_02
-    - name: East loot chest 2
+    - name: Spirit Hunter Chest 1
       objectName: Chest_A02_EastArcane_Loot_02
-    - name: East loot chest 3
-      objectName: Chest_A02_EastArcane_Loot_03
-    - name: South loot chest
+    - name: Spirit Hunter Chest 2
+      objectName: Chest_A02_EastArcane_Loot_01
+    - name: Parkour Room Left Chest
+      objectName: Chest_A02_EastArcane_Loot_05
+    - name: Middle Column Chest
+      objectName: Chest_A02_NorthArcane_Sword_Bloodstorm
+    - name: Ambush chest
+      objectName: Chest_A01_Arcane_Spell
+    - name: Guard Room Chest 1
       objectName: Chest_A02_SouthArcane_Loot_01
+    - name: Guard Room Chest 2
+      objectName: Chest_A02_SouthArcane_Key_02
+    - name: Behind Elevator Chest
+      objectName: Chest_A02_EastArcane_Loot_04
     statues:
     - name: Windmill Emote Statue
       objectName: A02_Arcane_EmoteStatue_Windmill
@@ -80,7 +79,7 @@ regions:
   - name: Pipes
     chests:
     - name: Jail Cell Chest
-      objectName: Chest_A02_EastArcane_Loot_04
+      objectName: Chest_A02_NorthArcane_Loot_04
   - name: Center Top
     chests:
     - name: Chest
@@ -95,20 +94,15 @@ regions:
   subregions:
   - name: Main Area
     chests:
-    - name: Stoneheart chest 3
+    - name: Crossroads Door Chest
       objectName: Chest_A01_Stoneheart_Loot_03
-    - name: Stoneheart chest 2
-      objectName: Chest_A01_Stoneheart_Loot_02
-    - name: Stoneheart chest 4
+    - name: Mork's Chest
       objectName: Chest_A01_Stoneheart_Loot_3
-    - name: Merchants Robe chest
-      objectName: Chest_A01_Stoneheart_Tunic_MerchantsRobe
-    - name: Graveyard key chest 1
-      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey
-    - name: Graveyard key chest 2
-      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey2
-    - name: Chest
+    - name: Top Chest
       objectName: Chest_A01_Stoneheart_Loot_01
+    - name: Triceps Emote Chest
+      dance: Triceps
+      objectName: Dance_Platform_Triceps_Chest
     pickups:
     - name: Books 1
       objectName: Pickup_Book
@@ -132,6 +126,14 @@ regions:
     - name: Mork's Shop
       shopId: 0
       items: 5
+  - name: Breemur's Tavern
+    chests:
+    - name: Downstairs Chest 1
+      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey
+    - name: Downstairs Chest 2
+      objectName: Chest_Master_A01_StoneheartCity_GraveyardKey2
+    - name: Upstairs Chest
+      objectName: Chest_A01_Stoneheart_Tunic_MerchantsRobe
   - name: Top
     chests:
     - name: chest
@@ -177,74 +179,91 @@ regions:
     events:
     - name: Beat Samuel
       requiredItems: []
+
 - name: Crossroads
   subregions:
   - name: Left Area
     chests:
-    - name: Stairs Chest
-      objectName: Chest_A01_CrossRoads_Loot_03
     - name: Ambush Chest
       objectName: Chest_A01_Well_SpinAttack
+    - name: Stairs Chest
+      objectName: Chest_A01_CrossRoads_Loot_3
   - name: Main Area
     chests:
-    - name: Well Loot Chest 3
-      objectName: Chest_A01_CrossRoads_Loot_3
-    - name: Bottom Chest
+    - name: Right Side High Chest
+      objectName: Chest_A01_CrossRoads_Loot_03
+    - name: Bottom Left Chest
       objectName: Chest_A01_CrossRoads_Loot_01
-    - name: Loot chest 2
+    - name: Right Side Low Chest
       objectName: Chest_A01_CrossRoads_Loot_02
     - name: Techno Emote Chest
       objectName: Dance_Platform_Techno_Chest
       dance: Techno
+
 - name: Forest Temple
   subregions:
   - name: High Level
     chests:
-    - name: Loot chest 1
+    - name: Lever Room Chest
       objectName: Chest_A01_Nuos_Loot_05
-    - name: Loot chest 2
-      objectName: Chest_A01_Nuos_Loot_02
-    - name: Key chest
-      objectName: Chest_A01_Nuos_Key_2
   - name: Middle Level
+    chests:
+    - name: Ladder Chest 1
+      objectName: Chest_A01_Nuos_Loot_02
+    - name: Ladder Chest 2
+      objectName: Chest_A01_Nuos_Key_2
   - name: Ambush 1
     chests:
-    - name: Key chest
+    - name: Ambush Chest
       objectName: Chest_A01_Nuos_Key_01
+    - name: Stairs chest
+      objectName: Chest_A01_Nuos_Loot_01
   - name: Ambush 2
     chests:
-    - name: Key chest
+    - name: Ambush Chest
       objectName: Chest_A01_Nuos_Key_03
-  - name: Nuos Claw
+  - name: Nuos Claw Room
     chests:
-    - name: Nuos Claw chest
+    - name: Chest
       objectName: Chest_A01_Nuos_Ability_WallRun
   - name: Low Level
     chests:
-    - name: Loot chest 1
+    - name: Ladder Chest
       objectName: Chest_A01_Nuos_Loot_03
-    - name: Loot chest 2
-      objectName: Chest_A01_Nuos_Loot_06
-    - name: Loot chest 3
-      objectName: Chest_A01_Nuos_Loot_04
     - name: Void chest
       objectName: Chest_Master_2
-    - name: Silverblades chest
-      objectName: Chest_A01_TempleGardens_Sword_SilverBlades
-    - name: Key chest
-      objectName: Chest_A01_Nuos_Key_02
     - name: Hello Emote Chest
       objectName: Dance_Platform_Hello2_Chest
-    pickup:
+    pickups:
     - name: Spirit
       objectName: Spirit_A01_ForestGuardian
     void_gates:
-    - name: TODO Void Gate
+    - name: Argio's Challenge Void Gate
       objectName: Void_Gate_Easy
+  - name: Center Room
+    chests:
+    - name: Entrance Stairs Chest
+      objectName: Chest_A01_Nuos_Loot_06
+    - name: End Stairs Chest
+      objectName: Chest_A01_TempleGardens_Sword_SilverBlades
+  - name: Parkour Room
+    chests:
+    - name: Entrance Chest
+      objectName: Chest_A01_Nuos_Loot_04
+    - name: End of Parkour Chest
+      objectName: Chest_A01_Nuos_Key_02
+    statues:
+    - name: Wave Emote Statue
+      objectName: A01_Nuos_EmoteStatue_Wave
   - name: Center Room Trunk
     chests:
-    - name: Loot chest 1
+    - name: Chest
       objectName: Chest_A01_Nuos_MasterKey
+  - name: Boss Room
+    events:
+    - name: Beat Gruh
+      requiredItems: []
+
 - name: Abandoned Path
   subregions:
   - name: Entrance
