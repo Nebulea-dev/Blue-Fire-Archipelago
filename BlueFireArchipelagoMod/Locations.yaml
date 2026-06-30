@@ -1,6 +1,7 @@
 regions:
 - name: Menu
   subregions: []
+
 - name: Fire Keep
   subregions:
   - name: Intro
@@ -40,6 +41,7 @@ regions:
       objectName: Void_Gate_Matias
     - name: Umbert's Secret Void Gate
       objectName: Void_Gate_Ricardo
+
 - name: Arcane Tunnels
   subregions:
   - name: Main Room
@@ -90,6 +92,7 @@ regions:
     pickups:
     - name: Spirit
       objectName: Spirit_A02_ToxicRat
+
 - name: Stoneheart City
   subregions:
   - name: Main Area
@@ -146,12 +149,10 @@ regions:
     void_gates:
     - name: Borisa's Fate Void Gate
       objectName: Void_Gate_04_V2
+
 - name: Water Ways
   subregions:
   - name: Main Area
-    chests:
-    - name: Pure Shadow chest
-      objectName: Chest_A02_Tunic_PureShadow
   - name: Arcane Tunnels Main Entrance
     statues:
     - name: Hat Kid Emote Statue
@@ -176,6 +177,9 @@ regions:
       requiredItems:
       - Sanctuary Stone
   - name: Samuel's Room
+    chests:
+    - name: Pure Shadow chest
+      objectName: Chest_A02_Tunic_PureShadow
     events:
     - name: Beat Samuel
       requiredItems: []
@@ -319,6 +323,7 @@ regions:
     void_gates:
     - name: Lucua's Climb
       objectName: Void_Gate_Luis
+
 - name: Uthas Temple
   subregions:
   - name: Entrance
@@ -370,6 +375,7 @@ regions:
     pickups:
     - name: Entrance Spirit
       objectName: TODO
+
 - name: Temple Gardens
   subregions:
   - name: Entrance
@@ -403,6 +409,7 @@ regions:
       - Beira Vessel
   - name: Middle Balcony
   - name: Temple of Gods
+
 - name: Firefall River
   subregions:
   - name: Main Area
@@ -453,6 +460,7 @@ regions:
     events:
     - name: Beat Fire Boss
       requiredItems: []
+
 - name: Rust Village
   subregions:
   - name: Main Area
