@@ -18,7 +18,7 @@ else()
         COMMAND "${CARGO_EXECUTABLE}" build --manifest-path "${GENERATOR_CARGO}" --release
         COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generate_locations/target/release/generate_locations$<$<PLATFORM_ID:Windows>:.exe>"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        DEPENDS "${LOCATIONS_JSON}" "${GENERATOR_SRC}" "${GENERATOR_CARGO}"
+        DEPENDS "${LOCATIONS_YAML}" "${GENERATOR_SRC}" "${GENERATOR_CARGO}"
         COMMENT "Generating LocationsData.hpp from Locations.yaml using Rust generator"
         VERBATIM
     )
