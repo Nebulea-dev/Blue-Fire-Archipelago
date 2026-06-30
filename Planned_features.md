@@ -21,6 +21,7 @@
 - @solukissin on the Archipelago server proposed to make the number of Beira shrines and Samael flames configurable in the options
 - @autumnhaunted on the Archipelago server proposed to make Beira shrines and Samael flames archipelago items/locations
 - Add Universal Tracker/PopTracker. Can only be done once the Blue Fire dev releases the next update which includes a map
+- Add the Hello emote to the item pool and remove the emote from the initial inventory
 - Add the associated item when giving ability to a player
 - Remove the old pouch when giving a better one
 - Add Death Link
