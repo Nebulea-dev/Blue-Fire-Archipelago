@@ -62,6 +62,8 @@ class ItemManager
 	 */
 	bool PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
+	static bool StartNewGame(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
 	/*******************************************************************************
 	 * @fn      givePlayerEmote
 	 *

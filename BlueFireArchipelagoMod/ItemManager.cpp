@@ -25,6 +25,7 @@ ItemManager::ItemManager()
         }
         return false;
     });
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartNewGame"), StartNewGame);
 }
 
 void ItemManager::itemReceiveCb(int itemID)
@@ -96,6 +97,27 @@ bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESU
     BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, itemAmount);
 
     // Do not prevent the original function from being called
+    return false;
+}
+
+bool ItemManager::StartNewGame(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return false;
+    }
+
+    TArray<uint8_t>* emoteInventory = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<uint8_t>>(L"Emotes");
+	if(!emoteInventory)
+	{
+        Output::send<LogLevel::Error>(STR("Could not find the Emotes parameter of the game instance\n"));
+		return false;
+	}
+
+    emoteInventory->Pop(true);
+
     return false;
 }
 
