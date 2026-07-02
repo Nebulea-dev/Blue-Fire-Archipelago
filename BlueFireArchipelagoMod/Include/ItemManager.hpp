@@ -138,6 +138,32 @@ class ItemManager
 	 * @return  none
 	 */
 	void givePlayerKeyItem(int itemID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveItem
+	 *
+	 * @brief   Give the player a progressive item, managing upgrades.
+	 *
+	 *          Routes to specific progressive item handlers based on itemID.
+	 *
+	 * @param   itemID - The progressive item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveItem(int itemID);
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressivePouch
+	 *
+	 * @brief   Handle progressive pouch upgrade logic.
+	 *
+	 *          Checks the current pouch level in the passive inventory and upgrades
+	 *          to the next level. Progression: Large Pouch -> Extra Large Pouch.
+	 *          First receipt gives Large Pouch, second receipt upgrades to Extra Large Pouch.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressivePouch();
 };
 
 struct inventoryItem

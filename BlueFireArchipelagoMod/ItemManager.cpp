@@ -66,6 +66,10 @@ void ItemManager::itemReceiveCb(int itemID)
             givePlayerKeyItem(itemID - 600);
             break;
 
+        case 7:
+            givePlayerProgressiveItem(itemID - 700);
+            break;
+
         default:
             Output::send<LogLevel::Error>(STR("Could not map item to a valid category of item\n"));
             break;
@@ -515,4 +519,103 @@ void ItemManager::givePlayerKeyItem(int itemID)
     newItem.item = itemID;
     newItem.amount = 1;
     inventory->Push(newItem);
+}
+
+void ItemManager::givePlayerProgressiveItem(int itemID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player progressive item ID: {}\n"), itemID);
+
+    // Progressive Pouch (itemID = 0)
+    if(itemID == 0)
+    {
+        givePlayerProgressivePouch();
+    }
+    else
+    {
+        Output::send<LogLevel::Error>(STR("Unknown progressive item ID: {}\n"), itemID);
+    }
+}
+
+void ItemManager::givePlayerProgressivePouch()
+{
+    Output::send<LogLevel::Verbose>(STR("Upgrading player pouch...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    // Get the "PlayerStats" property
+    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
+    if (!playerStatsProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
+        return;
+    }
+
+    auto playerStatsStruct = playerStatsProperty->GetStruct();
+    if (!playerStatsStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+        return;
+    }
+
+    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerStats)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
+        return;
+    }
+
+    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
+    if (!inventoryProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94 property in PlayerStats\n"));
+        return;
+    }
+
+    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    if (!inventory)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        return;
+    }
+
+
+    const int32_t BASIC_POUCH = 72;
+    const int32_t LARGE_POUCH = 0;
+    const int32_t EXTRA_LARGE_POUCH = 75;
+
+    // Look for existing pouch in inventory
+    for(int32_t i = 0; i < inventory->Num(); i++)
+    {
+        inventoryItem item = (*inventory)[i];
+
+        // If the inventory item isn't of type "item"
+        if(item.type != 0)
+        {
+            continue;
+        }
+
+        // Check if this is a pouch item and upgrade to the next level
+        if(item.item == BASIC_POUCH)
+        {
+            Output::send<LogLevel::Verbose>(STR("Found Basic Pouch, upgrading to Large Pouch...\n"));
+            item.item = LARGE_POUCH;
+            (*inventory)[i] = item;
+            return;
+        }
+        if(item.item == LARGE_POUCH)
+        {
+            Output::send<LogLevel::Verbose>(STR("Found Large Pouch, upgrading to Extra Large Pouch...\n"));
+            item.item = EXTRA_LARGE_POUCH;
+            (*inventory)[i] = item;
+            return;
+        }
+    }
+
+    // If no pouch found in inventory, give the player the Large Pouch
+    Output::send<LogLevel::Error>(STR("No Pouch found in inventory, could not replace with better pouch\n"));
 }
