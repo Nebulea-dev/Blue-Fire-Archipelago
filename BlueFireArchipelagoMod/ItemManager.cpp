@@ -116,7 +116,51 @@ bool ItemManager::StartNewGame(UObject* Context, FFrame& Stack, void* RESULT_DEC
 		return false;
 	}
 
+    // Remove the first emote
     emoteInventory->Pop(true);
+
+
+
+
+    // Get the "PlayerStats" property
+    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
+    if (!playerStatsProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
+        return false;
+    }
+
+    // Get the "PlayerEquipment.Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659" property
+    auto playerStatsStruct = playerStatsProperty->GetStruct();
+    if (!playerStatsStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+        return false;
+    }
+
+    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerStats)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
+        return false;
+    }
+
+    FStructProperty* currencyProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659"));
+    if (!currencyProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659 property in PlayerStats\n"));
+        return false;
+    }
+
+    int32* currency = currencyProperty->ContainerPtrToValuePtr<int32>(playerStats);
+    if (!currency)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get currency value pointer\n"));
+        return false;
+    }
+
+    // Set currency to 200 in order to buy the first statue
+    *currency = 200;
 
     return false;
 }
