@@ -530,6 +530,11 @@ void ItemManager::givePlayerProgressiveItem(int itemID)
     {
         givePlayerProgressivePouch();
     }
+    // Progressive Weapon (itemID = 1)
+    else if(itemID == 1)
+    {
+        givePlayerProgressiveWeapon();
+    }
     else
     {
         Output::send<LogLevel::Error>(STR("Unknown progressive item ID: {}\n"), itemID);
@@ -618,4 +623,68 @@ void ItemManager::givePlayerProgressivePouch()
 
     // If no pouch found in inventory, give the player the Large Pouch
     Output::send<LogLevel::Error>(STR("No Pouch found in inventory, could not replace with better pouch\n"));
+}
+
+void ItemManager::givePlayerProgressiveWeapon()
+{
+    Output::send<LogLevel::Verbose>(STR("Upgrading player weapon...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    // Get the "PlayerEquipment" property
+    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
+    if (!playerEquipmentProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
+        return;
+    }
+
+    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
+    if (!playerEquipmentStruct)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
+        return;
+    }
+
+    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
+    if (!playerEquipment)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
+        return;
+    }
+
+    FStructProperty* weaponProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317"));
+    if (!weaponProperty)
+    {
+        Output::send<LogLevel::Error>(STR("Could not find Weapons_18_409D783242E4CBDA66AAB6A252C7A317 property in PlayerEquipment\n"));
+        return;
+    }
+
+    TArray<uint8_t>* weapons = weaponProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    if (!weapons)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get weapons value pointer\n"));
+        return;
+    }
+
+    // Find the highest weapon ID currently in inventory
+    uint8_t highestWeaponID = 0;
+    for(int32_t i = 0; i < weapons->Num(); i++)
+    {
+        uint8_t weaponID = (*weapons)[i];
+        if(weaponID > highestWeaponID)
+        {
+            highestWeaponID = weaponID;
+        }
+    }
+
+    uint8_t nextWeaponID = highestWeaponID + 1;
+    Output::send<LogLevel::Verbose>(STR("Found highest weapon ID: {}, adding weapon ID: {}\n"), highestWeaponID, nextWeaponID);
+
+    weapons->Push(nextWeaponID);
 }

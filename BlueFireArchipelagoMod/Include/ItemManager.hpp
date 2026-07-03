@@ -164,6 +164,19 @@ class ItemManager
 	 * @return  none
 	 */
 	void givePlayerProgressivePouch();
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveWeapon
+	 *
+	 * @brief   Handle progressive weapon upgrade logic.
+	 *
+	 *          Checks the current highest weapon level in the weapon inventory and adds
+	 *          the next weapon in the progression sequence. Looks for the highest weapon ID
+	 *          currently owned and adds a new weapon with ID + 1.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveWeapon();
 };
 
 struct inventoryItem

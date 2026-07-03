@@ -46,34 +46,41 @@ regions:
   subregions:
   - name: Main Room
     chests:
-    - name: Left Room Chest
-      objectName: Chest_A02_NorthArcane_Loot_01
     - name: Corridor Chest
       objectName: Chest_A02_NorthArcane_Loot_03
-    - name: Spirit Hunter Chest 1
-      objectName: Chest_A02_EastArcane_Loot_02
-    - name: Spirit Hunter Chest 2
-      objectName: Chest_A02_EastArcane_Loot_01
     - name: Parkour Room Left Chest
       objectName: Chest_A02_EastArcane_Loot_05
     - name: Middle Column Chest
       objectName: Chest_A02_NorthArcane_Sword_Bloodstorm
     - name: Ambush chest
       objectName: Chest_A01_Arcane_Spell
+    - name: Behind Elevator Chest
+      objectName: Chest_A02_EastArcane_Loot_04
+    void_gates:
+    - name: Path of Victory Void Gate
+      objectName: Void_Gate_Paul
+  - name: Guard Room
+    chests:
     - name: Guard Room Chest 1
       objectName: Chest_A02_SouthArcane_Loot_01
     - name: Guard Room Chest 2
       objectName: Chest_A02_SouthArcane_Key_02
-    - name: Behind Elevator Chest
-      objectName: Chest_A02_EastArcane_Loot_04
+  - name: Guard Armory
+    chests:
+    - name: Chest
+      objectName: Chest_A02_NorthArcane_Loot_01
     statues:
     - name: Windmill Emote Statue
       objectName: A02_Arcane_EmoteStatue_Windmill
     void_gates:
-    - name: Path of Victory Void Gate
-      objectName: Void_Gate_Paul
     - name: Fara's Dream Void Gate
       objectName: Void_Gate_Esteban
+  - name: Spirit Hunter Room
+    chests:
+    - name: Chest 1
+      objectName: Chest_A02_EastArcane_Loot_02
+    - name: Chest 2
+      objectName: Chest_A02_EastArcane_Loot_01
     shops:
     - name: Spirit Hunter's Shop
       shopId: 2
@@ -448,14 +455,8 @@ regions:
   - name: Steam House
     events:
     - name: Repair Generator 1
-      requiredItems:
-      - Iron Justice
     - name: Repair Generator 2
-      requiredItems:
-      - Iron Justice
     - name: Repair Generator 3
-      requiredItems:
-      - Iron Justice
   - name: Fire Boss Room
     events:
     - name: Beat Fire Boss
