@@ -589,7 +589,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 			item.amount = 1;
 			item.type = 1;
 			item.weapon = 0;
-			item.price = 100;
+			item.price = BlueFireArchipelagoMod::locationManager->GetItemPrice();
 
 			(*inventoryPointer)[i] = item;
 		}

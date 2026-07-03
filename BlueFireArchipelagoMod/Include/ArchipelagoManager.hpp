@@ -86,7 +86,7 @@ class ArchipelagoManager
 	 * @brief   initializes Archipelago callbacks.
 	 *
 	 *          Registers all event callbacks with the Archipelago library
-	 *          (item receive, item clear, location check). Must be called
+	 *          (item receive, item clear, location check, slot data). Must be called
 	 *          once during mod initialization before any server connections
 	 *          are attempted and after calling AP_Shutdown.
 	 *

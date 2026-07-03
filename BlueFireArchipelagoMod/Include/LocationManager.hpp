@@ -17,6 +17,8 @@ public:
     std::optional<uint32_t> GetLocationIDFromVoidGateName(const std::wstring& voidGateName);
     std::optional<uint32_t> GetLocationIDFromShopID(const uint32_t shopID);
 
+    int GetItemPrice() const { return itemPrice; }
+    void SetItemPrice(int price) { itemPrice = price; }
 
     static bool OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool OnPressButton(UObject* Context, FFrame& Stack, void* RESULT_DECL);
@@ -37,6 +39,8 @@ public:
 
 
 private:
+    int itemPrice = 100;
+
     static void OnNewItemCreated(const UObjectBase* object, int32 index);
     static void logIncorrectMapping(const std::wstring locationName);
 };

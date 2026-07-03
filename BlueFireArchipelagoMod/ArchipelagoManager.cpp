@@ -8,6 +8,7 @@
 #include <BlueFireArchipelagoMod.hpp>
 #include <ArchipelagoModConfig.hpp>
 #include <ItemManager.hpp>
+#include <LocationManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -24,6 +25,13 @@ void ArchipelagoManager::initCallbacks()
 	AP_SetItemClearCallback(StaticItemClearCallback);
 	AP_SetItemRecvCallback(StaticItemReceiveCallback);
 	AP_SetLocationCheckedCallback(StaticLocationCheckCallback);
+	AP_RegisterSlotDataIntCallback("item_price", [](int price) {
+		if (BlueFireArchipelagoMod::locationManager)
+		{
+			BlueFireArchipelagoMod::locationManager->SetItemPrice(price);
+			Output::send<LogLevel::Verbose>(STR("Received item price from slot data: {}\n"), price);
+		}
+	});
 }
 
 
