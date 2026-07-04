@@ -738,19 +738,33 @@ void ItemManager::givePlayerProgressiveWeapon()
         return;
     }
 
-    // Find the highest weapon ID currently in inventory
-    uint8_t highestWeaponID = 0;
+    // Find the highest weapon damage
+    uint8_t highestWeaponOrderIndex = 0;
     for(int32_t i = 0; i < weapons->Num(); i++)
     {
         uint8_t weaponID = (*weapons)[i];
-        if(weaponID > highestWeaponID)
+        uint8_t weaponOrderIndex = ArchipelagoModConfig::Weapons::orderFromWeapon.find(weaponID) != ArchipelagoModConfig::Weapons::orderFromWeapon.end() ? ArchipelagoModConfig::Weapons::orderFromWeapon.at(weaponID) : 0;
+        Output::send<LogLevel::Verbose>(STR("Found weapon ID: {}, order index: {}\n"), weaponID, weaponOrderIndex);
+        if(weaponOrderIndex > highestWeaponOrderIndex)
         {
-            highestWeaponID = weaponID;
+            highestWeaponOrderIndex = weaponOrderIndex;
         }
     }
 
-    uint8_t nextWeaponID = highestWeaponID + 1;
-    Output::send<LogLevel::Verbose>(STR("Found highest weapon ID: {}, adding weapon ID: {}\n"), highestWeaponID, nextWeaponID);
 
-    weapons->Push(nextWeaponID);
+    uint8_t nextWeaponIndex = highestWeaponOrderIndex + 1;
+
+    if(nextWeaponIndex < ArchipelagoModConfig::Weapons::weaponFromOrder.size() + 1)
+    {
+        uint8_t nextWeaponID = ArchipelagoModConfig::Weapons::weaponFromOrder.at(nextWeaponIndex);
+        Output::send<LogLevel::Verbose>(STR("Found highest weapon order index: {}, adding weapon ID: {}\n"), highestWeaponOrderIndex, nextWeaponID);
+
+        weapons->Push(nextWeaponID);
+    }
+    else
+    {
+        Output::send<LogLevel::Verbose>(STR("Cannot find the next weapon for order index: {}, max weapon already obtained\n"), highestWeaponOrderIndex);
+        return;
+    }
+
 }

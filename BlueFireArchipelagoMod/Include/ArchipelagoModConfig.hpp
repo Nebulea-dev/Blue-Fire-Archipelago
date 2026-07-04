@@ -184,132 +184,6 @@ namespace ArchipelagoModConfig
 	}
 
 	// ============================================================
-	// Chest Names - Name of all the chests in the game
-	// ============================================================
-	namespace ChestNames
-	{
-		namespace FireKeepIntro
-		{
-			constexpr auto AMBUSH_CHEST_1 = STR("Chest_A01_Keep_Shield");
-			constexpr auto AMBUSH_CHEST_2 = STR("Chest_A02_Keep_Key_01");
-		}
-
-		namespace FireKeepHub
-		{
-			constexpr auto SPIN_ATTACK_CHEST = STR("Chest_A01_TempleGardens_Ability_SpinAttack2");
-			constexpr auto LOOT_CHEST_1 = STR("Chest_A02_Keep_Loot_01");
-			constexpr auto LOOT_CHEST_2 = STR("Chest_A02_Keep_Loot_02");
-			constexpr auto LOOT_CHEST_3 = STR("Chest_A02_GameIntro_44");
-			constexpr auto DIAMOND_WING_CHEST = STR("Chest_A02_Sword_DiamondWings");
-		}
-
-		namespace ArcaneTunnels
-		{
-			constexpr auto NORTH_LOOT_CHEST_1 = STR("Chest_A02_NorthArcane_Loot_01");
-			constexpr auto NORTH_LOOT_CHEST_2 = STR("Chest_A02_NorthArcane_Loot_03");
-			constexpr auto NORTH_LOOT_CHEST_3 = STR("Chest_A02_NorthArcane_Loot_04"); // TODO : This probably requires a special skill cuz its behind an iron gate
-			constexpr auto EAST_LOOT_CHEST_1 = STR("Chest_A02_EastArcane_Loot_01");
-			constexpr auto EAST_LOOT_CHEST_4 = STR("Chest_A02_EastArcane_Loot_04");
-			constexpr auto EAST_LOOT_CHEST_5 = STR("Chest_A02_EastArcane_Loot_05");
-			constexpr auto BLOODSTORM_CHEST = STR("Chest_A02_NorthArcane_Sword_Bloodstorm");
-			constexpr auto ARCANE_CHEST = STR("Chest_A01_Arcane_Spell");
-			constexpr auto SOUTH_KEY_CHEST_2 = STR("Chest_A02_SouthArcane_Key_02"); // Doesn't actually contain a key but a Ruby ?
-
-			// Uncategorized yet
-			// constexpr auto EAST_LOOT_CHEST_2 = STR("Chest_A02_EastArcane_Loot_02"); // Could not find
-			// constexpr auto EAST_LOOT_CHEST_3 = STR("Chest_A02_EastArcane_Loot_03"); // Could not find
-			// constexpr auto SOUTH_LOOT_CHEST = STR("Chest_A02_SouthArcane_Loot_01"); // Could not find
-			// constexpr auto SOUTH_KEY_CHEST_1 = STR("Chest_A02_SouthArcane_Key_01"); // Could not find
-		}
-
-		namespace WaterWays
-		{
-			// Uncategorized yet
-			constexpr auto PURE_SHADOW_CHEST = STR("Chest_A02_Tunic_PureShadow");
-		}
-
-		namespace StoneHeart
-		{
-			constexpr auto STONEHEART_CHEST_3 = STR("Chest_A01_Stoneheart_Loot_03");
-
-			// Uncategorized yet
-			constexpr auto STONEHEART_CHEST_1 = STR("Chest_A01_Stoneheart_Loot_01");
-			constexpr auto STONEHEART_CHEST_2 = STR("Chest_A01_Stoneheart_Loot_02");
-			constexpr auto STONEHEART_CHEST_4 = STR("Chest_A01_Stoneheart_Loot_3");
-			constexpr auto MERCHANTS_ROBE_CHEST = STR("Chest_A01_Stoneheart_Tunic_MerchantsRobe");
-			constexpr auto GRAVEYARD_KEY_CHEST_1 = STR("Chest_Master_A01_StoneheartCity_GraveyardKey");
-			constexpr auto GRAVEYARD_KEY_CHEST_2 = STR("Chest_Master_A01_StoneheartCity_GraveyardKey2");
-		}
-
-		namespace CrossRoads
-		{
-			constexpr auto CROSSROADS_LOOT_CHEST_2 = STR("Chest_A01_CrossRoads_Loot_02");
-			constexpr auto WELL_CROSSROADS_LOOT_CHEST_3 = STR("Chest_A01_CrossRoads_Loot_3");
-
-			// Uncategorized yet
-			constexpr auto CROSSROADS_CHEST_LOOT_1 = STR("Chest_A01_CrossRoads_Loot_01");
-			constexpr auto CROSSROADS_CHEST_LOOT_3 = STR("Chest_A01_CrossRoads_Loot_03");
-
-		}
-
-		namespace TempleGardens
-		{
-			// Uncategorized yet
-			constexpr auto LOOT_CHEST_1 = STR("Chest_A01_TempleGardens_Loot_01");
-			constexpr auto LOOT_CHEST_2 = STR("Chest_A01_TempleGardens_Loot_02");
-			constexpr auto LOOT_CHEST_3 = STR("Chest_A01_TempleGardens_Loot_03");
-			constexpr auto LOOT_CHEST_4 = STR("Chest_A01_TempleGardens_Loot_04");
-			constexpr auto LOOT_CHEST_5 = STR("Chest_A01_TempleGardens_Loot_05");
-			constexpr auto LOOT_CHEST_6 = STR("Chest_A01_TempleGardens_Loot_06");
-			constexpr auto LOOT_CHEST_7 = STR("Chest_A01_TempleGardens_Loot_07");
-			constexpr auto LOOT_CHEST_8 = STR("Chest_A01_TempleGardens_Loot_08");
-			constexpr auto RARE_SNOW_CHEST = STR("Chest_A01_TempleGardens_RareSnow");
-			constexpr auto SHANKS_CHEST = STR("Chest_A01_TempleGardens_Sword_Shanks");
-		}
-
-		namespace ForestTempleWater
-		{
-			constexpr auto LOOT_CHEST_1 = STR("Chest_A01_Nuos_Loot_05");
-			constexpr auto LOOT_CHEST_2 = STR("Chest_A01_Nuos_Loot_02");
-			constexpr auto KEY_CHEST = STR("Chest_A01_Nuos_Key_2");
-		}
-
-		namespace ForestTreeAmbush1
-		{
-			constexpr auto KEY_CHEST = STR("Chest_A01_Nuos_Key_01");
-
-			// constexpr auto LOOT_CHEST = STR("Chest_A01_Nuos_Loot_01"); // Not found
-		}
-
-		namespace ForestTreeAmbush2 // Requires 1 old key
-		{
-			constexpr auto KEY_CHEST = STR("Chest_A01_Nuos_Key_03");
-		}
-
-		namespace ForestTreeNuosClaw // Requires 1 old key
-		{
-			constexpr auto NUOS_CLAW_CHEST = STR("Chest_A01_Nuos_Ability_WallRun"); // Not a chest_master_c nor chest_master_child_c, no idea who tf is this guy
-		}
-
-		namespace ForestTempleCenterTree // Requires Nuos Claw
-		{
-			constexpr auto LOOT_CHEST_1 = STR("Chest_A01_Nuos_Loot_03");
-			constexpr auto LOOT_CHEST_2 = STR("Chest_A01_Nuos_Loot_06");
-			constexpr auto LOOT_CHEST_3 = STR("Chest_A01_Nuos_Loot_04");
-			constexpr auto VOID_CHEST = STR("Chest_Master_2");
-			constexpr auto SILVERBLADES_CHEST = STR("Chest_A01_TempleGardens_Sword_SilverBlades");
-			constexpr auto KEY_CHEST = STR("Chest_A01_Nuos_Key_02");
-
-			// constexpr auto LOOT_CHEST_1 = STR("Chest_A01_Nuos_Loot_45"); // Not found
-		}
-
-		namespace ForestTempleCenterTreeTrunk // Requires old key
-		{
-			constexpr auto LOOT_CHEST_1 = STR("Chest_A01_Nuos_MasterKey");
-		}
-	}
-
-	// ============================================================
 	// Statue Names - Name of all the statues in the game
 	// ============================================================
 	namespace EmoteNames
@@ -336,6 +210,54 @@ namespace ArchipelagoModConfig
 	{
 		constexpr uint32_t BF_BASE_ID = 437000;
 		constexpr char GAME_NAME[] = "Blue Fire";
+	}
+
+	namespace Weapons
+	{
+		constexpr uint8_t BLOODSTORM_BLADES = 1;
+		constexpr uint8_t DIAMOND_WINGS = 2;
+		constexpr uint8_t SHADOW_CASTERS = 3;
+		constexpr uint8_t EMBER_TWINS = 4;
+		constexpr uint8_t IRON_JUSTICE = 5;
+		constexpr uint8_t ICE_DESTROYERS = 6;
+		constexpr uint8_t PEACE_KEEPERS = 7;
+		constexpr uint8_t STEEL_SHANKS = 8;
+		constexpr uint8_t BREEMUR_FAMILY_SWORDS = 9;
+		constexpr uint8_t SILVER_BLADES = 10;
+		constexpr uint8_t KINA_DEFENDERS = 11;
+		constexpr uint8_t VOID_BLADES = 13;
+
+		const std::map<uint8_t, uint32_t> weaponFromOrder =
+		{
+			{1, DIAMOND_WINGS},
+			{2, BLOODSTORM_BLADES},
+			{3, SILVER_BLADES},
+			{4, PEACE_KEEPERS},
+			{5, BREEMUR_FAMILY_SWORDS},
+			{6, ICE_DESTROYERS},
+			{7, EMBER_TWINS},
+			{8, IRON_JUSTICE},
+			{9, STEEL_SHANKS},
+			{10, KINA_DEFENDERS},
+			{11, SHADOW_CASTERS},
+			{12, VOID_BLADES},
+		};
+
+		const std::map<uint8_t, uint32_t> orderFromWeapon =
+		{
+			{DIAMOND_WINGS, 1},
+			{BLOODSTORM_BLADES, 2},
+			{SILVER_BLADES, 3},
+			{PEACE_KEEPERS, 4},
+			{BREEMUR_FAMILY_SWORDS, 5},
+			{ICE_DESTROYERS, 6},
+			{EMBER_TWINS, 7},
+			{IRON_JUSTICE, 8},
+			{STEEL_SHANKS, 9},
+			{KINA_DEFENDERS, 10},
+			{SHADOW_CASTERS, 11},
+			{VOID_BLADES, 12},
+		};
 	}
 
 

@@ -57,16 +57,4 @@ void BlueFireArchipelagoMod::on_unreal_init()
     register_keydown_event(Input::Key::TAB, {}, [this]() {
         mainMenuManager->OnReturnPressed();
     });
-
-    // TODO : remove this
-    register_keydown_event(Input::Key::F5, {}, [this]() {
-        if (itemManager)
-        {
-            // Give all spirits
-            for(uint8_t i = 0; i < 29; i++)
-            {
-                itemManager->itemReceiveCb(300 + i);
-            }
-        }
-    });
 }
