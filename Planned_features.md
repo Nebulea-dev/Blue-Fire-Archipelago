@@ -4,11 +4,8 @@
 
 - Add the Spirit slots shop to the archipelago logic
 - Add the mana purchase to the archipelago logic (@roxas300)
-- Make the price of shop items customizable
-- Turn weapons into a progressive item
 - Turn movement spirits into a progressive item
 - Turn abilities into a progressive item with their associated spirit
-- Turn pouch into a progressive item
 - Add spirits slots, money and fire essences as an archipelago item
 
 ## Mid priority
@@ -22,7 +19,5 @@
 - @solukissin on the Archipelago server proposed to make the number of Beira shrines and Samael flames configurable in the options
 - @autumnhaunted on the Archipelago server proposed to make Beira shrines and Samael flames archipelago items/locations
 - Add Universal Tracker/PopTracker. Can only be done once the Blue Fire dev releases the next update which includes a map
-- Add the Hello emote to the item pool and remove the emote from the initial inventory
 - Add the associated item when giving ability to a player
-- Remove the old pouch when giving a better one
 - Add Death Link
