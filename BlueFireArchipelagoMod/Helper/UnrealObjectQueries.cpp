@@ -215,32 +215,10 @@ TArray<inventoryItem>* UnrealObjectQueries::GetInventoryFromGameInstance()
 		return nullptr;
 	}
 
-	FStructProperty* playerStatsProperty = GetStructProperty(gameInstance.value(), L"PlayerStats");
-	if (!playerStatsProperty)
-		return nullptr;
-
-	void* playerStats = GetStructPropertyValue(gameInstance.value(), L"PlayerStats");
-	if (!playerStats)
-		return nullptr;
-
-	UStruct* playerStatsStruct = playerStatsProperty->GetStruct();
-	if (!playerStatsStruct)
-	{
-		Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-		return nullptr;
-	}
-
-	FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory"));
-	if (!inventoryProperty)
-	{
-		Output::send<LogLevel::Error>(STR("Could not find Inventory property in PlayerStats\n"));
-		return nullptr;
-	}
-
-	TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+	TArray<inventoryItem>* inventory = GetNestedPropertyValue<TArray<inventoryItem>>(gameInstance.value(), L"PlayerStats", L"Inventory_23_288399C5416269F828550FB7376E7942");
 	if (!inventory)
 	{
-		Output::send<LogLevel::Error>(STR("Could not get Inventory value pointer\n"));
+		Output::send<LogLevel::Error>(STR("Could not get inventory from game instance\n"));
 		return nullptr;
 	}
 
@@ -256,32 +234,10 @@ TArray<inventoryItem>* UnrealObjectQueries::GetPassiveInventoryFromGameInstance(
 		return nullptr;
 	}
 
-	FStructProperty* playerStatsProperty = GetStructProperty(gameInstance.value(), L"PlayerStats");
-	if (!playerStatsProperty)
-		return nullptr;
-
-	void* playerStats = GetStructPropertyValue(gameInstance.value(), L"PlayerStats");
-	if (!playerStats)
-		return nullptr;
-
-	UStruct* playerStatsStruct = playerStatsProperty->GetStruct();
-	if (!playerStatsStruct)
-	{
-		Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-		return nullptr;
-	}
-
-	FStructProperty* passiveInventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory"));
-	if (!passiveInventoryProperty)
-	{
-		Output::send<LogLevel::Error>(STR("Could not find PassiveInventory property in PlayerStats\n"));
-		return nullptr;
-	}
-
-	TArray<inventoryItem>* passiveInventory = passiveInventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+	TArray<inventoryItem>* passiveInventory = GetNestedPropertyValue<TArray<inventoryItem>>(gameInstance.value(), L"PlayerStats", L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94");
 	if (!passiveInventory)
 	{
-		Output::send<LogLevel::Error>(STR("Could not get PassiveInventory value pointer\n"));
+		Output::send<LogLevel::Error>(STR("Could not get passive inventory from game instance\n"));
 		return nullptr;
 	}
 
