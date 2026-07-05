@@ -4,8 +4,9 @@
 
 #include <Archipelago.h>
 
-#include <BlueFireArchipelagoMod.hpp>
+#include <ArchipelagoManager.hpp>
 #include <DeathLinkManager.hpp>
+#include <BlueFireArchipelagoMod.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -106,5 +107,5 @@ void DeathLinkManager::sendDeathLink()
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Sending deathlink to Archipelago server\n"));
-	AP_DeathLink();
+	AP_DeathLinkSend("Player died");
 }

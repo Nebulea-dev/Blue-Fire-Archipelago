@@ -221,40 +221,10 @@ bool LocationManager::OnItemPickupRemove(UObject* Context, FFrame& Stack, void* 
         return false;
     }
 
-    // Get the "PlayerStats" property
-    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
-    if (!playerStatsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
-        return false;
-    }
-
-    // Get the "PlayerEquipment.PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94" property
-    auto playerStatsStruct = playerStatsProperty->GetStruct();
-    if (!playerStatsStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-        return false;
-    }
-
-    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerStats)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
-        return false;
-    }
-
-    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
-    if (!inventoryProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94 property in PlayerStats\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    TArray<inventoryItem>* inventory = UnrealObjectQueries::GetNestedPropertyValue<TArray<inventoryItem>>(gameInstance.value(), L"PlayerStats", L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94");
     if (!inventory)
     {
-        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get passive inventory in OnItemPickupRemove\n"));
         return false;
     }
 
@@ -379,6 +349,35 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromVoidGateName(const std
 
 // ============== Shop related methods ==============
 
+bool LocationManager::ProcessShopInventory(TArray<inventoryItem>* shopInventory, const wchar_t* shopName,
+	std::function<std::map<uint8_t, uint32_t>::const_iterator(uint8_t, uint8_t, uint8_t)> inventoryLookup)
+{
+	if (!shopInventory)
+		return true;
+
+	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
+
+	for (int32_t i = 0; i < shopInventory->Num(); i++)
+	{
+		inventoryItem item = (*shopInventory)[i];
+
+		if (item.type == 1 && item.weapon == 0) continue;
+		if (item.type == 0 && item.item == 43) continue;
+
+		itemIndex = inventoryLookup(item.type, item.item, item.spirit);
+		if (itemIndex == std::map<uint8_t, uint32_t>::const_iterator())
+		{
+			Output::send<LogLevel::Error>(STR("Could not find the item in {}'s shop\n"), shopName);
+			return false;
+		}
+
+		item.originalAmount = itemIndex->second;
+		(*shopInventory)[i] = item;
+	}
+
+	return true;
+}
+
 bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
@@ -388,210 +387,59 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
         return false;
     }
 
-	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
+	const wchar_t* shopNames[] = {L"Shop0-Mork", L"Shop1-Onrom", L"Shop2-SpiritHunter", L"Shop3-Ari", L"Shop4-Poti", L"Shop5-POI"};
+	TArray<inventoryItem>* shops[6] = {};
 
-    TArray<inventoryItem>* shopMork = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop0-Mork");
-    if(!shopMork)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop0-Mork property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopOnrom = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop1-Onrom");
-    if(!shopOnrom)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop1-Onrom property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopSpiritHunter = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop2-SpiritHunter");
-    if(!shopSpiritHunter)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop2-SpiritHunter property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopAri = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop3-Ari");
-    if(!shopAri)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop3-Ari property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopPoti = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop4-Poti");
-    if(!shopPoti)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop4-Poti property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopPOI = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop5-POI");
-    if(!shopPOI)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop5-POI property\n"));
-        return false;
-    }
-
-	TArray<inventoryItem>* shops[6] = {shopMork, shopOnrom, shopSpiritHunter, shopAri, shopPoti, shopPOI};
-
-	// Mork
-	for(int32_t i = 0; i < shopMork->Num(); i++)
-    {
-		itemIndex = Shops::Mork::spiritInventory.end();
-        inventoryItem item = (*shopMork)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		if(item.type == 0)
-		{
-			itemIndex = Shops::Mork::itemInventory.find(item.item);
-		}
-
-		if(item.type == 3)
-		{
-			itemIndex = Shops::Mork::spiritInventory.find(item.spirit);
-		}
-
-		if (itemIndex == Shops::Mork::itemInventory.end() || itemIndex == Shops::Mork::spiritInventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Mork's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopMork)[i] = item;
-    }
-
-	// Onrom
-	for(int32_t i = 0; i < shopOnrom->Num(); i++)
-    {
-        inventoryItem item = (*shopOnrom)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		itemIndex = Shops::Onrom::inventory.find(item.item);
-		if (itemIndex == Shops::Onrom::inventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Onrom's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopOnrom)[i] = item;
-    }
-
-	// Spirit Hunter
-	for(int32_t i = 0; i < shopSpiritHunter->Num(); i++)
-    {
-        inventoryItem item = (*shopSpiritHunter)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		itemIndex = Shops::SpiritHunter::inventory.find(item.spirit);
-		if (itemIndex == Shops::SpiritHunter::inventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Spirit Hunter's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopSpiritHunter)[i] = item;
-    }
-
-	// Ari
-	for(int32_t i = 0; i < shopAri->Num(); i++)
-    {
-        inventoryItem item = (*shopAri)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		itemIndex = Shops::Ari::inventory.find(item.tunic);
-		if (itemIndex == Shops::Ari::inventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Ari's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopAri)[i] = item;
-    }
-
-	// Poti
-	for(int32_t i = 0; i < shopPoti->Num(); i++)
-    {
-		itemIndex = Shops::Mork::spiritInventory.end();
-        inventoryItem item = (*shopPoti)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		if(item.type == 0)
-		{
-			itemIndex = Shops::Poti::itemInventory.find(item.item);
-		}
-
-		if(item.type == 1)
-		{
-			itemIndex = Shops::Poti::weaponInventory.find(item.weapon);
-		}
-
-		if(item.type == 3)
-		{
-			itemIndex = Shops::Poti::spiritInventory.find(item.spirit);
-		}
-
-		if (itemIndex == Shops::Poti::itemInventory.end() || itemIndex == Shops::Poti::weaponInventory.end() || itemIndex == Shops::Poti::spiritInventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Poti's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopPoti)[i] = item;
-    }
-
-	// Poi
-	for(int32_t i = 0; i < shopPOI->Num(); i++)
-    {
-        inventoryItem item = (*shopPOI)[i];
-
-		if(item.type == 1 && item.weapon == 0) continue;
-		if(item.type == 0 && item.item == 43) continue;
-
-		itemIndex = Shops::Poi::inventory.find(item.item);
-		if (itemIndex == Shops::Poi::inventory.end())
-		{
-			Output::send<LogLevel::Error>(STR("Could not find the item in Ari's shop\n"));
-			return false;
-		}
-
-		item.originalAmount = itemIndex->second;
-
-        (*shopPOI)[i] = item;
-    }
-
-	// Set all items to the default weapon
-	for(TArray<inventoryItem>* inventoryPointer : shops)
+	for (int i = 0; i < 6; i++)
 	{
-		for(int32_t i = 0; i < inventoryPointer->Num(); i++)
+		shops[i] = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(shopNames[i]);
+		if (!shops[i])
 		{
-			inventoryItem item = (*inventoryPointer)[i];
+			Output::send<LogLevel::Error>(STR("Could not find {} property\n"), shopNames[i]);
+			return false;
+		}
+	}
 
+	// Process each shop with its specific inventory lookup
+	if (!ProcessShopInventory(shops[0], STR("Mork"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		if (type == 0) return Shops::Mork::itemInventory.find(item);
+		if (type == 3) return Shops::Mork::spiritInventory.find(spirit);
+		return Shops::Mork::spiritInventory.end();
+	})) return false;
+
+	if (!ProcessShopInventory(shops[1], STR("Onrom"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		return Shops::Onrom::inventory.find(item);
+	})) return false;
+
+	if (!ProcessShopInventory(shops[2], STR("Spirit Hunter"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		return Shops::SpiritHunter::inventory.find(spirit);
+	})) return false;
+
+	if (!ProcessShopInventory(shops[3], STR("Ari"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		return Shops::Ari::inventory.find(item);
+	})) return false;
+
+	if (!ProcessShopInventory(shops[4], STR("Poti"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		if (type == 0) return Shops::Poti::itemInventory.find(item);
+		if (type == 1) return Shops::Poti::weaponInventory.find(item);
+		if (type == 3) return Shops::Poti::spiritInventory.find(spirit);
+		return Shops::Poti::spiritInventory.end();
+	})) return false;
+
+	if (!ProcessShopInventory(shops[5], STR("POI"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+		return Shops::Poi::inventory.find(item);
+	})) return false;
+
+	for (TArray<inventoryItem>* shop : shops)
+	{
+		for (int32_t i = 0; i < shop->Num(); i++)
+		{
+			inventoryItem item = (*shop)[i];
 			item.amount = 1;
 			item.type = 1;
 			item.weapon = 0;
 			item.price = BlueFireArchipelagoMod::locationManager->GetItemPrice();
-
-			(*inventoryPointer)[i] = item;
+			(*shop)[i] = item;
 		}
 	}
 
@@ -600,7 +448,6 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 
 bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())
     {
@@ -608,53 +455,19 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
         return false;
     }
 
-	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
+	const wchar_t* shopNames[] = {L"Shop0-Mork", L"Shop1-Onrom", L"Shop2-SpiritHunter", L"Shop3-Ari", L"Shop4-Poti", L"Shop5-POI"};
+	TArray<inventoryItem>* shops[6] = {};
 
-    TArray<inventoryItem>* shopMork = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop0-Mork");
-    if(!shopMork)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop0-Mork property\n"));
-        return false;
-    }
+	for (int i = 0; i < 6; i++)
+	{
+		shops[i] = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(shopNames[i]);
+		if (!shops[i])
+		{
+			Output::send<LogLevel::Error>(STR("Could not find {} property\n"), shopNames[i]);
+			return false;
+		}
+	}
 
-    TArray<inventoryItem>* shopOnrom = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop1-Onrom");
-    if(!shopOnrom)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop1-Onrom property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopSpiritHunter = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop2-SpiritHunter");
-    if(!shopSpiritHunter)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop2-SpiritHunter property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopAri = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop3-Ari");
-    if(!shopAri)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop3-Ari property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopPoti = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop4-Poti");
-    if(!shopPoti)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop4-Poti property\n"));
-        return false;
-    }
-
-    TArray<inventoryItem>* shopPOI = gameInstance.value()->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"Shop5-POI");
-    if(!shopPOI)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Shop5-POI property\n"));
-        return false;
-    }
-
-	TArray<inventoryItem>* shops[6] = {shopMork, shopOnrom, shopSpiritHunter, shopAri, shopPoti, shopPOI};
-
-	// Get the global shop
 	int32_t* WorldShop = Context->GetValuePtrByPropertyNameInChain<int32_t>(L"WorldShop");
 	if(!WorldShop)
 	{
@@ -662,7 +475,6 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
-	// Get the local updated shop
     TArray<inventoryItem>* ShopInventory = Context->GetValuePtrByPropertyNameInChain<TArray<inventoryItem>>(L"ShopInventory");
 	if(!ShopInventory)
 	{
@@ -670,24 +482,20 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
-	// Find the missing item
-	bool match;
 	for(int32_t i = 0; i < (shops[*WorldShop])->Num(); i++)
     {
-		match = false;
         inventoryItem globalItem = (*shops[*WorldShop])[i];
+		bool match = false;
 
-		for(int32_t i = 0; i < ShopInventory->Num(); i++)
+		for(int32_t j = 0; j < ShopInventory->Num(); j++)
 		{
-			inventoryItem localItem = (*ShopInventory)[i];
-
-			if(globalItem.originalAmount == localItem.originalAmount)
+			if(globalItem.originalAmount == (*ShopInventory)[j].originalAmount)
 			{
 				match = true;
+				break;
 			}
 		}
 
-		// We found the missing item
 		if(!match)
 		{
 			std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromShopID(*WorldShop);
@@ -698,13 +506,10 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 			}
 
 			uint32_t archipelagoShopLocationID = locationID.value() + globalItem.originalAmount;
-
 			Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
 			AP_SendItem(archipelagoShopLocationID);
 		}
     }
-
-
 
     return false;
 }
