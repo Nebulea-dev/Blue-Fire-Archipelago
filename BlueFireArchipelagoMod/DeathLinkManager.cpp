@@ -46,7 +46,7 @@ bool DeathLinkManager::DeathHudConstructPreHook(UObject* Context, FFrame& Stack,
 		Output::send<LogLevel::Verbose>(STR("Skipping deathlink send (received deathlink)\n"));
 		bSkipNextDeathHudConstruct = false;
 	}
-	else
+	else if (BlueFireArchipelagoMod::arcManager && BlueFireArchipelagoMod::arcManager->isDeathLinkEnabled())
 	{
 		Output::send<LogLevel::Verbose>(STR("Player died, sending deathlink\n"));
 		sendDeathLink();

@@ -75,10 +75,20 @@ class ArchipelagoManager
 	 */
 	void ReleaseWorld();
 
+	/*******************************************************************************
+	 * @fn      isDeathLinkEnabled
+	 *
+	 * @brief   Returns whether death link is enabled for this session.
+	 *
+	 * @return  true if death link is enabled, false otherwise
+	 */
+	bool isDeathLinkEnabled() const;
+
 	private:
 
 	void (*successfulConnectionCallback)(void);
 	bool bResetConnectionStatusLoop;
+	bool bDeathLinkEnabled;
 
 	/*******************************************************************************
 	 * @fn      initCallbacks

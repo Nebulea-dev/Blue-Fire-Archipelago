@@ -15,7 +15,7 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false)
+ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false)
 {
 	this->initCallbacks();
 	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
@@ -33,6 +33,13 @@ void ArchipelagoManager::initCallbacks()
 		{
 			BlueFireArchipelagoMod::locationManager->SetItemPrice(price);
 			Output::send<LogLevel::Verbose>(STR("Received item price from slot data: {}\n"), price);
+		}
+	});
+	AP_RegisterSlotDataBoolCallback("death_link", [](bool enabled) {
+		if (BlueFireArchipelagoMod::arcManager)
+		{
+			BlueFireArchipelagoMod::arcManager->bDeathLinkEnabled = enabled;
+			Output::send<LogLevel::Verbose>(STR("Received death_link setting from slot data: {}\n"), enabled);
 		}
 	});
 }
@@ -88,6 +95,12 @@ void ArchipelagoManager::OnLocationCheck(int64_t location)
 
 void ArchipelagoManager::OnDeathLink()
 {
+	if (!bDeathLinkEnabled)
+	{
+		Output::send<LogLevel::Verbose>(STR("Deathlink received but deathlink is disabled, ignoring\n"));
+		return;
+	}
+
 	Output::send<LogLevel::Verbose>(STR("Received deathlink from Archipelago\n"));
 	if (!BlueFireArchipelagoMod::deathLinkManager)
 	{
@@ -186,4 +199,9 @@ void ArchipelagoManager::ReleaseWorld()
 {
     Output::send<LogLevel::Verbose>(STR("Game completed, releasing world...\n"));
 	AP_StoryComplete();
+}
+
+bool ArchipelagoManager::isDeathLinkEnabled() const
+{
+	return bDeathLinkEnabled;
 }
