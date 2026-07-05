@@ -9,6 +9,7 @@
 #include <ArchipelagoModConfig.hpp>
 #include <ItemManager.hpp>
 #include <LocationManager.hpp>
+#include <DeathLinkManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -25,6 +26,8 @@ void ArchipelagoManager::initCallbacks()
 	AP_SetItemClearCallback(StaticItemClearCallback);
 	AP_SetItemRecvCallback(StaticItemReceiveCallback);
 	AP_SetLocationCheckedCallback(StaticLocationCheckCallback);
+	AP_SetDeathLinkSupported(true);
+	AP_SetDeathLinkCallback(StaticDeathLinkCallback);
 	AP_RegisterSlotDataIntCallback("item_price", [](int price) {
 		if (BlueFireArchipelagoMod::locationManager)
 		{
@@ -81,6 +84,26 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 void ArchipelagoManager::OnLocationCheck(int64_t location)
 {
 	Output::send<LogLevel::Verbose>(STR("Checked location with id {} from Archipelago\n"), location - ArchipelagoModConfig::Archipelago::BF_BASE_ID);
+}
+
+void ArchipelagoManager::OnDeathLink()
+{
+	Output::send<LogLevel::Verbose>(STR("Received deathlink from Archipelago\n"));
+	if (!BlueFireArchipelagoMod::deathLinkManager)
+	{
+		Output::send<LogLevel::Error>(STR("deathLinkManager is null in OnDeathLink\n"));
+		return;
+	}
+
+	BlueFireArchipelagoMod::deathLinkManager->onDeathLinkReceived();
+}
+
+void ArchipelagoManager::StaticDeathLinkCallback()
+{
+	if (BlueFireArchipelagoMod::arcManager)
+	{
+		BlueFireArchipelagoMod::arcManager->OnDeathLink();
+	}
 }
 
 void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText* Username, const FText* Password)

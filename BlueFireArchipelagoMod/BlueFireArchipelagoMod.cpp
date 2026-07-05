@@ -16,6 +16,7 @@
 #include <ArchipelagoManager.hpp>
 #include <ArchipelagoModConfig.hpp>
 #include <LocationManager.hpp>
+#include <DeathLinkManager.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -44,6 +45,7 @@ void BlueFireArchipelagoMod::on_unreal_init()
     itemManager = new ItemManager();
     arcManager = new ArchipelagoManager();
     locationManager = new LocationManager();
+    deathLinkManager = new DeathLinkManager();
     mainMenuManager = new MainMenuManager();
 
     Output::send<LogLevel::Verbose>(STR("All managers initialized\n"));

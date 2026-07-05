@@ -19,6 +19,7 @@ class HookHelper;
 class ItemManager;
 class ArchipelagoManager;
 class LocationManager;
+class DeathLinkManager;
 
 /*******************************************************************************
  * BlueFireArchipelagoMod
@@ -51,6 +52,9 @@ public:
 
 	/// Location manager instance - manages location checks and events
 	static inline LocationManager* locationManager = nullptr;
+
+	/// Death link manager instance - manages deathlink events
+	static inline DeathLinkManager* deathLinkManager = nullptr;
 
 	/*******************************************************************************
 	 * @fn      BlueFireArchipelagoMod

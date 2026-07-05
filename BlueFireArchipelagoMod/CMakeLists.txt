@@ -35,6 +35,7 @@ add_library(${TARGET} SHARED
     ItemManager.cpp
     ArchipelagoManager.cpp
     LocationManager.cpp
+    DeathLinkManager.cpp
     "${LOCATIONS_DATA_HPP}"
 )
 

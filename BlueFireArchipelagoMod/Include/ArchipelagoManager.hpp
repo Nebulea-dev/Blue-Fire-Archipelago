@@ -179,4 +179,30 @@ class ArchipelagoManager
 	 * @return  none
 	 */
 	static void StaticLocationCheckCallback(int64_t location);
+
+	/*******************************************************************************
+	 * @fn      OnDeathLink
+	 *
+	 * @brief   Event handler when a deathlink is received from another player.
+	 *
+	 *          Called when the Archipelago server sends a deathlink event from
+	 *          another player. Routes the deathlink to DeathLinkManager to handle
+	 *          player death and UI updates.
+	 *
+	 * @return  none
+	 */
+	void OnDeathLink();
+
+	/*******************************************************************************
+	 * @fn      StaticDeathLinkCallback
+	 *
+	 * @brief   Static callback wrapper for deathlink events.
+	 *
+	 *          Static function required by the Archipelago library's callback
+	 *          registration system. Delegates to the instance method
+	 *          OnDeathLink() via the mod manager instance.
+	 *
+	 * @return  none
+	 */
+	static void StaticDeathLinkCallback();
 };
