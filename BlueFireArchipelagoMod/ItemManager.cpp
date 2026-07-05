@@ -116,50 +116,15 @@ bool ItemManager::StartNewGame(UObject* Context, FFrame& Stack, void* RESULT_DEC
 		return false;
 	}
 
-    // Remove the first emote
     emoteInventory->Pop(true);
 
-
-
-
-    // Get the "PlayerStats" property
-    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
-    if (!playerStatsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
-        return false;
-    }
-
-    // Get the "PlayerEquipment.Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659" property
-    auto playerStatsStruct = playerStatsProperty->GetStruct();
-    if (!playerStatsStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-        return false;
-    }
-
-    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerStats)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
-        return false;
-    }
-
-    FStructProperty* currencyProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659"));
-    if (!currencyProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659 property in PlayerStats\n"));
-        return false;
-    }
-
-    int32* currency = currencyProperty->ContainerPtrToValuePtr<int32>(playerStats);
+    int32* currency = UnrealObjectQueries::GetNestedPropertyValue<int32>(gameInstance.value(), L"PlayerStats", L"Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659");
     if (!currency)
     {
-        Output::send<LogLevel::Error>(STR("Could not get currency value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get currency value in StartNewGame\n"));
         return false;
     }
 
-    // Set currency to 200 in order to buy the first statue
     *currency = 200;
 
     return false;
@@ -197,40 +162,10 @@ void ItemManager::givePlayerWeapon(int weaponID)
         return;
     }
 
-    // Get the "PlayerEquipment" property
-    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
-    if (!playerEquipmentProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
-        return;
-    }
-
-    // Get the "PlayerEquipment.Weapons_18_409D783242E4CBDA66AAB6A252C7A317" property
-    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
-    if (!playerEquipmentStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
-        return;
-    }
-
-    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerEquipment)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
-        return;
-    }
-
-    FStructProperty* weaponProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317"));
-    if (!weaponProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Weapons_18_409D783242E4CBDA66AAB6A252C7A317 property in PlayerEquipment\n"));
-        return;
-    }
-
-    TArray<uint8_t>* weapons = weaponProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    TArray<uint8_t>* weapons = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317");
     if (!weapons)
     {
-        Output::send<LogLevel::Error>(STR("Could not get weapons value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get weapons array in givePlayerWeapon\n"));
         return;
     }
 
@@ -248,40 +183,10 @@ void ItemManager::givePlayerTunic(int tunicID)
         return;
     }
 
-    // Get the "PlayerEquipment" property
-    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
-    if (!playerEquipmentProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
-        return;
-    }
-
-    // Get the "PlayerEquipment.Tunics_19_8878CF744AF2806994F2E48778F1CC2D" property
-    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
-    if (!playerEquipmentStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
-        return;
-    }
-
-    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerEquipment)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
-        return;
-    }
-
-    FStructProperty* tunicProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Tunics_19_8878CF744AF2806994F2E48778F1CC2D"));
-    if (!tunicProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Tunics_19_8878CF744AF2806994F2E48778F1CC2D property in PlayerEquipment\n"));
-        return;
-    }
-
-    TArray<uint8_t>* tunics = tunicProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    TArray<uint8_t>* tunics = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"Tunics_19_8878CF744AF2806994F2E48778F1CC2D");
     if (!tunics)
     {
-        Output::send<LogLevel::Error>(STR("Could not get tunics value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get tunics array in givePlayerTunic\n"));
         return;
     }
 
@@ -299,40 +204,10 @@ void ItemManager::givePlayerSpirit(int spiritID)
         return;
     }
 
-    // Get the "PlayerEquipment" property
-    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
-    if (!playerEquipmentProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
-        return;
-    }
-
-    // Get the "PlayerEquipment.SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A" property
-    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
-    if (!playerEquipmentStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
-        return;
-    }
-
-    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerEquipment)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
-        return;
-    }
-
-    FStructProperty* spiritsProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A"));
-    if (!spiritsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A property in PlayerEquipment\n"));
-        return;
-    }
-
-    TArray<uint8_t>* spirits = spiritsProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
     if (!spirits)
     {
-        Output::send<LogLevel::Error>(STR("Could not get spirits value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerSpirit\n"));
         return;
     }
 
@@ -344,7 +219,25 @@ void ItemManager::givePlayerAbility(int abilityID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player ability ID: {}\n"), abilityID);
 
-    wchar_t propertyName[50];
+    const wchar_t* abilityProperties[] = {
+        L"Attack_10_351804CD4B3F2EFBDC0B2DAAA7ED7238",
+        L"Dash_8_C5BEBFCD4803BE8A33ADC7BB805F1659",
+        L"DoubleJump_9_9ACF69B4474D76AACA0E349806254782",
+        L"WallJump_12_8CC261B848F97BE432C43FBFDFB65D1D",
+        L"Sprint_21_A2EA9CA54248830C70D2A096307CA144",
+        L"DownSmash_22_84DE6230457D45C1BBF111BBA6DDE737",
+        L"Spell_23_EFD583FD46ED9B47C8C80EBEEB3D9753",
+        L"Grind_19_5D0328FB486C70BF86BFD58EAB4CE52D",
+        L"Block_25_5710D9FB4D2A4FF88972508279869DF4",
+        L"SpinAttack_27_19AE29114077C361BA4934AD401C4A0B",
+    };
+
+    if (abilityID < 0 || abilityID >= 10)
+    {
+        Output::send<LogLevel::Error>(STR("Invalid ability ID: {}\n"), abilityID);
+        return;
+    }
+
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())
     {
@@ -352,77 +245,9 @@ void ItemManager::givePlayerAbility(int abilityID)
         return;
     }
 
-    // Get the "PlayerAbilities" property
-    FStructProperty* playerAbilitiesProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerAbilities"));
-    if (!playerAbilitiesProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerAbilities property\n"));
-        return;
-    }
-
-
-    switch(abilityID)
-    {
-        case 0:
-            wcsncpy_s(propertyName, 50, L"Attack_10_351804CD4B3F2EFBDC0B2DAAA7ED7238", 50);
-            break;
-        case 1:
-            wcsncpy_s(propertyName, 50, L"Dash_8_C5BEBFCD4803BE8A33ADC7BB805F1659", 50);
-            break;
-        case 2:
-            wcsncpy_s(propertyName, 50, L"DoubleJump_9_9ACF69B4474D76AACA0E349806254782", 50);
-            break;
-        case 3:
-            wcsncpy_s(propertyName, 50, L"WallJump_12_8CC261B848F97BE432C43FBFDFB65D1D", 50);
-            break;
-        case 4:
-            wcsncpy_s(propertyName, 50, L"Sprint_21_A2EA9CA54248830C70D2A096307CA144", 50);
-            break;
-        case 5:
-            wcsncpy_s(propertyName, 50, L"DownSmash_22_84DE6230457D45C1BBF111BBA6DDE737", 50);
-            break;
-        case 6:
-            wcsncpy_s(propertyName, 50, L"Spell_23_EFD583FD46ED9B47C8C80EBEEB3D9753", 50);
-            break;
-        case 7:
-            wcsncpy_s(propertyName, 50, L"Grind_19_5D0328FB486C70BF86BFD58EAB4CE52D", 50);
-            break;
-        case 8:
-            wcsncpy_s(propertyName, 50, L"Block_25_5710D9FB4D2A4FF88972508279869DF4", 50);
-            break;
-        case 9:
-            wcsncpy_s(propertyName, 50, L"SpinAttack_27_19AE29114077C361BA4934AD401C4A0B", 50);
-            break;
-    }
-
-
-    auto playerAbilitiesStruct = playerAbilitiesProperty->GetStruct();
-    if (!playerAbilitiesStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerAbilities property\n"));
-        return;
-    }
-
-    auto playerAbilities = playerAbilitiesProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerAbilities)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerAbilities value pointer\n"));
-        return;
-    }
-
-    FStructProperty* abilityProperty = static_cast<FStructProperty*>(playerAbilitiesStruct->GetPropertyByNameInChain(propertyName));
-    if (!abilityProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find property in PlayerAbilities\n"));
-        return;
-    }
-
-    uint8_t* ability = abilityProperty->ContainerPtrToValuePtr<uint8_t>(playerAbilities);
+    uint8_t* ability = UnrealObjectQueries::GetNestedPropertyValue<uint8_t>(gameInstance.value(), L"PlayerAbilities", abilityProperties[abilityID]);
     if (!ability)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get ability value pointer\n"));
         return;
-    }
 
     *ability = true;
 }
@@ -431,78 +256,20 @@ void ItemManager::givePlayerItem(int itemID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player item ID: {}\n"), itemID);
 
-    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
-    if(!gameInstance.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
-        return;
-    }
-
-    // Get the "PlayerStats" property
-    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
-    if (!playerStatsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
-        return;
-    }
-
-    // Get the "PlayerEquipment.Inventory_23_288399C5416269F828550FB7376E7942" property
-    auto playerStatsStruct = playerStatsProperty->GetStruct();
-    if (!playerStatsStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-        return;
-    }
-
-    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerStats)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
-        return;
-    }
-
-    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory_23_288399C5416269F828550FB7376E7942"));
-    if (!inventoryProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Inventory_23_288399C5416269F828550FB7376E7942 property in PlayerStats\n"));
-        return;
-    }
-
-    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    TArray<inventoryItem>* inventory = UnrealObjectQueries::GetInventoryFromGameInstance();
     if (!inventory)
     {
-        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get inventory in givePlayerItem\n"));
         return;
     }
 
-    // Go through all items already in inventory, to stack it instead of creating a new item if possible
-    for(int32_t i = 0; i < inventory->Num(); i++)
+    if (UnrealObjectQueries::StackItemInInventory(inventory, itemID))
     {
-        inventoryItem item = (*inventory)[i];
-
-        // If the inventory item isn't of type "item"
-        if(item.type != 0)
-        {
-            continue;
-        }
-
-        // If not the correct item
-        if(item.item != itemID)
-        {
-            continue;
-        }
-
-        Output::send<LogLevel::Verbose>(STR("Found item in inventory, increasing quantity ..\n"), itemID);
-
-        item.amount += 1;
-        (*inventory)[i] = item;
-
+        Output::send<LogLevel::Verbose>(STR("Found item in inventory, increasing quantity\n"));
         return;
     }
 
-    Output::send<LogLevel::Verbose>(STR("Item not found in inventory, creating it ..\n"), itemID);
-
-    // If item is not already in inventory, add it
+    Output::send<LogLevel::Verbose>(STR("Item not found in inventory, creating it\n"));
     inventoryItem newItem = {};
     newItem.item = itemID;
     newItem.amount = 1;
@@ -513,74 +280,16 @@ void ItemManager::givePlayerKeyItem(int itemID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player passive item ID: {}\n"), itemID);
 
-    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
-    if(!gameInstance.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
-        return;
-    }
-
-    // Get the "PlayerStats" property
-    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
-    if (!playerStatsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
-        return;
-    }
-
-    // Get the "PlayerEquipment.PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94" property
-    auto playerStatsStruct = playerStatsProperty->GetStruct();
-    if (!playerStatsStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-        return;
-    }
-
-    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerStats)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
-        return;
-    }
-
-    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
-    if (!inventoryProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94 property in PlayerStats\n"));
-        return;
-    }
-
-    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    TArray<inventoryItem>* inventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
     if (!inventory)
     {
-        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get passive inventory in givePlayerKeyItem\n"));
         return;
     }
 
-    // Go through all items already in inventory, to stack it instead of creating a new item if possible
-    for(int32_t i = 0; i < inventory->Num(); i++)
-    {
-        inventoryItem item = (*inventory)[i];
-
-        // If the inventory item isn't of type "item"
-        if(item.type != 0)
-        {
-            continue;
-        }
-
-        // If not the correct item
-        if(item.item != itemID)
-        {
-            continue;
-        }
-
-        item.amount += 1;
-        (*inventory)[i] = item;
-
+    if (UnrealObjectQueries::StackItemInInventory(inventory, itemID))
         return;
-    }
 
-    // If item is not already in inventory, add it
     inventoryItem newItem = {};
     newItem.item = itemID;
     newItem.amount = 1;
@@ -611,83 +320,35 @@ void ItemManager::givePlayerProgressivePouch()
 {
     Output::send<LogLevel::Verbose>(STR("Upgrading player pouch...\n"));
 
-    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
-    if(!gameInstance.has_value())
-    {
-        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
-        return;
-    }
-
-    // Get the "PlayerStats" property
-    FStructProperty* playerStatsProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerStats"));
-    if (!playerStatsProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerStats property\n"));
-        return;
-    }
-
-    auto playerStatsStruct = playerStatsProperty->GetStruct();
-    if (!playerStatsStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
-        return;
-    }
-
-    auto playerStats = playerStatsProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerStats)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerStats value pointer\n"));
-        return;
-    }
-
-    FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94"));
-    if (!inventoryProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PassiveInventory_48_636C916F4A37F051CF9B14A1402B4C94 property in PlayerStats\n"));
-        return;
-    }
-
-    TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+    TArray<inventoryItem>* inventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
     if (!inventory)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get inventory value pointer\n"));
         return;
-    }
 
+    const uint32_t BASIC_POUCH = 72;
+    const uint32_t LARGE_POUCH = 0;
+    const uint32_t EXTRA_LARGE_POUCH = 75;
 
-    const int32_t BASIC_POUCH = 72;
-    const int32_t LARGE_POUCH = 0;
-    const int32_t EXTRA_LARGE_POUCH = 75;
-
-    // Look for existing pouch in inventory
     for(int32_t i = 0; i < inventory->Num(); i++)
     {
         inventoryItem item = (*inventory)[i];
+        if(item.type != 0) continue;
 
-        // If the inventory item isn't of type "item"
-        if(item.type != 0)
-        {
-            continue;
-        }
-
-        // Check if this is a pouch item and upgrade to the next level
         if(item.item == BASIC_POUCH)
         {
-            Output::send<LogLevel::Verbose>(STR("Found Basic Pouch, upgrading to Large Pouch...\n"));
+            Output::send<LogLevel::Verbose>(STR("Found Basic Pouch, upgrading to Large Pouch\n"));
             item.item = LARGE_POUCH;
             (*inventory)[i] = item;
             return;
         }
         if(item.item == LARGE_POUCH)
         {
-            Output::send<LogLevel::Verbose>(STR("Found Large Pouch, upgrading to Extra Large Pouch...\n"));
+            Output::send<LogLevel::Verbose>(STR("Found Large Pouch, upgrading to Extra Large Pouch\n"));
             item.item = EXTRA_LARGE_POUCH;
             (*inventory)[i] = item;
             return;
         }
     }
 
-    // If no pouch found in inventory, give the player the Large Pouch
     Output::send<LogLevel::Error>(STR("No Pouch found in inventory, could not replace with better pouch\n"));
 }
 
@@ -702,43 +363,13 @@ void ItemManager::givePlayerProgressiveWeapon()
         return;
     }
 
-    // Get the "PlayerEquipment" property
-    FStructProperty* playerEquipmentProperty = static_cast<FStructProperty*>(gameInstance.value()->GetPropertyByNameInChain(L"PlayerEquipment"));
-    if (!playerEquipmentProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find PlayerEquipment property\n"));
-        return;
-    }
-
-    auto playerEquipmentStruct = playerEquipmentProperty->GetStruct();
-    if (!playerEquipmentStruct)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get struct from PlayerEquipment property\n"));
-        return;
-    }
-
-    auto playerEquipment = playerEquipmentProperty->ContainerPtrToValuePtr<void>(gameInstance.value());
-    if (!playerEquipment)
-    {
-        Output::send<LogLevel::Error>(STR("Could not get PlayerEquipment value pointer\n"));
-        return;
-    }
-
-    FStructProperty* weaponProperty = static_cast<FStructProperty*>(playerEquipmentStruct->GetPropertyByNameInChain(L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317"));
-    if (!weaponProperty)
-    {
-        Output::send<LogLevel::Error>(STR("Could not find Weapons_18_409D783242E4CBDA66AAB6A252C7A317 property in PlayerEquipment\n"));
-        return;
-    }
-
-    TArray<uint8_t>* weapons = weaponProperty->ContainerPtrToValuePtr<TArray<uint8_t>>(playerEquipment);
+    TArray<uint8_t>* weapons = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"Weapons_18_409D783242E4CBDA66AAB6A252C7A317");
     if (!weapons)
     {
-        Output::send<LogLevel::Error>(STR("Could not get weapons value pointer\n"));
+        Output::send<LogLevel::Error>(STR("Could not get weapons array in givePlayerProgressiveWeapon\n"));
         return;
     }
 
-    // Find the highest weapon damage
     uint8_t highestWeaponOrderIndex = 0;
     for(int32_t i = 0; i < weapons->Num(); i++)
     {
@@ -746,11 +377,8 @@ void ItemManager::givePlayerProgressiveWeapon()
         uint8_t weaponOrderIndex = ArchipelagoModConfig::Weapons::orderFromWeapon.find(weaponID) != ArchipelagoModConfig::Weapons::orderFromWeapon.end() ? ArchipelagoModConfig::Weapons::orderFromWeapon.at(weaponID) : 0;
         Output::send<LogLevel::Verbose>(STR("Found weapon ID: {}, order index: {}\n"), weaponID, weaponOrderIndex);
         if(weaponOrderIndex > highestWeaponOrderIndex)
-        {
             highestWeaponOrderIndex = weaponOrderIndex;
-        }
     }
-
 
     uint8_t nextWeaponIndex = highestWeaponOrderIndex + 1;
 
@@ -758,13 +386,10 @@ void ItemManager::givePlayerProgressiveWeapon()
     {
         uint8_t nextWeaponID = ArchipelagoModConfig::Weapons::weaponFromOrder.at(nextWeaponIndex);
         Output::send<LogLevel::Verbose>(STR("Found highest weapon order index: {}, adding weapon ID: {}\n"), highestWeaponOrderIndex, nextWeaponID);
-
         weapons->Push(nextWeaponID);
     }
     else
     {
         Output::send<LogLevel::Verbose>(STR("Cannot find the next weapon for order index: {}, max weapon already obtained\n"), highestWeaponOrderIndex);
-        return;
     }
-
 }

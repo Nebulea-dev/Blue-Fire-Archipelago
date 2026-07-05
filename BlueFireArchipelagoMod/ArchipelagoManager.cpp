@@ -27,7 +27,7 @@ void ArchipelagoManager::initCallbacks()
 	AP_SetItemRecvCallback(StaticItemReceiveCallback);
 	AP_SetLocationCheckedCallback(StaticLocationCheckCallback);
 	AP_SetDeathLinkSupported(true);
-	AP_SetDeathLinkCallback(StaticDeathLinkCallback);
+	AP_SetDeathLinkRecvCallback(StaticDeathLinkCallback);
 	AP_RegisterSlotDataIntCallback("item_price", [](int price) {
 		if (BlueFireArchipelagoMod::locationManager)
 		{
@@ -35,11 +35,11 @@ void ArchipelagoManager::initCallbacks()
 			Output::send<LogLevel::Verbose>(STR("Received item price from slot data: {}\n"), price);
 		}
 	});
-	AP_RegisterSlotDataBoolCallback("death_link", [](bool enabled) {
+	AP_RegisterSlotDataIntCallback("death_link", [](int enabled) {
 		if (BlueFireArchipelagoMod::arcManager)
 		{
-			BlueFireArchipelagoMod::arcManager->bDeathLinkEnabled = enabled;
-			Output::send<LogLevel::Verbose>(STR("Received death_link setting from slot data: {}\n"), enabled);
+			BlueFireArchipelagoMod::arcManager->bDeathLinkEnabled = (enabled != 0);
+			Output::send<LogLevel::Verbose>(STR("Received death_link setting from slot data: {}\n"), enabled != 0 ? STR("enabled") : STR("disabled"));
 		}
 	});
 }

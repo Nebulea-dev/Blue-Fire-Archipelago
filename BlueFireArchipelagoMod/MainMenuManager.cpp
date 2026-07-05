@@ -301,71 +301,17 @@ bool MainMenuManager::ConfigureTextboxStyles(const TArray<UObject*>& textboxes, 
     {
         UObject* textBox = textboxes[i];
 
-        // Get the "WidgetStyle" property
-        FStructProperty* StyleWidgetProperty = static_cast<FStructProperty*>(textBox->GetPropertyByNameInChain(PropertyNames::PROP_WIDGET_STYLE));
-        if (!StyleWidgetProperty)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find WidgetStyle property\n"));
-            return false;
-        }
-
-        // Get the "WidgetStyle.Font" property
-        auto StyleWidgetStruct = StyleWidgetProperty->GetStruct();
-        if (!StyleWidgetStruct)
-        {
-            Output::send<LogLevel::Error>(STR("Could not get struct from WidgetStyle property\n"));
-            return false;
-        }
-
-        auto StyleWidget = StyleWidgetProperty->ContainerPtrToValuePtr<void>(textBox);
-        if (!StyleWidget)
-        {
-            Output::send<LogLevel::Error>(STR("Could not get StyleWidget value pointer\n"));
-            return false;
-        }
-
-        FStructProperty* FontProperty = static_cast<FStructProperty*>(StyleWidgetStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT));
-        if (!FontProperty)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find Font property in WidgetStyle\n"));
-            return false;
-        }
-
-        auto FontStruct = FontProperty->GetStruct();
-        if (!FontStruct)
-        {
-            Output::send<LogLevel::Error>(STR("Could not get struct from Font property\n"));
-            return false;
-        }
-
-        auto Font = FontProperty->ContainerPtrToValuePtr<void>(StyleWidget);
-        if (!Font)
-        {
-            Output::send<LogLevel::Error>(STR("Could not get Font value pointer\n"));
-            return false;
-        }
-
-        // Get the "WidgetStyle.Font.FontObject" and "WidgetStyle.Font.Size" properties
-        FProperty* FontSizeProperty = static_cast<FProperty*>(FontStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT_SIZE));
-        FStructProperty* FontObjectProperty = static_cast<FStructProperty*>(FontStruct->GetPropertyByNameInChain(PropertyNames::PROP_FONT_OBJECT));
-        if (!FontSizeProperty || !FontObjectProperty)
-        {
-            Output::send<LogLevel::Error>(STR("Could not find FontSize or FontObject property\n"));
-            return false;
-        }
-
-        uint32_t* widgetFontSize = FontSizeProperty->ContainerPtrToValuePtr<uint32_t>(Font);
-        UObject** widgetFontObject = FontObjectProperty->ContainerPtrToValuePtr<UObject*>(Font);
-
+        uint32_t* widgetFontSize = UnrealObjectQueries::GetNestedPropertyValue<uint32_t>(textBox, PropertyNames::PROP_WIDGET_STYLE, PropertyNames::PROP_FONT, PropertyNames::PROP_FONT_SIZE);
         if (!widgetFontSize)
         {
-            Output::send<LogLevel::Error>(STR("Could not get font size value pointer for textbox %d\n"), i);
+            Output::send<LogLevel::Error>(STR("Could not get font size property for textbox %d\n"), i);
             return false;
         }
 
+        UObject** widgetFontObject = UnrealObjectQueries::GetNestedPropertyValue<UObject*>(textBox, PropertyNames::PROP_WIDGET_STYLE, PropertyNames::PROP_FONT, PropertyNames::PROP_FONT_OBJECT);
         if (!widgetFontObject)
         {
-            Output::send<LogLevel::Error>(STR("Could not get font object value pointer for textbox %d\n"), i);
+            Output::send<LogLevel::Error>(STR("Could not get font object property for textbox %d\n"), i);
             return false;
         }
 

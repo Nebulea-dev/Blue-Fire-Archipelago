@@ -1,6 +1,10 @@
 #include <Helper/UnrealObjectQueries.hpp>
 #include <Helper/ObjectFinder.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
+#include <ItemManager.hpp>
+
+using namespace RC;
+using namespace Unreal;
 
 std::optional<UObject*> UnrealObjectQueries::FindArchipelagoTextbox(std::wstring_view boxName)
 {
@@ -154,3 +158,185 @@ std::optional<UObject*> UnrealObjectQueries::FindGameMenu()
 {
 	return FindWidget(L"GameMenu_C", L"GameMenu_C /Engine/", L"");
 }
+
+FStructProperty* UnrealObjectQueries::GetStructProperty(UObject* owner, const wchar_t* propertyName)
+{
+	if (!owner)
+	{
+		Output::send<LogLevel::Error>(STR("owner is null in GetStructProperty\n"));
+		return nullptr;
+	}
+
+	FStructProperty* property = static_cast<FStructProperty*>(owner->GetPropertyByNameInChain(propertyName));
+	if (!property)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find {} property\n"), propertyName);
+		return nullptr;
+	}
+
+	return property;
+}
+
+void* UnrealObjectQueries::GetStructPropertyValue(UObject* owner, const wchar_t* propertyName)
+{
+	if (!owner)
+	{
+		Output::send<LogLevel::Error>(STR("owner is null in GetStructPropertyValue\n"));
+		return nullptr;
+	}
+
+	FStructProperty* property = GetStructProperty(owner, propertyName);
+	if (!property)
+		return nullptr;
+
+	UStruct* structDef = property->GetStruct();
+	if (!structDef)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get struct from {} property\n"), propertyName);
+		return nullptr;
+	}
+
+	void* value = property->ContainerPtrToValuePtr<void>(owner);
+	if (!value)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get {} value pointer\n"), propertyName);
+		return nullptr;
+	}
+
+	return value;
+}
+
+TArray<inventoryItem>* UnrealObjectQueries::GetInventoryFromGameInstance()
+{
+	std::optional<UObject*> gameInstance = FindGameInstance();
+	if (!gameInstance.has_value())
+	{
+		Output::send<LogLevel::Error>(STR("Could not find game instance\n"));
+		return nullptr;
+	}
+
+	FStructProperty* playerStatsProperty = GetStructProperty(gameInstance.value(), L"PlayerStats");
+	if (!playerStatsProperty)
+		return nullptr;
+
+	void* playerStats = GetStructPropertyValue(gameInstance.value(), L"PlayerStats");
+	if (!playerStats)
+		return nullptr;
+
+	UStruct* playerStatsStruct = playerStatsProperty->GetStruct();
+	if (!playerStatsStruct)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+		return nullptr;
+	}
+
+	FStructProperty* inventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"Inventory"));
+	if (!inventoryProperty)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find Inventory property in PlayerStats\n"));
+		return nullptr;
+	}
+
+	TArray<inventoryItem>* inventory = inventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+	if (!inventory)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get Inventory value pointer\n"));
+		return nullptr;
+	}
+
+	return inventory;
+}
+
+TArray<inventoryItem>* UnrealObjectQueries::GetPassiveInventoryFromGameInstance()
+{
+	std::optional<UObject*> gameInstance = FindGameInstance();
+	if (!gameInstance.has_value())
+	{
+		Output::send<LogLevel::Error>(STR("Could not find game instance\n"));
+		return nullptr;
+	}
+
+	FStructProperty* playerStatsProperty = GetStructProperty(gameInstance.value(), L"PlayerStats");
+	if (!playerStatsProperty)
+		return nullptr;
+
+	void* playerStats = GetStructPropertyValue(gameInstance.value(), L"PlayerStats");
+	if (!playerStats)
+		return nullptr;
+
+	UStruct* playerStatsStruct = playerStatsProperty->GetStruct();
+	if (!playerStatsStruct)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get struct from PlayerStats property\n"));
+		return nullptr;
+	}
+
+	FStructProperty* passiveInventoryProperty = static_cast<FStructProperty*>(playerStatsStruct->GetPropertyByNameInChain(L"PassiveInventory"));
+	if (!passiveInventoryProperty)
+	{
+		Output::send<LogLevel::Error>(STR("Could not find PassiveInventory property in PlayerStats\n"));
+		return nullptr;
+	}
+
+	TArray<inventoryItem>* passiveInventory = passiveInventoryProperty->ContainerPtrToValuePtr<TArray<inventoryItem>>(playerStats);
+	if (!passiveInventory)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get PassiveInventory value pointer\n"));
+		return nullptr;
+	}
+
+	return passiveInventory;
+}
+
+bool UnrealObjectQueries::StackItemInInventory(TArray<inventoryItem>* inventory, uint32_t itemID, uint32_t amount)
+{
+	if (!inventory)
+	{
+		Output::send<LogLevel::Error>(STR("inventory is null in StackItemInInventory\n"));
+		return false;
+	}
+
+	for (int32_t i = 0; i < inventory->Num(); i++)
+	{
+		inventoryItem item = (*inventory)[i];
+		if (item.type != 0) continue;
+		if (item.item != itemID) continue;
+
+		item.amount += amount;
+		(*inventory)[i] = item;
+		return true;
+	}
+
+	return false;
+}
+
+bool UnrealObjectQueries::GetStructPropertyAndValue(UObject* owner, const wchar_t* propertyName,
+	FStructProperty*& outProperty, void*& outValue)
+{
+	if (!owner)
+	{
+		Output::send<LogLevel::Error>(STR("owner is null in GetStructPropertyAndValue\n"));
+		return false;
+	}
+
+	outProperty = GetStructProperty(owner, propertyName);
+	if (!outProperty)
+		return false;
+
+	UStruct* structDef = outProperty->GetStruct();
+	if (!structDef)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get struct from {} property\n"), propertyName);
+		return false;
+	}
+
+	outValue = outProperty->ContainerPtrToValuePtr<void>(owner);
+	if (!outValue)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get {} value pointer\n"), propertyName);
+		return false;
+	}
+
+	return true;
+}
+
