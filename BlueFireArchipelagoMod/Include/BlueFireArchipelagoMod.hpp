@@ -66,6 +66,17 @@ public:
 	BlueFireArchipelagoMod();
 
 	/*******************************************************************************
+	 * @fn      ~BlueFireArchipelagoMod
+	 *
+	 * @brief   Destructor - cleans up all manager instances.
+	 *
+	 *          Deletes all static manager instances and releases resources.
+	 *
+	 * @return  none
+	 */
+	~BlueFireArchipelagoMod();
+
+	/*******************************************************************************
 	 * @fn      on_unreal_init
 	 *
 	 * @brief   Called when Unreal Engine has initialized.

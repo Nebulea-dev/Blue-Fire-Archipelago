@@ -8,14 +8,13 @@ using namespace RC;
 using namespace Unreal;
 
 HookHelper::HookHelper()
-    : prehooksRegistered(), posthooksRegistered(), functionsToExecuteInGameThread()
+    : prehooksRegistered(), posthooksRegistered(), functionsToExecuteInGameThread(), globalCallbackIds()
 {
-    Hook::RegisterProcessLocalScriptFunctionPreCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
+    globalCallbackIds[0] = Hook::RegisterProcessLocalScriptFunctionPreCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
     {
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
 
-        /*
         if(objectName.find(STR("Ubergraph")) == std::string::npos &&
            objectName.find(STR("Tick")) == std::string::npos &&
            objectName.find(STR("ReceiveTraceHandler")) == std::string::npos &&
@@ -55,6 +54,7 @@ HookHelper::HookHelper()
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
         }
 
+        /*
         if(objectName.find(STR("TunicMaker")) != std::string::npos && objectName.find(STR("Ubergraph")) == std::string::npos)
         {
             Output::send<LogLevel::Verbose>(STR("Function call : {}\n"), objectName);
@@ -88,7 +88,7 @@ HookHelper::HookHelper()
         }
     }, { false, false, STR("NebuleasMod"), STR("NebuleasPreHookWrapper") });
 
-    Hook::RegisterProcessLocalScriptFunctionPostCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
+    globalCallbackIds[1] = Hook::RegisterProcessLocalScriptFunctionPostCallback([&]([[maybe_unused]] Hook::TCallbackIterationData<void>& CallbackIterationData, [[maybe_unused]] UObject* Context, FFrame& Stack, [[maybe_unused]] void* RESULT_DECL)
     {
         // Get name of the function that was called
         const std::wstring objectName = Stack.Node()->GetFullName();
@@ -111,6 +111,15 @@ HookHelper::HookHelper()
     }, { false, false, STR("NebuleasMod"), STR("NebuleasPostHookWrapper") });
 
     Output::send<LogLevel::Verbose>(STR("HookHelper instance created\n"));
+}
+
+HookHelper::~HookHelper()
+{
+    // Unregister all registered hooks
+    for (const auto& pair : globalCallbackIds)
+    {
+        Hook::UnregisterCallback(pair);
+    }
 }
 
 bool HookHelper::registerPreHook(std::wstring objectName, HookFunctionSignature callback)
