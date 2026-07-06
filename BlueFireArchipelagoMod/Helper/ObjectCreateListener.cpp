@@ -45,4 +45,6 @@ bool ObjectCreateListener::deleteObjectCallback(std::wstring objectName)
 	return this->objectsListened.erase(objectName);
 }
 
-void ObjectCreateListener::OnUObjectArrayShutdown() {}
+void ObjectCreateListener::OnUObjectArrayShutdown() {
+	UObjectArray::RemoveUObjectCreateListener(this);
+}

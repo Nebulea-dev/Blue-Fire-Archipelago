@@ -36,6 +36,17 @@ public:
     HookHelper();
 
     /*******************************************************************************
+     * @fn      ~HookHelper
+     *
+     * @brief   Destructor - cleans up registered hooks and resources.
+     *
+     *          Unregisters all hooks and clears internal state.
+     *
+     * @return  none
+     */
+    ~HookHelper();
+
+    /*******************************************************************************
      * @fn      registerPreHook
      *
      * @brief   Register a callback to be executed before a function runs.
@@ -139,6 +150,9 @@ private:
 
     /// Map of function names to post-hook callbacks
     std::map<std::wstring, HookFunctionSignature> posthooksRegistered;
+
+    // Ids of Unreal Engine hook callbacks
+    RC::Unreal::Hook::GlobalCallbackId globalCallbackIds[2];
 };
 
 

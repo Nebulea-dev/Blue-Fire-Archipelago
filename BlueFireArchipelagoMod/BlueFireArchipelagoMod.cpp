@@ -60,3 +60,16 @@ void BlueFireArchipelagoMod::on_unreal_init()
         mainMenuManager->OnReturnPressed();
     });
 }
+
+BlueFireArchipelagoMod::~BlueFireArchipelagoMod()
+{
+    delete objectListener;
+    delete hookManager;
+    delete itemManager;
+    delete arcManager;
+    delete locationManager;
+    delete deathLinkManager;
+    delete mainMenuManager;
+
+    Output::send<LogLevel::Verbose>(STR("BlueFireArchipelagoMod destroyed\n"));
+}
