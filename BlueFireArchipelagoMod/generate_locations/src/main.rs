@@ -38,6 +38,12 @@ struct Event {
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
+struct ManaUpgrade {
+    number: u32,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Subregion {
     name: String,
     #[serde(default)]
@@ -52,6 +58,8 @@ struct Subregion {
     shops: Vec<Shop>,
     #[serde(default)]
     events: Vec<Event>,
+    #[serde(default)]
+    mana_upgrades: Vec<ManaUpgrade>,
 }
 
 #[allow(non_snake_case)]
@@ -141,13 +149,15 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_shopIDToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
-
-
-    header.push_str("public:\n");
-    header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
-    // We'll add shop defines here after processing
-
-    header.push_str("\nprivate:\n");
+    header.push_str("    /**\n");
+    header.push_str("     * Get the mana upgrades IDs to location ID map\n");
+    header.push_str("     * @return A map of mana upgrade IDs to location IDs\n");
+    header.push_str("     */\n");
+    header.push_str("    static const std::map<uint32_t, uint32_t>& GetManaUpgradeIDToLocationIDMap()\n");
+    header.push_str("    {\n");
+    header.push_str("        return s_manaUpgradeIDToLocationID;\n");
+    header.push_str("    }\n");
+    header.push_str("\n");
 
     let mut location_id: u32 = 0;
     let mut chest_entries = String::new();
@@ -155,8 +165,9 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     let mut pickup_entries = String::new();
     let mut void_gate_entries = String::new();
     let mut shop_entries = String::new();
+    let mut mana_entries = String::new();
+    let mut mana_upgrade_entries: u32 = 0;
 
-    // NEW STRUCTURE: Region-first hierarchy
     // Iterate: regions -> subregions -> location_types -> locations
     // Location types order: chests, statues, pickups, void_gates, shops
     // All locations get sequential IDs regardless of type
@@ -208,10 +219,26 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
                 }
             }
 
+            // Process mana upgrades
+            for location in &subregion.mana_upgrades {
+                for _ in 0..location.number {
+                    mana_upgrade_entries += 1;
+                    mana_entries.push_str(&format!("        {{{}, {}}},\n", mana_upgrade_entries, location_id));
+                    location_id += 1;
+                }
+            }
+
             // Events are parsed but not exposed in the C++ header
             // They are used by the Python Archipelago mod parser only
         }
     }
+
+
+    header.push_str("public:\n");
+    header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
+    // We'll add shop defines here after processing
+
+    header.push_str("\nprivate:\n");
 
     // Build all the maps
     header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {\n");
@@ -235,6 +262,10 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
 
     header.push_str("    static inline const std::map<uint32_t, uint32_t> s_shopIDToLocationID = {\n");
     header.push_str(&shop_entries);
+    header.push_str("    };\n");
+
+    header.push_str("    static inline const std::map<uint32_t, uint32_t> s_manaUpgradeIDToLocationID = {\n");
+    header.push_str(&mana_entries);
     header.push_str("    };\n");
 
     header.push_str("};\n");

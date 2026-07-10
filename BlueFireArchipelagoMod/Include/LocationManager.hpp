@@ -20,6 +20,7 @@ public:
     std::optional<uint32_t> GetLocationIDFromPickupName(const std::wstring& pickupName);
     std::optional<uint32_t> GetLocationIDFromVoidGateName(const std::wstring& voidGateName);
     std::optional<uint32_t> GetLocationIDFromShopID(const uint32_t shopID);
+    std::optional<uint32_t> GetBaseLocationIDForManaUpgrade(const uint32_t manaUpgradeLevel);
 
     int GetItemPrice() const { return itemPrice; }
     void SetItemPrice(int price) { itemPrice = price; }
@@ -40,6 +41,7 @@ public:
     static bool OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
     static bool OnKillGoddess(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+    static bool OnManaUpgrade(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
 
 private:

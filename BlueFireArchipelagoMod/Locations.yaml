@@ -41,6 +41,8 @@ regions:
       objectName: Void_Gate_Matias
     - name: Umbert's Secret Void Gate
       objectName: Void_Gate_Ricardo
+    mana_upgrades:
+    - number: 2
 
 - name: Arcane Tunnels
   subregions:
@@ -136,6 +138,8 @@ regions:
     - name: Mork's Shop
       shopId: 0
       items: 5
+    mana_upgrades:
+    - number: 2
   - name: Breemur's Tavern
     chests:
     - name: Downstairs Chest 1
@@ -316,6 +320,8 @@ regions:
     - name: Capture Beira Shards 2
       requiredItems:
       - Beira Vessel
+    mana_upgrades:
+    - number: 2
   - name: Beira's Room
     pickups:
     - name: Spirit
@@ -452,6 +458,8 @@ regions:
     - name: Capture Beira Shards 4
       requiredItems:
       - Beira Vessel
+    mana_upgrades:
+    - number: 2
   - name: Steam House
     events:
     - name: Repair Generator 1
@@ -478,6 +486,8 @@ regions:
     void_gates:
     - name: Douklan's Leap Void Gate
       objectName: Void_Gate_Jesica
+    mana_upgrades:
+    - number: 2
 - name: Victory
   subregions:
   - name: Victory
