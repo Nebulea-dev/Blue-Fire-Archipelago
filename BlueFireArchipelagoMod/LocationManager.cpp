@@ -32,9 +32,7 @@ LocationManager::LocationManager()
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Enemies/Master/BP_BossDoor_Queen.BP_BossDoor_Queen_C:Kill Goddess"), OnKillGoddess);
 
-
-	// Listen to object creation for EditableTextBox controls
-	// objectListener->registerObjectCallback(std::wstring(L"NewItem_C"), OnNewItemCreated);
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Bounds/Checkpoint/CheckPoint.CheckPoint_C:Get Mana"), OnManaUpgrade);
 }
 
 // ============== Chest related methods ==============
@@ -544,6 +542,75 @@ bool LocationManager::OnKillGoddess(UObject* Context, FFrame& Stack, void* RESUL
 
 	return false;
 }
+
+
+// ============== Mana Upgrade methods ==============
+
+
+bool LocationManager::OnManaUpgrade(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return false;
+    }
+
+    uint32_t* manaUpgradeLevel = UnrealObjectQueries::GetNestedPropertyValue<uint32_t>(gameInstance.value(), L"PlayerStats", L"Levels_85_3996A743428F6DEC04E741B8F0E2B7C4");
+    if (!manaUpgradeLevel)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get mana upgrade level in OnManaUpgrade\n"));
+        return false;
+    }
+
+    float* maxStamina = UnrealObjectQueries::GetNestedPropertyValue<float>(gameInstance.value(), L"PlayerStats", L"MaxStamina_8_A0DAE7564A0F01238D8F6BBC0D00D733");
+    if (!maxStamina)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get max stamina in OnManaUpgrade\n"));
+        return false;
+    }
+
+    float* currentStamina = UnrealObjectQueries::GetNestedPropertyValue<float>(gameInstance.value(), L"PlayerStats", L"Stamina_13_63486BD942500C84BEF7BDB51839CDCF");
+    if (!currentStamina)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get current stamina in OnManaUpgrade\n"));
+        return false;
+    }
+
+
+	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetBaseLocationIDForManaUpgrade(*manaUpgradeLevel);
+	if (!locationID.has_value())
+	{
+		Output::send<LogLevel::Error>(STR("Could not find the location ID for the mana upgrade"));
+		return false;
+	}
+
+	uint32_t archipelagoManaLocationID = locationID.value();
+	Output::send<LogLevel::Verbose>(STR("Mana upgrade level {} obtained, marking location ID {} as checked in Archipelago\n"), *manaUpgradeLevel, archipelagoManaLocationID);
+	AP_SendItem(archipelagoManaLocationID);
+
+	// Set stamina back to its previous level
+	*maxStamina = *maxStamina - 11.0f;
+	*currentStamina = *maxStamina;
+
+	return false;
+}
+
+std::optional<uint32_t> LocationManager::GetBaseLocationIDForManaUpgrade(uint32_t manaUpgradeID)
+{
+
+	const auto& manaUpgradeMap = LocationsData::GetManaUpgradeIDToLocationIDMap();
+	auto it = manaUpgradeMap.find(manaUpgradeID);
+	if (it != manaUpgradeMap.end())
+	{
+		return it->second + Archipelago::BF_BASE_ID;
+	}
+	else
+	{
+		return std::nullopt;
+	}
+}
+
 
 
 // ============== Logs methods ==============
