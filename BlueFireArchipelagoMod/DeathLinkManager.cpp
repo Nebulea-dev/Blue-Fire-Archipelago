@@ -7,6 +7,7 @@
 #include <ArchipelagoManager.hpp>
 #include <DeathLinkManager.hpp>
 #include <BlueFireArchipelagoMod.hpp>
+#include <Helper/UnrealObjectQueries.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -72,8 +73,8 @@ void DeathLinkManager::killPlayer()
 		return;
 	}
 
-	UObject* playerCharacter = UObjectGlobals::StaticFindObject<UObject*>(nullptr, nullptr, L"/Game/BlueFire/Player/Logic/Player_Character_BP");
-	if (!playerCharacter)
+	std::optional<UObject*> playerCharacter = UnrealObjectQueries::FindPlayerCharacter();
+	if (!playerCharacter.has_value())
 	{
 		Output::send<LogLevel::Error>(STR("Could not find Player_Character_BP\n"));
 		return;
@@ -94,7 +95,7 @@ void DeathLinkManager::killPlayer()
 		false   // isFall
 	};
 
-	playerCharacter->ProcessEvent(RemoveLifeFunc, &params);
+	playerCharacter.value()->ProcessEvent(RemoveLifeFunc, &params);
 	Output::send<LogLevel::Verbose>(STR("RemoveLife function called on player\n"));
 }
 
