@@ -15,7 +15,7 @@ class LocationManager {
 public:
     LocationManager();
 
-    std::optional<uint32_t> GetLocationIDFromChestName(const std::wstring& chestName);
+    std::optional<uint32_t> GetLocationIDFromChestName(const std::wstring& chestName, const std::wstring& chestFullName);
     std::optional<uint32_t> GetLocationIDFromStatueName(const std::wstring& statueName);
     std::optional<uint32_t> GetLocationIDFromPickupName(const std::wstring& pickupName);
     std::optional<uint32_t> GetLocationIDFromVoidGateName(const std::wstring& voidGateName);

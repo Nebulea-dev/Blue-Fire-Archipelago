@@ -39,11 +39,12 @@ LocationManager::LocationManager()
 
 bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-	// Get the path of the chest being opened
+	// Get the short name (private name) and full name of the chest being opened
 	const std::wstring chestName = Context->GetNamePrivate().ToString();
+	const std::wstring chestFullName = Context->GetFullName();
 
 	// Match the chest name to a location ID and mark it as checked
-	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromChestName(chestName);
+	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromChestName(chestName, chestFullName);
 	if (!locationID.has_value())
 	{
 		logIncorrectMapping(chestName);
@@ -57,18 +58,28 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
     return false;
 }
 
-std::optional<uint32_t> LocationManager::GetLocationIDFromChestName(const std::wstring& chestName)
+std::optional<uint32_t> LocationManager::GetLocationIDFromChestName(const std::wstring& chestName, const std::wstring& chestFullName)
 {
+	// First try to find by private name
 	const auto& chestMap = LocationsData::GetChestNameToLocationIDMap();
 	auto it = chestMap.find(chestName);
 	if (it != chestMap.end())
 	{
 		return it->second + Archipelago::BF_BASE_ID;
 	}
-	else
+
+	// If not found by short name, try full name
+	if (!chestFullName.empty())
 	{
-		return std::nullopt;
+		const auto& chestFullMap = LocationsData::GetChestFullNameToLocationIDMap();
+		auto fullIt = chestFullMap.find(chestFullName);
+		if (fullIt != chestFullMap.end())
+		{
+			return fullIt->second + Archipelago::BF_BASE_ID;
+		}
 	}
+
+	return std::nullopt;
 }
 
 

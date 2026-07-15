@@ -246,7 +246,7 @@ regions:
     - name: Ladder Chest
       objectName: Chest_A01_Nuos_Loot_03
     - name: Void chest
-      objectName: Chest_Master_2
+      fullObjectName: TODO/Chest_Master_2
     - name: Hello Emote Chest
       objectName: Dance_Platform_Hello2_Chest
     pickups:
