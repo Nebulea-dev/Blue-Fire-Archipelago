@@ -17,6 +17,8 @@ struct Chest {
     #[serde(default)]
     objectName: String,
     #[serde(default)]
+    fullObjectName: String,
+    #[serde(default)]
     dance: String,
 }
 
@@ -158,9 +160,25 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("        return s_manaUpgradeIDToLocationID;\n");
     header.push_str("    }\n");
     header.push_str("\n");
+    header.push_str("     * Get the chest full name to location ID map (for disambiguating duplicate objectNames)\n");
+    header.push_str("     * @return A map of full chest names to location IDs\n");
+    header.push_str("     */\n");
+    header.push_str("    static const std::map<std::wstring, uint32_t>& GetChestFullNameToLocationIDMap()\n");
+    header.push_str("    {\n");
+    header.push_str("        return s_chestFullNameToLocationID;\n");
+    header.push_str("    }\n");
+    header.push_str("\n");
+
+
+    header.push_str("public:\n");
+    header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
+    // We'll add shop defines here after processing
+
+    header.push_str("\nprivate:\n");
 
     let mut location_id: u32 = 0;
     let mut chest_entries = String::new();
+    let mut chest_full_entries = String::new();
     let mut statue_entries = String::new();
     let mut pickup_entries = String::new();
     let mut void_gate_entries = String::new();
@@ -175,7 +193,11 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
         for subregion in &region.subregions {
             // Process chests
             for location in &subregion.chests {
-                if !location.objectName.is_empty() {
+                // Use fullObjectName if present, otherwise use objectName
+                if !location.fullObjectName.is_empty() {
+                    let escaped_name = escape_string(&location.fullObjectName);
+                    chest_full_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
+                } else if !location.objectName.is_empty() {
                     let escaped_name = escape_string(&location.objectName);
                     chest_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
                 }
@@ -243,6 +265,11 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     // Build all the maps
     header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestNameToLocationID = {\n");
     header.push_str(&chest_entries);
+    header.push_str("    };\n");
+    header.push_str("\n");
+
+    header.push_str("    static inline const std::map<std::wstring, uint32_t> s_chestFullNameToLocationID = {\n");
+    header.push_str(&chest_full_entries);
     header.push_str("    };\n");
     header.push_str("\n");
 
