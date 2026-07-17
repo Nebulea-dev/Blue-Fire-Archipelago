@@ -225,11 +225,24 @@ void ItemManager::givePlayerAbility(int abilityID)
         L"DoubleJump_9_9ACF69B4474D76AACA0E349806254782",
         L"WallJump_12_8CC261B848F97BE432C43FBFDFB65D1D",
         L"Sprint_21_A2EA9CA54248830C70D2A096307CA144",
-        L"DownSmash_22_84DE6230457D45C1BBF111BBA6DDE737",
+        L"DownSmash_22_84DE6230457D45C1BBF111BBA6DDE737", // (NOTE: DownSmash ability does not actually do anything in-game)
         L"Spell_23_EFD583FD46ED9B47C8C80EBEEB3D9753",
-        L"Grind_19_5D0328FB486C70BF86BFD58EAB4CE52D",
+        L"Grind_19_5D0328FB486C70BF86BFD58EAB4CE52D",     // (NOTE: Grind ability does not actually do anything in-game)
         L"Block_25_5710D9FB4D2A4FF88972508279869DF4",
         L"SpinAttack_27_19AE29114077C361BA4934AD401C4A0B",
+    };
+
+    const int32_t abilityPassiveItems[] = {
+        -1,   // Attack -> no passive item
+        -1,   // Dash -> no passive item
+        47,   // DoubleJump -> DoubleJump passive item
+        49,   // WallRun -> WallRun passive item
+        69,   // Sprint -> Sprint passive item
+        -1,   // DownSmash -> no passive item
+        50,   // Spell -> FireBall passive item
+        -1,   // Grind -> no passive item
+        52,   // Block -> Shield passive item
+        48,   // SpinAttack -> SpinAttack passive item
     };
 
     if (abilityID < 0 || abilityID >= 10)
@@ -250,6 +263,24 @@ void ItemManager::givePlayerAbility(int abilityID)
         return;
 
     *ability = true;
+
+    // Also add the corresponding passive item
+    int32_t passiveItemID = abilityPassiveItems[abilityID];
+    if (passiveItemID >= 0)
+    {
+        TArray<inventoryItem>* passiveInventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
+        if (passiveInventory)
+        {
+            if (!UnrealObjectQueries::StackItemInInventory(passiveInventory, passiveItemID))
+            {
+                inventoryItem newItem = {};
+                newItem.item = passiveItemID;
+                newItem.amount = 1;
+                passiveInventory->Push(newItem);
+                Output::send<LogLevel::Verbose>(STR("Added passive item ID {} for ability {}\n"), passiveItemID, abilityID);
+            }
+        }
+    }
 }
 
 void ItemManager::givePlayerItem(int itemID)
