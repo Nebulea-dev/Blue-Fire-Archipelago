@@ -181,6 +181,17 @@ class ItemManager
 	 * @return  none
 	 */
 	void givePlayerProgressiveWeapon();
+
+	/*******************************************************************************
+	 * @fn      givePlayerCurrency
+	 *
+	 * @brief   Give the player currency.
+	 *
+	 * @param   amount - The currency amount to add
+	 *
+	 * @return  none
+	 */
+	void givePlayerCurrency(int32_t amount);
 };
 
 struct inventoryItem

@@ -379,6 +379,21 @@ void ItemManager::givePlayerCustomItem(int itemID)
             }
         }
     }
+    // x1000 Currency (itemID = 4)
+    else if(itemID == 4)
+    {
+        givePlayerCurrency(1000);
+    }
+    // x2000 Currency (itemID = 5)
+    else if(itemID == 5)
+    {
+        givePlayerCurrency(2000);
+    }
+    // x3000 Currency (itemID = 6)
+    else if(itemID == 6)
+    {
+        givePlayerCurrency(3000);
+    }
     else
     {
         Output::send<LogLevel::Error>(STR("Unknown custom item ID: {}\n"), itemID);
@@ -461,4 +476,26 @@ void ItemManager::givePlayerProgressiveWeapon()
     {
         Output::send<LogLevel::Verbose>(STR("Cannot find the next weapon for order index: {}, max weapon already obtained\n"), highestWeaponOrderIndex);
     }
+}
+
+void ItemManager::givePlayerCurrency(int32_t amount)
+{
+    Output::send<LogLevel::Verbose>(STR("Adding {} currency to player...\n"), amount);
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    int32* currency = UnrealObjectQueries::GetNestedPropertyValue<int32>(gameInstance.value(), L"PlayerStats", L"Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659");
+    if (!currency)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get currency value in givePlayerCurrency\n"));
+        return;
+    }
+
+    *currency += amount;
+    Output::send<LogLevel::Verbose>(STR("Updated currency to: {}\n"), *currency);
 }
