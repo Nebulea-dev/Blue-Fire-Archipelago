@@ -142,17 +142,19 @@ class ItemManager
 	void givePlayerKeyItem(int itemID);
 
 	/*******************************************************************************
-	 * @fn      givePlayerProgressiveItem
+	 * @fn      givePlayerCustomItem
 	 *
-	 * @brief   Give the player a progressive item, managing upgrades.
+	 * @brief   Give the player a custom item requiring special handling logic.
 	 *
-	 *          Routes to specific progressive item handlers based on itemID.
+	 *          Routes to specific custom item handlers based on itemID.
+	 *          This includes progressive items (Pouch, Weapon) and items like
+	 *          Fire Essence Slot that need custom upgrade/progression logic.
 	 *
-	 * @param   itemID - The progressive item ID (0-based index)
+	 * @param   itemID - The custom item ID (0-based index)
 	 *
 	 * @return  none
 	 */
-	void givePlayerProgressiveItem(int itemID);
+	void givePlayerCustomItem(int itemID);
 
 	/*******************************************************************************
 	 * @fn      givePlayerProgressivePouch

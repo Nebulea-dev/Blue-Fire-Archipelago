@@ -68,7 +68,7 @@ void ItemManager::itemReceiveCb(int itemID)
             break;
 
         case 7:
-            givePlayerProgressiveItem(itemID - 700);
+            givePlayerCustomItem(itemID - 700);
             break;
 
         default:
@@ -327,9 +327,9 @@ void ItemManager::givePlayerKeyItem(int itemID)
     inventory->Push(newItem);
 }
 
-void ItemManager::givePlayerProgressiveItem(int itemID)
+void ItemManager::givePlayerCustomItem(int itemID)
 {
-    Output::send<LogLevel::Verbose>(STR("Giving player progressive item ID: {}\n"), itemID);
+    Output::send<LogLevel::Verbose>(STR("Giving player custom item ID: {}\n"), itemID);
 
     // Progressive Pouch (itemID = 0)
     if(itemID == 0)
@@ -341,9 +341,47 @@ void ItemManager::givePlayerProgressiveItem(int itemID)
     {
         givePlayerProgressiveWeapon();
     }
+    // Fire Essence Slot (itemID = 2)
+    else if(itemID == 2)
+    {
+        // TODO : Add also the essence slot to the player instance
+
+        TArray<inventoryItem>* passiveInventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
+        if (passiveInventory)
+        {
+            const uint32_t FIRE_ESSENCE_SLOT = 73;
+            if (!UnrealObjectQueries::StackItemInInventory(passiveInventory, FIRE_ESSENCE_SLOT))
+            {
+                inventoryItem newItem = {};
+                newItem.item = FIRE_ESSENCE_SLOT;
+                newItem.amount = 1;
+                passiveInventory->Push(newItem);
+                Output::send<LogLevel::Verbose>(STR("Added Fire Essence Slot to passive inventory\n"));
+            }
+        }
+    }
+    // Spirit Slot (itemID = 3)
+    else if(itemID == 3)
+    {
+        // TODO : Add also the spirit slot to the player instance
+
+        TArray<inventoryItem>* passiveInventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
+        if (passiveInventory)
+        {
+            const uint32_t SPIRIT_SLOT = 53;
+            if (!UnrealObjectQueries::StackItemInInventory(passiveInventory, SPIRIT_SLOT))
+            {
+                inventoryItem newItem = {};
+                newItem.item = SPIRIT_SLOT;
+                newItem.amount = 1;
+                passiveInventory->Push(newItem);
+                Output::send<LogLevel::Verbose>(STR("Added Spirit Slot to passive inventory\n"));
+            }
+        }
+    }
     else
     {
-        Output::send<LogLevel::Error>(STR("Unknown progressive item ID: {}\n"), itemID);
+        Output::send<LogLevel::Error>(STR("Unknown custom item ID: {}\n"), itemID);
     }
 }
 
