@@ -636,7 +636,7 @@ std::string SendQueue::getSendQueueFilePath()
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if (gameInstance.has_value())
     {
-        int32_t* saveIndex = UnrealObjectQueries::GetNestedPropertyValue<int32_t>(gameInstance.value(), L"FSave_System System", L"SaveFileIndex_7_9ACF69B4474D76AACA0E349806254782");
+        int32_t* saveIndex = UnrealObjectQueries::GetNestedPropertyValue<int32_t>(gameInstance.value(), L"System", L"SaveFileIndex_7_9ACF69B4474D76AACA0E349806254782");
         if (saveIndex)
         {
             saveFileIndex = *saveIndex;
