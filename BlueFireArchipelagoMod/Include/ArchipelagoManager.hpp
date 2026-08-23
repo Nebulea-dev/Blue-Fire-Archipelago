@@ -84,11 +84,32 @@ class ArchipelagoManager
 	 */
 	bool isDeathLinkEnabled() const;
 
+	/*******************************************************************************
+	 * @fn      isGameLoaded
+	 *
+	 * @brief   Returns whether the game is currently loaded.
+	 *
+	 * @return  true if game is loaded, false if in menu or game closed
+	 */
+	bool isGameLoaded() const;
+
+	/*******************************************************************************
+	 * @fn      setGameLoaded
+	 *
+	 * @brief   Sets the game loaded state.
+	 *
+	 * @param   loaded - true when game levels are loaded, false when in menu
+	 *
+	 * @return  none
+	 */
+	void setGameLoaded(bool loaded);
+
 	private:
 
 	void (*successfulConnectionCallback)(void);
 	bool bResetConnectionStatusLoop;
 	bool bDeathLinkEnabled;
+	bool bIsGameLoaded;
 
 	/*******************************************************************************
 	 * @fn      initCallbacks

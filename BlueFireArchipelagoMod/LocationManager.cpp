@@ -392,6 +392,29 @@ bool LocationManager::ProcessShopInventory(TArray<inventoryItem>* shopInventory,
 
 bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+	Output::send<LogLevel::Verbose>(STR("Level loaded, setting game loaded state to true\n"));
+
+	// Set game loaded flag
+	if (BlueFireArchipelagoMod::arcManager)
+	{
+		BlueFireArchipelagoMod::arcManager->setGameLoaded(true);
+	}
+
+	// Process queued items if any exist
+	if (ItemQueue::queueFileExists())
+	{
+		Output::send<LogLevel::Verbose>(STR("Item queue found, processing queued items\n"));
+		auto queuedItems = ItemQueue::loadAndClearQueue();
+		if (BlueFireArchipelagoMod::itemManager)
+		{
+			for (int itemID : queuedItems)
+			{
+				Output::send<LogLevel::Verbose>(STR("Processing queued item: {}\n"), itemID);
+				BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
+			}
+		}
+	}
+
 	Output::send<LogLevel::Verbose>(STR("Re-generating the original amount field of the shop item list\n"));
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())

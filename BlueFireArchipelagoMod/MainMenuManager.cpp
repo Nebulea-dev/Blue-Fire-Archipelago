@@ -730,5 +730,11 @@ bool MainMenuManager::MainMenuDoneLoading(UObject* Context, FFrame& Stack, void*
     BlueFireArchipelagoMod::mainMenuManager->DeleteOriginalTextbox();
     BlueFireArchipelagoMod::mainMenuManager->bMainMenuLoaded = true;
 
+	// Set game loaded flag to false when returning to menu
+	if (BlueFireArchipelagoMod::arcManager)
+	{
+		BlueFireArchipelagoMod::arcManager->setGameLoaded(false);
+	}
+
     return false;
 }

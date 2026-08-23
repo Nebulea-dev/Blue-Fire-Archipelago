@@ -15,7 +15,7 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false)
+ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false)
 {
 	this->initCallbacks();
 	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
@@ -79,13 +79,23 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 	// If the item was already given
 	if(!notifyPlayer) return;
 
+	int itemID = (int)item - ArchipelagoModConfig::Archipelago::BF_BASE_ID;
+
+	// If game is not loaded, queue the item for later
+	if (!bIsGameLoaded)
+	{
+		Output::send<LogLevel::Verbose>(STR("Game not loaded, queueing item {} for later\n"), itemID);
+		ItemQueue::saveItemToQueue(itemID);
+		return;
+	}
+
 	if (!BlueFireArchipelagoMod::itemManager)
 	{
 		Output::send<LogLevel::Error>(STR("itemManager is null in OnItemReceive\n"));
 		return;
 	}
 
-	BlueFireArchipelagoMod::itemManager->itemReceiveCb((int)item - ArchipelagoModConfig::Archipelago::BF_BASE_ID);
+	BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
 }
 
 void ArchipelagoManager::OnLocationCheck(int64_t location)
@@ -204,4 +214,15 @@ void ArchipelagoManager::ReleaseWorld()
 bool ArchipelagoManager::isDeathLinkEnabled() const
 {
 	return bDeathLinkEnabled;
+}
+
+bool ArchipelagoManager::isGameLoaded() const
+{
+	return bIsGameLoaded;
+}
+
+void ArchipelagoManager::setGameLoaded(bool loaded)
+{
+	bIsGameLoaded = loaded;
+	Output::send<LogLevel::Verbose>(STR("Game loaded state set to: {}\n"), loaded ? STR("true") : STR("false"));
 }

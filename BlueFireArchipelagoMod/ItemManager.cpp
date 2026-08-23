@@ -9,6 +9,11 @@
 #include <ArchipelagoModConfig.hpp>
 #include <ItemManager.hpp>
 
+#include <fstream>
+#include <filesystem>
+#include <json/json.h>
+#include <windows.h>
+
 using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
@@ -498,4 +503,118 @@ void ItemManager::givePlayerCurrency(int32_t amount)
 
     *currency += amount;
     Output::send<LogLevel::Verbose>(STR("Updated currency to: {}\n"), *currency);
+}
+
+std::string ItemQueue::getQueueFilePath()
+{
+    wchar_t dllPath[MAX_PATH] = {0};
+    HMODULE moduleHandle = GetModuleHandle(nullptr);
+    if (!moduleHandle)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get module handle for DLL path\n"));
+        return "";
+    }
+
+    GetModuleFileNameW(moduleHandle, dllPath, MAX_PATH);
+    std::filesystem::path modPath = std::filesystem::path(dllPath).parent_path();
+    std::string queuePath = (modPath / "item_queue.json").string();
+
+    Output::send<LogLevel::Verbose>(STR("Item queue file path set\n"));
+    return queuePath;
+}
+
+bool ItemQueue::queueFileExists()
+{
+    std::string filePath = getQueueFilePath();
+    if (filePath.empty())
+        return false;
+
+    return std::filesystem::exists(filePath);
+}
+
+void ItemQueue::saveItemToQueue(int itemID)
+{
+    std::string filePath = getQueueFilePath();
+    if (filePath.empty())
+    {
+        Output::send<LogLevel::Error>(STR("Could not determine queue file path\n"));
+        return;
+    }
+
+    try
+    {
+        Json::Value root;
+        Json::Reader reader;
+
+        if (std::filesystem::exists(filePath))
+        {
+            std::ifstream inFile(filePath);
+            if (!reader.parse(inFile, root) || !root.isMember("items"))
+            {
+                root["items"] = Json::Value(Json::arrayValue);
+            }
+            inFile.close();
+        }
+        else
+        {
+            root["items"] = Json::Value(Json::arrayValue);
+        }
+
+        root["items"].append(itemID);
+
+        std::ofstream outFile(filePath);
+        Json::FastWriter writer;
+        outFile << writer.write(root);
+        outFile.close();
+
+        Output::send<LogLevel::Verbose>(STR("Saved item {} to queue (total: {})\n"), itemID, root["items"].size());
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while saving item to queue\n"));
+    }
+}
+
+std::vector<int> ItemQueue::loadAndClearQueue()
+{
+    std::vector<int> items;
+    std::string filePath = getQueueFilePath();
+
+    if (filePath.empty() || !std::filesystem::exists(filePath))
+    {
+        return items;
+    }
+
+    try
+    {
+        Json::Value root;
+        Json::Reader reader;
+
+        std::ifstream inFile(filePath);
+        if (!reader.parse(inFile, root) || !root.isMember("items"))
+        {
+            inFile.close();
+            std::filesystem::remove(filePath);
+            return items;
+        }
+        inFile.close();
+
+        const Json::Value& itemArray = root["items"];
+        for (const auto& item : itemArray)
+        {
+            if (item.isInt())
+            {
+                items.push_back(item.asInt());
+            }
+        }
+
+        std::filesystem::remove(filePath);
+        Output::send<LogLevel::Verbose>(STR("Loaded and cleared {} items from queue\n"), items.size());
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while loading queue\n"));
+    }
+
+    return items;
 }

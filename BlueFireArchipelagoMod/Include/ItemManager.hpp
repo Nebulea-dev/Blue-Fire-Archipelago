@@ -3,6 +3,7 @@
 #include <Unreal/UObject.hpp>
 #include <Unreal/Hooks.hpp>
 #include <Unreal/CoreUObject/UObject/UnrealType.hpp>
+#include <vector>
 
 using namespace RC;
 using namespace Unreal;
@@ -206,4 +207,63 @@ struct inventoryItem
 	uint8_t spirit;
 	uint32_t price;
 	uint8_t ability;
+};
+
+/*******************************************************************************
+ * ItemQueue
+ *
+ * @brief   Manages persistence of items received when the game is not loaded.
+ *
+ *          Stores pending items to a JSON queue file next to the DLL, allowing
+ *          items received while the game is closed to be applied when the game
+ *          restarts.
+ */
+class ItemQueue
+{
+	public:
+	/*******************************************************************************
+	 * @fn      getQueueFilePath
+	 *
+	 * @brief   Gets the full path to the item queue JSON file.
+	 *
+	 * @return  String path to item_queue.json in the DLL directory
+	 */
+	static std::string getQueueFilePath();
+
+	/*******************************************************************************
+	 * @fn      queueFileExists
+	 *
+	 * @brief   Checks if the item queue file exists on disk.
+	 *
+	 * @return  true if queue file exists, false otherwise
+	 */
+	static bool queueFileExists();
+
+	/*******************************************************************************
+	 * @fn      saveItemToQueue
+	 *
+	 * @brief   Appends an item to the persistent queue file.
+	 *
+	 *          Reads the existing queue file (if it exists), appends the new item ID,
+	 *          and writes it back. Safe to call multiple times - each call appends
+	 *          another item to the queue.
+	 *
+	 * @param   itemID - The Archipelago item ID to queue
+	 *
+	 * @return  none
+	 */
+	static void saveItemToQueue(int itemID);
+
+	/*******************************************************************************
+	 * @fn      loadAndClearQueue
+	 *
+	 * @brief   Loads all pending items from queue file and deletes the file.
+	 *
+	 *          Reads the queue file, returns all queued item IDs as a vector,
+	 *          then deletes the queue file from disk. Returns empty vector if
+	 *          queue file doesn't exist.
+	 *
+	 * @return  Vector of item IDs that were queued
+	 */
+	static std::vector<int> loadAndClearQueue();
 };
