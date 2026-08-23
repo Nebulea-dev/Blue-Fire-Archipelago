@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Unreal/UObject.hpp>
+#include <thread>
+#include <atomic>
 
 using namespace RC;
 using namespace Unreal;
@@ -110,6 +112,38 @@ class ArchipelagoManager
 	bool bResetConnectionStatusLoop;
 	bool bDeathLinkEnabled;
 	bool bIsGameLoaded;
+	std::atomic<bool> bConnectionMonitorRunning;
+	std::thread connectionMonitorThread;
+
+	/*******************************************************************************
+	 * @fn      startConnectionMonitor
+	 *
+	 * @brief   Starts a background thread that monitors connection status.
+	 *
+	 *          Spawns a thread that checks every 20 seconds if we're connected
+	 *          to Archipelago. If reconnected, flushes any queued locations.
+	 *
+	 * @return  none
+	 */
+	void startConnectionMonitor();
+
+	/*******************************************************************************
+	 * @fn      stopConnectionMonitor
+	 *
+	 * @brief   Stops the connection monitor thread.
+	 *
+	 * @return  none
+	 */
+	void stopConnectionMonitor();
+
+	/*******************************************************************************
+	 * @fn      connectionMonitorThreadFunc
+	 *
+	 * @brief   Main loop for the connection monitor thread.
+	 *
+	 * @return  none
+	 */
+	void connectionMonitorThreadFunc();
 
 	/*******************************************************************************
 	 * @fn      initCallbacks

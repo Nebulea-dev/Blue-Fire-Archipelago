@@ -3,6 +3,7 @@
 #include <Unreal/CoreUObject/UObject/UnrealType.hpp>
 
 #include <Archipelago.h>
+#include <chrono>
 
 #include <ArchipelagoManager.hpp>
 #include <BlueFireArchipelagoMod.hpp>
@@ -15,9 +16,10 @@ using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false)
+ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false), bConnectionMonitorRunning(false)
 {
 	this->initCallbacks();
+	this->startConnectionMonitor();
 	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
 }
 
@@ -225,4 +227,57 @@ void ArchipelagoManager::setGameLoaded(bool loaded)
 {
 	bIsGameLoaded = loaded;
 	Output::send<LogLevel::Verbose>(STR("Game loaded state set to: {}\n"), loaded ? STR("true") : STR("false"));
+}
+
+void ArchipelagoManager::startConnectionMonitor()
+{
+	if (bConnectionMonitorRunning)
+		return;
+
+	bConnectionMonitorRunning = true;
+	connectionMonitorThread = std::thread(&ArchipelagoManager::connectionMonitorThreadFunc, this);
+	Output::send<LogLevel::Verbose>(STR("Connection monitor thread started\n"));
+}
+
+void ArchipelagoManager::stopConnectionMonitor()
+{
+	if (!bConnectionMonitorRunning)
+		return;
+
+	bConnectionMonitorRunning = false;
+	if (connectionMonitorThread.joinable())
+	{
+		connectionMonitorThread.join();
+	}
+	Output::send<LogLevel::Verbose>(STR("Connection monitor thread stopped\n"));
+}
+
+void ArchipelagoManager::connectionMonitorThreadFunc()
+{
+	while (bConnectionMonitorRunning)
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(20));
+
+		if (!bConnectionMonitorRunning)
+			break;
+
+		AP_ConnectionStatus status = AP_GetConnectionStatus();
+		if (status == AP_ConnectionStatus::Authenticated && bIsGameLoaded)
+		{
+			Output::send<LogLevel::Verbose>(STR("Connection monitor: reconnected to Archipelago, flushing send queue\n"));
+
+			if (SendQueue::sendQueueFileExists())
+			{
+				auto queuedLocations = SendQueue::loadAndClearSendQueue();
+				if (!queuedLocations.empty())
+				{
+					Output::send<LogLevel::Verbose>(STR("Connection monitor: sending {} queued locations\n"), queuedLocations.size());
+					for (int64_t locationID : queuedLocations)
+					{
+						AP_SendItem(locationID);
+					}
+				}
+			}
+		}
+	}
 }
