@@ -25,6 +25,8 @@ public:
     int GetItemPrice() const { return itemPrice; }
     void SetItemPrice(int price) { itemPrice = price; }
 
+    static void SendOrQueueLocation(int64_t locationID);
+
     static bool OnChestOpened(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool OnPressButton(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 

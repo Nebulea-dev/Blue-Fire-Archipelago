@@ -618,3 +618,130 @@ std::vector<int> ItemQueue::loadAndClearQueue()
 
     return items;
 }
+
+std::string SendQueue::getSendQueueFilePath()
+{
+    wchar_t dllPath[MAX_PATH] = {0};
+    HMODULE moduleHandle = GetModuleHandle(nullptr);
+    if (!moduleHandle)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get module handle for DLL path\n"));
+        return "";
+    }
+
+    GetModuleFileNameW(moduleHandle, dllPath, MAX_PATH);
+    std::filesystem::path modPath = std::filesystem::path(dllPath).parent_path();
+
+    int32_t saveFileIndex = 0;
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if (gameInstance.has_value())
+    {
+        int32_t* saveIndex = UnrealObjectQueries::GetNestedPropertyValue<int32_t>(gameInstance.value(), L"FSave_System System", L"SaveFileIndex_7_9ACF69B4474D76AACA0E349806254782");
+        if (saveIndex)
+        {
+            saveFileIndex = *saveIndex;
+        }
+    }
+
+    std::string filename = "send_queue_" + std::to_string(saveFileIndex) + ".json";
+    std::string queuePath = (modPath / filename).string();
+
+    Output::send<LogLevel::Verbose>(STR("Send queue file path set for save index {}\n"), saveFileIndex);
+    return queuePath;
+}
+
+bool SendQueue::sendQueueFileExists()
+{
+    std::string filePath = getSendQueueFilePath();
+    if (filePath.empty())
+        return false;
+
+    return std::filesystem::exists(filePath);
+}
+
+void SendQueue::saveLocationToSendQueue(int64_t locationID)
+{
+    std::string filePath = getSendQueueFilePath();
+    if (filePath.empty())
+    {
+        Output::send<LogLevel::Error>(STR("Could not determine send queue file path\n"));
+        return;
+    }
+
+    try
+    {
+        Json::Value root;
+        Json::Reader reader;
+
+        if (std::filesystem::exists(filePath))
+        {
+            std::ifstream inFile(filePath);
+            if (!reader.parse(inFile, root) || !root.isMember("locations"))
+            {
+                root["locations"] = Json::Value(Json::arrayValue);
+            }
+            inFile.close();
+        }
+        else
+        {
+            root["locations"] = Json::Value(Json::arrayValue);
+        }
+
+        root["locations"].append((Json::Value::Int64)locationID);
+
+        std::ofstream outFile(filePath);
+        Json::FastWriter writer;
+        outFile << writer.write(root);
+        outFile.close();
+
+        Output::send<LogLevel::Verbose>(STR("Saved location {} to send queue (total: {})\n"), (int64_t)locationID, root["locations"].size());
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while saving location to send queue\n"));
+    }
+}
+
+std::vector<int64_t> SendQueue::loadAndClearSendQueue()
+{
+    std::vector<int64_t> locations;
+    std::string filePath = getSendQueueFilePath();
+
+    if (filePath.empty() || !std::filesystem::exists(filePath))
+    {
+        return locations;
+    }
+
+    try
+    {
+        Json::Value root;
+        Json::Reader reader;
+
+        std::ifstream inFile(filePath);
+        if (!reader.parse(inFile, root) || !root.isMember("locations"))
+        {
+            inFile.close();
+            std::filesystem::remove(filePath);
+            return locations;
+        }
+        inFile.close();
+
+        const Json::Value& locationArray = root["locations"];
+        for (const auto& location : locationArray)
+        {
+            if (location.isInt64())
+            {
+                locations.push_back(location.asInt64());
+            }
+        }
+
+        std::filesystem::remove(filePath);
+        Output::send<LogLevel::Verbose>(STR("Loaded and cleared {} locations from send queue\n"), locations.size());
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while loading send queue\n"));
+    }
+
+    return locations;
+}

@@ -267,3 +267,62 @@ class ItemQueue
 	 */
 	static std::vector<int> loadAndClearQueue();
 };
+
+/*******************************************************************************
+ * SendQueue
+ *
+ * @brief   Manages persistence of locations to be sent when connection is restored.
+ *
+ *          Stores locations checked while offline to a JSON queue file per save file.
+ *          When levels load, all queued locations are sent to the Archipelago server.
+ */
+class SendQueue
+{
+	public:
+	/*******************************************************************************
+	 * @fn      getSendQueueFilePath
+	 *
+	 * @brief   Gets the full path to the send queue JSON file for current save.
+	 *
+	 *          Uses the SaveFileIndex from the game instance to create a unique
+	 *          queue per save file: send_queue_<index>.json
+	 *
+	 * @return  String path to send_queue_<index>.json in the DLL directory
+	 */
+	static std::string getSendQueueFilePath();
+
+	/*******************************************************************************
+	 * @fn      sendQueueFileExists
+	 *
+	 * @brief   Checks if the send queue file exists for current save.
+	 *
+	 * @return  true if queue file exists, false otherwise
+	 */
+	static bool sendQueueFileExists();
+
+	/*******************************************************************************
+	 * @fn      saveLocationToSendQueue
+	 *
+	 * @brief   Appends a location ID to the send queue for current save.
+	 *
+	 *          Reads the existing queue file, appends the location ID,
+	 *          and writes it back. Safe to call multiple times.
+	 *
+	 * @param   locationID - The Archipelago location ID to queue for sending
+	 *
+	 * @return  none
+	 */
+	static void saveLocationToSendQueue(int64_t locationID);
+
+	/*******************************************************************************
+	 * @fn      loadAndClearSendQueue
+	 *
+	 * @brief   Loads all pending locations from queue and deletes the file.
+	 *
+	 *          Reads the queue file, returns all location IDs as a vector,
+	 *          then deletes the queue file from disk for this save.
+	 *
+	 * @return  Vector of location IDs that were queued to send
+	 */
+	static std::vector<int64_t> loadAndClearSendQueue();
+};

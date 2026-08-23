@@ -52,7 +52,7 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Chest {} opened, marking location ID {} as checked in Archipelago\n"), chestName, locationID.value());
-	AP_SendItem(locationID.value());
+	LocationManager::SendOrQueueLocation(locationID.value());
 
 
     return false;
@@ -154,7 +154,7 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Emote Statue {} purchased, marking location ID {} as checked in Archipelago\n"), statueName, locationID.value());
-	AP_SendItem(locationID.value());
+	LocationManager::SendOrQueueLocation(locationID.value());
 
 	// TODO : remove item from inventory
 	emoteInventory->Pop(true);
@@ -194,7 +194,7 @@ bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Pickup {} picked up, marking location ID {} as checked in Archipelago\n"), pickupName, locationID.value());
-	AP_SendItem(locationID.value());
+	LocationManager::SendOrQueueLocation(locationID.value());
 
 	// Get the Type parameter
 	uint8_t* pickupType = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Type");
@@ -289,7 +289,7 @@ bool LocationManager::OnSpiritPickup(UObject* Context, FFrame& Stack, void* RESU
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Pickup {} picked up, marking location ID {} as checked in Archipelago\n"), pickupName, locationID.value());
-	AP_SendItem(locationID.value());
+	LocationManager::SendOrQueueLocation(locationID.value());
 
 	// Get the Type parameter
 	uint8_t* spiritType = Context->GetValuePtrByPropertyNameInChain<uint8_t>(L"Amulet");
@@ -336,7 +336,7 @@ bool LocationManager::OnVoidGateCompleted(UObject* Context, FFrame& Stack, void*
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Void Gate {} completed, marking location ID {} as checked in Archipelago\n"), gateName, locationID.value());
-	AP_SendItem(locationID.value());
+	LocationManager::SendOrQueueLocation(locationID.value());
 
     return false;
 }
@@ -412,6 +412,18 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 				Output::send<LogLevel::Verbose>(STR("Processing queued item: {}\n"), itemID);
 				BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
 			}
+		}
+	}
+
+	// Process queued locations if any exist
+	if (SendQueue::sendQueueFileExists())
+	{
+		Output::send<LogLevel::Verbose>(STR("Send queue found, processing queued locations\n"));
+		auto queuedLocations = SendQueue::loadAndClearSendQueue();
+		for (int64_t locationID : queuedLocations)
+		{
+			Output::send<LogLevel::Verbose>(STR("Processing queued location: {}\n"), locationID);
+			LocationManager::SendOrQueueLocation(locationID);
 		}
 	}
 
@@ -545,7 +557,7 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 
 			uint32_t archipelagoShopLocationID = locationID.value() + globalItem.originalAmount;
 			Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
-			AP_SendItem(archipelagoShopLocationID);
+			LocationManager::SendOrQueueLocation(archipelagoShopLocationID);
 			return false;
 		}
 
@@ -631,7 +643,7 @@ bool LocationManager::OnManaUpgrade(UObject* Context, FFrame& Stack, void* RESUL
 
 	uint32_t archipelagoManaLocationID = locationID.value();
 	Output::send<LogLevel::Verbose>(STR("Mana upgrade level {} obtained, marking location ID {} as checked in Archipelago\n"), *manaUpgradeLevel, archipelagoManaLocationID);
-	AP_SendItem(archipelagoManaLocationID);
+	LocationManager::SendOrQueueLocation(archipelagoManaLocationID);
 
 	// Set stamina back to its previous level
 	*maxStamina = *maxStamina - 11.0f;
@@ -671,4 +683,19 @@ void LocationManager::logIncorrectMapping(const std::wstring locationName)
 	Output::send<LogLevel::Error>(STR("Please open an issue on Github or contact nebulea__ on discord to get this added."));
 	Output::send<LogLevel::Error>(STR("Be sure to include a description of where you found this location, and include the following location name in your message :"));
 	Output::send<LogLevel::Error>(STR("{}"), locationName);
+}
+
+void LocationManager::SendOrQueueLocation(int64_t locationID)
+{
+	AP_ConnectionStatus status = AP_GetConnectionStatus();
+	if (status == AP_ConnectionStatus::Authenticated)
+	{
+		AP_SendItem(locationID);
+		Output::send<LogLevel::Verbose>(STR("Sent location {} to Archipelago\n"), locationID);
+	}
+	else
+	{
+		SendQueue::saveLocationToSendQueue(locationID);
+		Output::send<LogLevel::Verbose>(STR("Not connected to Archipelago, queued location {} for later\n"), locationID);
+	}
 }
