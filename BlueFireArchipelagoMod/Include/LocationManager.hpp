@@ -48,7 +48,7 @@ private:
     int itemPrice = 100;
 
     static bool ProcessShopInventory(TArray<inventoryItem>* shopInventory, const wchar_t* shopName,
-        std::function<std::map<uint8_t, uint32_t>::const_iterator(uint8_t, uint8_t, uint8_t)> inventoryLookup);
+        std::function<std::map<uint8_t, uint32_t>::const_iterator(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t)> inventoryLookup);
 
     static void OnNewItemCreated(const UObjectBase* object, int32 index);
     static void logIncorrectMapping(const std::wstring locationName);

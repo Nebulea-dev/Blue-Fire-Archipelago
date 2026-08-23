@@ -359,10 +359,10 @@ std::optional<uint32_t> LocationManager::GetLocationIDFromVoidGateName(const std
 // ============== Shop related methods ==============
 
 bool LocationManager::ProcessShopInventory(TArray<inventoryItem>* shopInventory, const wchar_t* shopName,
-	std::function<std::map<uint8_t, uint32_t>::const_iterator(uint8_t, uint8_t, uint8_t)> inventoryLookup)
+	std::function<std::map<uint8_t, uint32_t>::const_iterator(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t)> inventoryLookup)
 {
 	if (!shopInventory)
-		return true;
+		return false;
 
 	std::map<uint8_t, uint32_t>::const_iterator itemIndex;
 
@@ -370,11 +370,14 @@ bool LocationManager::ProcessShopInventory(TArray<inventoryItem>* shopInventory,
 	{
 		inventoryItem item = (*shopInventory)[i];
 
+		// Skip the default blade because we replace all items with this
 		if (item.type == 1 && item.weapon == 0) continue;
+
+		// Skip the empty rat
 		if (item.type == 0 && item.item == 43) continue;
 
-		itemIndex = inventoryLookup(item.type, item.item, item.spirit);
-		if (itemIndex == std::map<uint8_t, uint32_t>::const_iterator())
+		itemIndex = inventoryLookup(item.type, item.item, item.spirit, item.tunic, item.weapon);
+		if (itemIndex->second >= 11)
 		{
 			Output::send<LogLevel::Error>(STR("Could not find the item in {}'s shop\n"), shopName);
 			return false;
@@ -389,6 +392,7 @@ bool LocationManager::ProcessShopInventory(TArray<inventoryItem>* shopInventory,
 
 bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+	Output::send<LogLevel::Verbose>(STR("Re-generating the original amount field of the shop item list\n"));
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())
     {
@@ -410,32 +414,32 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 	}
 
 	// Process each shop with its specific inventory lookup
-	if (!ProcessShopInventory(shops[0], STR("Mork"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+	if (!ProcessShopInventory(shops[0], STR("Mork"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
 		if (type == 0) return Shops::Mork::itemInventory.find(item);
 		if (type == 3) return Shops::Mork::spiritInventory.find(spirit);
 		return Shops::Mork::spiritInventory.end();
 	})) return false;
 
-	if (!ProcessShopInventory(shops[1], STR("Onrom"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+	if (!ProcessShopInventory(shops[1], STR("Onrom"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
 		return Shops::Onrom::inventory.find(item);
 	})) return false;
 
-	if (!ProcessShopInventory(shops[2], STR("Spirit Hunter"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+	if (!ProcessShopInventory(shops[2], STR("Spirit Hunter"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
 		return Shops::SpiritHunter::inventory.find(spirit);
 	})) return false;
 
-	if (!ProcessShopInventory(shops[3], STR("Ari"), [](uint8_t type, uint8_t item, uint8_t spirit) {
-		return Shops::Ari::inventory.find(item);
+	if (!ProcessShopInventory(shops[3], STR("Ari"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
+		return Shops::Ari::inventory.find(tunic);
 	})) return false;
 
-	if (!ProcessShopInventory(shops[4], STR("Poti"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+	if (!ProcessShopInventory(shops[4], STR("Poti"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
 		if (type == 0) return Shops::Poti::itemInventory.find(item);
-		if (type == 1) return Shops::Poti::weaponInventory.find(item);
+		if (type == 1) return Shops::Poti::weaponInventory.find(weapon);
 		if (type == 3) return Shops::Poti::spiritInventory.find(spirit);
 		return Shops::Poti::spiritInventory.end();
 	})) return false;
 
-	if (!ProcessShopInventory(shops[5], STR("POI"), [](uint8_t type, uint8_t item, uint8_t spirit) {
+	if (!ProcessShopInventory(shops[5], STR("POI"), [](uint8_t type, uint8_t item, uint8_t spirit, uint8_t tunic, uint8_t weapon) {
 		return Shops::Poi::inventory.find(item);
 	})) return false;
 
@@ -457,6 +461,7 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 
 bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
+	Output::send<LogLevel::Error>(STR("OnItemBought\n"));
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())
     {
@@ -491,6 +496,7 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
+	Output::send<LogLevel::Error>(STR("Num of items : {}\n"), (shops[*WorldShop])->Num());
 	for(int32_t i = 0; i < (shops[*WorldShop])->Num(); i++)
     {
         inventoryItem globalItem = (*shops[*WorldShop])[i];
@@ -517,9 +523,13 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 			uint32_t archipelagoShopLocationID = locationID.value() + globalItem.originalAmount;
 			Output::send<LogLevel::Verbose>(STR("Item bought in shop {}, marking location ID {} as checked in Archipelago\n"), *WorldShop, archipelagoShopLocationID);
 			AP_SendItem(archipelagoShopLocationID);
+			return false;
 		}
+
+		Output::send<LogLevel::Error>(STR("Matched\n"));
     }
 
+	Output::send<LogLevel::Error>(STR("Couldn't match any items\n"));
     return false;
 }
 

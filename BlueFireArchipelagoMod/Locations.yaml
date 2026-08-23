@@ -23,6 +23,10 @@ regions:
       objectName: Chest_A01_TempleGardens_Ability_SpinAttack2
     - name: Left Side Chest
       objectName: Chest_A02_Keep_Loot_02
+  - name: Top of Lula's Void Gate Room
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A02_RiverSpirit
   - name: Hub
     chests:
     - name: Corridor Right Chest
@@ -31,6 +35,9 @@ regions:
       objectName: Chest_A02_GameIntro_44
     - name: Left Side Chest
       objectName: Chest_A02_Sword_DiamondWings
+    - name: Photo Emote Chest
+      dance: Photo
+      objectName: Dance_Platform_Photo_Chest
     statues:
     - name: Techno Emote Statue
       objectName: A01_FireKeep_EmoteStatue_Techno
@@ -58,6 +65,9 @@ regions:
       objectName: Chest_A01_Arcane_Spell
     - name: Behind Elevator Chest
       objectName: Chest_A02_EastArcane_Loot_04
+    - name: Kung Fu Emote Chest
+      dance: Kung Fu
+      objectName: Dance_Platform_KungFu_Chest
     void_gates:
     - name: Path of Victory Void Gate
       objectName: Void_Gate_Paul
@@ -112,6 +122,8 @@ regions:
       objectName: Chest_A01_Stoneheart_Loot_3
     - name: Top Chest
       objectName: Chest_A01_Stoneheart_Loot_01
+    - name: Top of Lever Chest
+      objectName: Chest_A01_Stoneheart_Loot_02
     - name: Triceps Emote Chest
       dance: Triceps
       objectName: Dance_Platform_Triceps_Chest
@@ -160,6 +172,11 @@ regions:
     void_gates:
     - name: Borisa's Fate Void Gate
       objectName: Void_Gate_04_V2
+    chests:
+    - name: Void Gate First Chest
+      objectName: Chest_Master_Loot_04_V21
+    - name: Void Gate Second Chest
+      objectName: Chest_Master_Loot_04_V2
 
 - name: Water Ways
   subregions:
@@ -255,6 +272,10 @@ regions:
     void_gates:
     - name: Argio's Challenge Void Gate
       objectName: Void_Gate_Easy
+  - name: Long Corridor
+    chests:
+    - name: Chest
+      objectName: Chest_A01_Nuos_Loot_45
   - name: Center Room
     chests:
     - name: Entrance Stairs Chest
@@ -291,8 +312,8 @@ regions:
       objectName: Pickup_Rose
     - name: Rose 2
       objectName: Pickup_Rose2
-    - name: Necklace
-      objectName: Pickup_Necklace
+    #- name: Necklace  # This is temporarly removed until I find if this is a real item or not
+    #  objectName: Pickup_Necklace
     - name: Breemur Picture
       objectName: Pickup_BremurPicture
   - name: Entrance Ravin
@@ -306,6 +327,11 @@ regions:
     statues:
     - name: Aggressive Emote Statue
       objectName: A01_Graveyard_EmoteStatue_Aggressive
+  - name: Right side of Tower
+    chests:
+    - name: Levitation Emote Chest
+      dance: Levitation
+      objectName: Dance_Platform_Levitation_Chest
   - name: Heights
     chests:
     - name: Tower Chest
@@ -339,6 +365,10 @@ regions:
 
 - name: Uthas Temple
   subregions:
+  - name: Top of Entrance
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A01_LoveFlower
   - name: Entrance
     chests:
     - name: Right Side Chest
@@ -421,10 +451,30 @@ regions:
       requiredItems:
       - Beira Vessel
   - name: Middle Balcony
+    chests:
+    - name: Wave Emote Chest
+      dance: Wave
+      objectName: Dance_Platform_Wave_Chest
+  - name: Temple of Gods Bell Towers
+    chests:
+    - name: Left Bell Tower Applause Emote Chest
+      dance: Applause
+      objectName: Dance_Platform_Applause_Tunic_BananaKing
+    - name: Right Bell Tower Chest
+      objectName: Chest_A01_TempleGardens_Sword_Shanks
+  - name: Top of Temple of Gods Door
+    pickups:
+    - name: Spirit
+      objectName: Spirit_A01_HolyCentry
   - name: Temple of Gods
 
 - name: Firefall River
   subregions:
+  - name: Entrance Left Side
+    chests:
+    - name: Hat Kid Emote Chest
+      dance: Hat Kid
+      objectName: Dance_Platform_HatKid_Chest
   - name: Main Area
     chests:
     - name: Right Chest
@@ -435,6 +485,8 @@ regions:
       objectName: Chest_Master_Void_Santi_03
     - name: The Alchemist Void Gate Chest 2
       objectName: Chest_Master_Void_Santi_02
+    - name: Bunny House Chest
+      objectName: Chest_A06_River_Loot_02
     - name: Beira Vessel Chest
       objectName: Chest_A06_Lake_Loot_01_0
     - name: Steam House Entrance Chest
@@ -442,6 +494,9 @@ regions:
     - name: Party Emote Chest
       dance: Party
       objectName: Dance_Platform_Party_Chest_Spirit_HammerKing
+    - name: Windmill Emote Chest
+      dance: Windmill
+      objectName: Dance_Platform_Windmill_Chest
     statues:
     - name: Kungu Fu Emote Statue
       objectName: A06_Firefall_EmoteStatue_KungFu
@@ -453,7 +508,7 @@ regions:
     - name: The Alchemist Void Gate
       objectName: Void_Gate_Santi
     - name: Fury of Heraldo Void Gate
-      objectName: Void_Gate_Augustina
+      objectName: Void_Gate_Agustina
     events:
     - name: Capture Beira Shards 4
       requiredItems:
@@ -461,6 +516,9 @@ regions:
     mana_upgrades:
     - number: 2
   - name: Steam House
+    chests:
+    - name: Chest behind Generator
+      objectName: Chest_A06_SteamHouse_Tunic_SteamSuit
     events:
     - name: Repair Generator 1
     - name: Repair Generator 2
