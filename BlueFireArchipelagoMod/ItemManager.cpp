@@ -519,9 +519,22 @@ std::string ItemQueue::getQueueFilePath()
 
     GetModuleFileNameW(moduleHandle, dllPath, MAX_PATH);
     std::filesystem::path modPath = std::filesystem::path(dllPath).parent_path();
-    std::string queuePath = (modPath / "item_queue.json").string();
 
-    Output::send<LogLevel::Verbose>(STR("Item queue file path set\n"));
+    int32_t saveFileIndex = 0;
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if (gameInstance.has_value())
+    {
+        int32_t* saveIndex = UnrealObjectQueries::GetNestedPropertyValue<int32_t>(gameInstance.value(), L"System", L"SaveFileIndex_7_9ACF69B4474D76AACA0E349806254782");
+        if (saveIndex)
+        {
+            saveFileIndex = *saveIndex;
+        }
+    }
+
+    std::string filename = "item_queue_" + std::to_string(saveFileIndex) + ".json";
+    std::string queuePath = (modPath / filename).string();
+
+    Output::send<LogLevel::Verbose>(STR("Item queue file path set for save index {}\n"), saveFileIndex);
     return queuePath;
 }
 
