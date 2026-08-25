@@ -646,7 +646,9 @@ void ReceivedItemQueue::deleteReceivedItemQueue()
         if (std::filesystem::exists(filePath))
         {
             std::filesystem::remove(filePath);
-            Output::send<LogLevel::Verbose>(STR("Deleted item queue file\n"));
+
+            std::wstring wFilePath(filePath.begin(), filePath.end());
+            Output::send<LogLevel::Verbose>(STR("Deleted {} file\n"), wFilePath);
         }
     }
     catch (const std::exception&)
@@ -830,7 +832,9 @@ void CheckedLocationQueue::deleteCheckedLocationQueue()
         if (std::filesystem::exists(filePath))
         {
             std::filesystem::remove(filePath);
-            Output::send<LogLevel::Verbose>(STR("Deleted send queue file\n"));
+
+            std::wstring wFilePath(filePath.begin(), filePath.end());
+            Output::send<LogLevel::Verbose>(STR("Deleted {} file\n"), wFilePath);
         }
     }
     catch (const std::exception&)

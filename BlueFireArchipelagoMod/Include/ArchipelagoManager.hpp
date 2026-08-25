@@ -115,6 +115,9 @@ class ArchipelagoManager
 	 */
 	bool wasAuthenticatedPreviously() const;
 
+
+	static bool bShouldDeleteQueues;
+
 	private:
 
 	void (*successfulConnectionCallback)(void);
@@ -280,4 +283,10 @@ class ArchipelagoManager
 	 * @return  none
 	 */
 	static void StaticDeathLinkCallback();
+
+
+
+
+
+	static bool StartNewGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 };

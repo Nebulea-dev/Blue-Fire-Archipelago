@@ -394,6 +394,23 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 {
 	Output::send<LogLevel::Verbose>(STR("Level loaded, setting game loaded state to true\n"));
 
+	if (!ArchipelagoManager::bShouldDeleteQueues)
+	{
+		return false;
+	}
+
+	if (!BlueFireArchipelagoMod::itemManager)
+	{
+		Output::send<LogLevel::Error>(STR("itemManager is null in StartNewGameHook\n"));
+		return false;
+	}
+
+	CheckedLocationQueue::deleteCheckedLocationQueue();
+	ReceivedItemQueue::deleteReceivedItemQueue();
+
+	ArchipelagoManager::bShouldDeleteQueues = false;
+
+
 	// Set game loaded flag
 	if (BlueFireArchipelagoMod::arcManager)
 	{

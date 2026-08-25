@@ -13,16 +13,27 @@
 #include <DeathLinkManager.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
 
+
 using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
+
+
+bool ArchipelagoManager::bShouldDeleteQueues = false;
+
 
 ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false), bConnectionMonitorRunning(false), bWasAuthenticatedPreviously(false)
 {
 	this->initCallbacks();
 	this->startConnectionMonitor();
+
+	BlueFireArchipelagoMod::hookManager->registerPreHook(L"Function /Game/BlueFire/HUD/Menu/GameMenuController.GameMenuController_C:StartNewGame", StartNewGameHook);
+
+	bShouldDeleteQueues = false;
+
 	Output::send<LogLevel::Verbose>(STR("ArchipelagoManager instance created\n"));
 }
+
 
 void ArchipelagoManager::initCallbacks()
 {
@@ -56,6 +67,7 @@ void ArchipelagoManager::StaticItemClearCallback()
 	}
 }
 
+
 void ArchipelagoManager::StaticItemReceiveCallback(int64_t item, bool notifyPlayer)
 {
 	if (BlueFireArchipelagoMod::arcManager)
@@ -63,6 +75,7 @@ void ArchipelagoManager::StaticItemReceiveCallback(int64_t item, bool notifyPlay
 		BlueFireArchipelagoMod::arcManager->OnItemReceive(item, notifyPlayer);
 	}
 }
+
 
 void ArchipelagoManager::StaticLocationCheckCallback(int64_t location)
 {
@@ -72,10 +85,12 @@ void ArchipelagoManager::StaticLocationCheckCallback(int64_t location)
 	}
 }
 
+
 void ArchipelagoManager::OnItemClear()
 {
 	Output::send<LogLevel::Verbose>(STR("Clearing items received from Archipelago\n"));
 }
+
 
 void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 {
@@ -101,10 +116,12 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 	BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
 }
 
+
 void ArchipelagoManager::OnLocationCheck(int64_t location)
 {
 	Output::send<LogLevel::Verbose>(STR("Checked location with id {} from Archipelago\n"), location - ArchipelagoModConfig::Archipelago::BF_BASE_ID);
 }
+
 
 void ArchipelagoManager::OnDeathLink()
 {
@@ -124,6 +141,7 @@ void ArchipelagoManager::OnDeathLink()
 	BlueFireArchipelagoMod::deathLinkManager->onDeathLinkReceived();
 }
 
+
 void ArchipelagoManager::StaticDeathLinkCallback()
 {
 	if (BlueFireArchipelagoMod::arcManager)
@@ -131,6 +149,7 @@ void ArchipelagoManager::StaticDeathLinkCallback()
 		BlueFireArchipelagoMod::arcManager->OnDeathLink();
 	}
 }
+
 
 void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText* Username, const FText* Password)
 {
@@ -196,6 +215,7 @@ void ArchipelagoManager::connectToArchipelagoServer(const FText* IP, const FText
 	bResetConnectionStatusLoop = false;
 }
 
+
 void ArchipelagoManager::cancelConnection()
 {
 	AP_Shutdown();
@@ -203,10 +223,12 @@ void ArchipelagoManager::cancelConnection()
 	this->initCallbacks();
 }
 
+
 void ArchipelagoManager::setSuccessfulConnectionCallback(void (*callback)(void))
 {
 	this->successfulConnectionCallback = callback;
 }
+
 
 void ArchipelagoManager::ReleaseWorld()
 {
@@ -214,15 +236,18 @@ void ArchipelagoManager::ReleaseWorld()
 	AP_StoryComplete();
 }
 
+
 bool ArchipelagoManager::isDeathLinkEnabled() const
 {
 	return bDeathLinkEnabled;
 }
 
+
 bool ArchipelagoManager::isGameLoaded() const
 {
 	return bIsGameLoaded;
 }
+
 
 void ArchipelagoManager::setGameLoaded(bool loaded)
 {
@@ -230,10 +255,12 @@ void ArchipelagoManager::setGameLoaded(bool loaded)
 	Output::send<LogLevel::Verbose>(STR("Game loaded state set to: {}\n"), loaded ? STR("true") : STR("false"));
 }
 
+
 bool ArchipelagoManager::wasAuthenticatedPreviously() const
 {
 	return bWasAuthenticatedPreviously;
 }
+
 
 void ArchipelagoManager::startConnectionMonitor()
 {
@@ -244,6 +271,7 @@ void ArchipelagoManager::startConnectionMonitor()
 	connectionMonitorThread = std::thread(&ArchipelagoManager::connectionMonitorThreadFunc, this);
 	Output::send<LogLevel::Verbose>(STR("Connection monitor thread started\n"));
 }
+
 
 void ArchipelagoManager::stopConnectionMonitor()
 {
@@ -257,6 +285,7 @@ void ArchipelagoManager::stopConnectionMonitor()
 	}
 	Output::send<LogLevel::Verbose>(STR("Connection monitor thread stopped\n"));
 }
+
 
 void ArchipelagoManager::connectionMonitorThreadFunc()
 {
@@ -288,4 +317,12 @@ void ArchipelagoManager::connectionMonitorThreadFunc()
 		// Update previous state for next check
 		bWasAuthenticatedPreviously = bIsNowAuthenticated;
 	}
+}
+
+
+bool ArchipelagoManager::StartNewGameHook(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+	bShouldDeleteQueues = true;
+
+	return false;
 }
