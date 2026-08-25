@@ -401,10 +401,10 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 	}
 
 	// Process queued items if any exist
-	if (ItemQueue::queueFileExists())
+	if (ReceivedItemQueue::receivedItemQueueFileExists())
 	{
 		Output::send<LogLevel::Verbose>(STR("Item queue found, processing queued items\n"));
-		auto queuedItems = ItemQueue::loadAndClearQueue();
+		auto queuedItems = ReceivedItemQueue::flushReceivedItems();
 		if (BlueFireArchipelagoMod::itemManager)
 		{
 			for (int itemID : queuedItems)
@@ -676,10 +676,5 @@ void LocationManager::logIncorrectMapping(const std::wstring locationName)
 
 void LocationManager::SendOrQueueLocation(int64_t locationID)
 {
-	AP_ConnectionStatus status = AP_GetConnectionStatus();
-	bool bIsAuthenticated = (status == AP_ConnectionStatus::Authenticated);
-	bool bWasPreviouslyAuthenticated = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->wasAuthenticatedPreviously() : false;
-	bool bIsGameLoaded = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->isGameLoaded() : false;
-
-	SendQueue::appendLocationToQueue(locationID, bWasPreviouslyAuthenticated, bIsGameLoaded);
+	CheckedLocationQueue::appendCheckedLocation(locationID);
 }

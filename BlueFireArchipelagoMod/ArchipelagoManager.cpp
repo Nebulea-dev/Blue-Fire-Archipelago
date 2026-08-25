@@ -88,7 +88,7 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 	if (!bIsGameLoaded)
 	{
 		Output::send<LogLevel::Verbose>(STR("Game not loaded, queueing item {} for later\n"), itemID);
-		ItemQueue::saveItemToQueue(itemID);
+		ReceivedItemQueue::appendReceivedItem(itemID);
 		return;
 	}
 
@@ -275,9 +275,9 @@ void ArchipelagoManager::connectionMonitorThreadFunc()
 		{
 			Output::send<LogLevel::Verbose>(STR("Connection monitor: reconnected to Archipelago and in game, flushing send queue\n"));
 
-			if (SendQueue::sendQueueFileExists())
+			if (CheckedLocationQueue::checkedLocationQueueFileExists())
 			{
-				int sentCount = SendQueue::flushUnsendQueuedLocations();
+				int sentCount = CheckedLocationQueue::flushUnsentCheckedLocations();
 				if (sentCount > 0)
 				{
 					Output::send<LogLevel::Verbose>(STR("Connection monitor: sent {} queued locations\n"), sentCount);

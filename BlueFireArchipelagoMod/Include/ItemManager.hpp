@@ -210,39 +210,48 @@ struct inventoryItem
 };
 
 /*******************************************************************************
- * ItemQueue
+ * ReceivedItemQueue
  *
  * @brief   Manages persistence of items received when the game is not loaded.
  *
- *          Stores pending items to a JSON queue file next to the DLL, allowing
- *          items received while the game is closed to be applied when the game
- *          restarts.
+ *          Stores pending items received from other players to a JSON queue file,
+ *          allowing items received while the game is closed to be applied when
+ *          the game restarts.
  */
-class ItemQueue
+class ReceivedItemQueue
 {
 	public:
 	/*******************************************************************************
-	 * @fn      getQueueFilePath
+	 * @fn      getReceivedItemQueueFilePath
 	 *
-	 * @brief   Gets the full path to the item queue JSON file.
+	 * @brief   Gets the full path to the received item queue JSON file.
 	 *
-	 * @return  String path to item_queue.json in the DLL directory
+	 * @return  String path to received_item_queue_<SaveIndex>.json in the DLL directory
 	 */
-	static std::string getQueueFilePath();
+	static std::string getReceivedItemQueueFilePath();
 
 	/*******************************************************************************
-	 * @fn      queueFileExists
+	 * @fn      receivedItemQueueFileExists
 	 *
-	 * @brief   Checks if the item queue file exists on disk.
+	 * @brief   Checks if the received item queue file exists on disk.
 	 *
 	 * @return  true if queue file exists, false otherwise
 	 */
-	static bool queueFileExists();
+	static bool receivedItemQueueFileExists();
 
 	/*******************************************************************************
-	 * @fn      saveItemToQueue
+	 * @fn      deleteReceivedItemQueue
 	 *
-	 * @brief   Appends an item to the persistent queue file.
+	 * @brief   Deletes the received item queue file for current save.
+	 *
+	 * @return  none
+	 */
+	static void deleteReceivedItemQueue();
+
+	/*******************************************************************************
+	 * @fn      appendReceivedItem
+	 *
+	 * @brief   Appends a received item to the persistent queue file.
 	 *
 	 *          Reads the existing queue file (if it exists), appends the new item ID,
 	 *          and writes it back. Safe to call multiple times - each call appends
@@ -252,12 +261,12 @@ class ItemQueue
 	 *
 	 * @return  none
 	 */
-	static void saveItemToQueue(int itemID);
+	static void appendReceivedItem(int itemID);
 
 	/*******************************************************************************
-	 * @fn      loadAndClearQueue
+	 * @fn      flushReceivedItems
 	 *
-	 * @brief   Loads all pending items from queue file and deletes the file.
+	 * @brief   Flushes all pending items from queue file and deletes the file.
 	 *
 	 *          Reads the queue file, returns all queued item IDs as a vector,
 	 *          then deletes the queue file from disk. Returns empty vector if
@@ -265,57 +274,59 @@ class ItemQueue
 	 *
 	 * @return  Vector of item IDs that were queued
 	 */
-	static std::vector<int> loadAndClearQueue();
+	static std::vector<int> flushReceivedItems();
 };
 
 /*******************************************************************************
- * SendQueue
+ * CheckedLocationQueue
  *
- * @brief   Manages persistence of locations to be sent when connection is restored.
+ * @brief   Manages persistence of checked locations to send to the server.
  *
- *          Stores locations checked while offline to a JSON queue file per save file.
- *          When levels load, all queued locations are sent to the Archipelago server.
+ *          Stores locations checked by the player to a JSON queue file per save file.
+ *          When connection is restored while in-game, all queued locations are sent
+ *          to the Archipelago server.
  */
-class SendQueue
+class CheckedLocationQueue
 {
 	public:
 	/*******************************************************************************
-	 * @fn      getSendQueueFilePath
+	 * @fn      getCheckedLocationQueueFilePath
 	 *
-	 * @brief   Gets the full path to the send queue JSON file for current save.
+	 * @brief   Gets the full path to the checked location queue JSON file for current save.
 	 *
 	 *          Uses the SaveFileIndex from the game instance to create a unique
-	 *          queue per save file: send_queue_<index>.json
+	 *          queue per save file: checked_location_queue_<index>.json
 	 *
-	 * @return  String path to send_queue_<index>.json in the DLL directory
+	 * @return  String path to checked_location_queue_<index>.json in the DLL directory
 	 */
-	static std::string getSendQueueFilePath();
+	static std::string getCheckedLocationQueueFilePath();
 
 	/*******************************************************************************
-	 * @fn      sendQueueFileExists
+	 * @fn      checkedLocationQueueFileExists
 	 *
-	 * @brief   Checks if the send queue file exists for current save.
+	 * @brief   Checks if the checked location queue file exists for current save.
 	 *
 	 * @return  true if queue file exists, false otherwise
 	 */
-	static bool sendQueueFileExists();
+	static bool checkedLocationQueueFileExists();
 
 	/*******************************************************************************
-	 * @fn      saveLocationToSendQueue
+	 * @fn      appendCheckedLocation
 	 *
-	 * @brief   Appends a location ID to the send queue for current save.
+	 * @brief   Appends a checked location to queue and optionally sends if authenticated.
 	 *
-	 *          Reads the existing queue file, appends the location ID,
-	 *          and writes it back. Safe to call multiple times.
+	 *          Appends location to persistent queue. Reads authentication and game
+	 *          loaded state from managers. If already authenticated and was previously
+	 *          authenticated and in game, also sends immediately and updates sent index.
 	 *
-	 * @param   locationID - The Archipelago location ID to queue for sending
+	 * @param   locationID - The location ID to queue/send
 	 *
 	 * @return  none
 	 */
-	static void saveLocationToSendQueue(int64_t locationID);
+	static void appendCheckedLocation(int64_t locationID);
 
 	/*******************************************************************************
-	 * @fn      flushUnsendQueuedLocations
+	 * @fn      flushUnsentCheckedLocations
 	 *
 	 * @brief   Sends all locations from lastSentIndex onwards in the queue.
 	 *
@@ -325,22 +336,14 @@ class SendQueue
 	 *
 	 * @return  Number of locations that were sent
 	 */
-	static int flushUnsendQueuedLocations();
+	static int flushUnsentCheckedLocations();
 
 	/*******************************************************************************
-	 * @fn      appendLocationToQueue
+	 * @fn      deleteCheckedLocationQueue
 	 *
-	 * @brief   Appends a location to queue and optionally sends if authenticated.
-	 *
-	 *          Appends location to persistent queue. If already authenticated
-	 *          and was previously authenticated and in game, also sends it
-	 *          immediately and updates sent index.
-	 *
-	 * @param   locationID - The location ID to queue/send
-	 * @param   bWasPreviouslyAuthenticated - Whether we were authenticated before
-	 * @param   bIsGameLoaded - Whether game is currently loaded
+	 * @brief   Deletes the checked location queue file for current save.
 	 *
 	 * @return  none
 	 */
-	static void appendLocationToQueue(int64_t locationID, bool bWasPreviouslyAuthenticated, bool bIsGameLoaded);
+	static void deleteCheckedLocationQueue();
 };

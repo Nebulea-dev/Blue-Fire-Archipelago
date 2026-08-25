@@ -7,6 +7,7 @@
 #include <Helper/ObjectFinder.hpp>
 #include <Helper/HookHelper.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
+#include <ArchipelagoManager.hpp>
 #include <BlueFireArchipelagoMod.hpp>
 #include <ArchipelagoModConfig.hpp>
 #include <ItemManager.hpp>
@@ -507,7 +508,7 @@ void ItemManager::givePlayerCurrency(int32_t amount)
     Output::send<LogLevel::Verbose>(STR("Updated currency to: {}\n"), *currency);
 }
 
-std::string ItemQueue::getQueueFilePath()
+std::string ReceivedItemQueue::getReceivedItemQueueFilePath()
 {
     wchar_t dllPath[MAX_PATH] = {0};
     HMODULE moduleHandle = GetModuleHandle(nullptr);
@@ -531,25 +532,25 @@ std::string ItemQueue::getQueueFilePath()
         }
     }
 
-    std::string filename = "item_queue_" + std::to_string(saveFileIndex) + ".json";
+    std::string filename = "received_item_queue_" + std::to_string(saveFileIndex) + ".json";
     std::string queuePath = (modPath / filename).string();
 
-    Output::send<LogLevel::Verbose>(STR("Item queue file path set for save index {}\n"), saveFileIndex);
+    Output::send<LogLevel::Verbose>(STR("Received item queue file path set for save index {}\n"), saveFileIndex);
     return queuePath;
 }
 
-bool ItemQueue::queueFileExists()
+bool ReceivedItemQueue::receivedItemQueueFileExists()
 {
-    std::string filePath = getQueueFilePath();
+    std::string filePath = getReceivedItemQueueFilePath();
     if (filePath.empty())
         return false;
 
     return std::filesystem::exists(filePath);
 }
 
-void ItemQueue::saveItemToQueue(int itemID)
+void ReceivedItemQueue::appendReceivedItem(int itemID)
 {
-    std::string filePath = getQueueFilePath();
+    std::string filePath = getReceivedItemQueueFilePath();
     if (filePath.empty())
     {
         Output::send<LogLevel::Error>(STR("Could not determine queue file path\n"));
@@ -590,10 +591,10 @@ void ItemQueue::saveItemToQueue(int itemID)
     }
 }
 
-std::vector<int> ItemQueue::loadAndClearQueue()
+std::vector<int> ReceivedItemQueue::flushReceivedItems()
 {
     std::vector<int> items;
-    std::string filePath = getQueueFilePath();
+    std::string filePath = getReceivedItemQueueFilePath();
 
     if (filePath.empty() || !std::filesystem::exists(filePath))
     {
@@ -634,7 +635,27 @@ std::vector<int> ItemQueue::loadAndClearQueue()
     return items;
 }
 
-std::string SendQueue::getSendQueueFilePath()
+void ReceivedItemQueue::deleteReceivedItemQueue()
+{
+    std::string filePath = getReceivedItemQueueFilePath();
+    if (filePath.empty())
+        return;
+
+    try
+    {
+        if (std::filesystem::exists(filePath))
+        {
+            std::filesystem::remove(filePath);
+            Output::send<LogLevel::Verbose>(STR("Deleted item queue file\n"));
+        }
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while deleting item queue\n"));
+    }
+}
+
+std::string CheckedLocationQueue::getCheckedLocationQueueFilePath()
 {
     wchar_t dllPath[MAX_PATH] = {0};
     HMODULE moduleHandle = GetModuleHandle(nullptr);
@@ -658,68 +679,25 @@ std::string SendQueue::getSendQueueFilePath()
         }
     }
 
-    std::string filename = "send_queue_" + std::to_string(saveFileIndex) + ".json";
+    std::string filename = "checked_location_queue_" + std::to_string(saveFileIndex) + ".json";
     std::string queuePath = (modPath / filename).string();
 
-    Output::send<LogLevel::Verbose>(STR("Send queue file path set for save index {}\n"), saveFileIndex);
+    Output::send<LogLevel::Verbose>(STR("Checked location queue file path set for save index {}\n"), saveFileIndex);
     return queuePath;
 }
 
-bool SendQueue::sendQueueFileExists()
+bool CheckedLocationQueue::checkedLocationQueueFileExists()
 {
-    std::string filePath = getSendQueueFilePath();
+    std::string filePath = getCheckedLocationQueueFilePath();
     if (filePath.empty())
         return false;
 
     return std::filesystem::exists(filePath);
 }
 
-void SendQueue::saveLocationToSendQueue(int64_t locationID)
+int CheckedLocationQueue::flushUnsentCheckedLocations()
 {
-    std::string filePath = getSendQueueFilePath();
-    if (filePath.empty())
-    {
-        Output::send<LogLevel::Error>(STR("Could not determine send queue file path\n"));
-        return;
-    }
-
-    try
-    {
-        Json::Value root;
-        Json::Reader reader;
-
-        if (std::filesystem::exists(filePath))
-        {
-            std::ifstream inFile(filePath);
-            if (!reader.parse(inFile, root) || !root.isMember("locations"))
-            {
-                root["locations"] = Json::Value(Json::arrayValue);
-            }
-            inFile.close();
-        }
-        else
-        {
-            root["locations"] = Json::Value(Json::arrayValue);
-        }
-
-        root["locations"].append((Json::Value::Int64)locationID);
-
-        std::ofstream outFile(filePath);
-        Json::FastWriter writer;
-        outFile << writer.write(root);
-        outFile.close();
-
-        Output::send<LogLevel::Verbose>(STR("Saved location {} to send queue (total: {})\n"), (int64_t)locationID, root["locations"].size());
-    }
-    catch (const std::exception&)
-    {
-        Output::send<LogLevel::Verbose>(STR("Exception while saving location to send queue\n"));
-    }
-}
-
-int SendQueue::flushUnsendQueuedLocations()
-{
-    std::string filePath = getSendQueueFilePath();
+    std::string filePath = getCheckedLocationQueueFilePath();
     int sentCount = 0;
 
     if (filePath.empty() || !std::filesystem::exists(filePath))
@@ -778,14 +756,18 @@ int SendQueue::flushUnsendQueuedLocations()
     return sentCount;
 }
 
-void SendQueue::appendLocationToQueue(int64_t locationID, bool bWasPreviouslyAuthenticated, bool bIsGameLoaded)
+void CheckedLocationQueue::appendCheckedLocation(int64_t locationID)
 {
-    std::string filePath = getSendQueueFilePath();
+    std::string filePath = getCheckedLocationQueueFilePath();
     if (filePath.empty())
     {
-        Output::send<LogLevel::Error>(STR("Could not determine send queue file path\n"));
+        Output::send<LogLevel::Error>(STR("Could not determine checked location queue file path\n"));
         return;
     }
+
+    // Read current state from managers
+    bool bWasPreviouslyAuthenticated = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->wasAuthenticatedPreviously() : false;
+    bool bIsGameLoaded = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->isGameLoaded() : false;
 
     try
     {
@@ -833,6 +815,26 @@ void SendQueue::appendLocationToQueue(int64_t locationID, bool bWasPreviouslyAut
     }
     catch (const std::exception&)
     {
-        Output::send<LogLevel::Verbose>(STR("Exception while appending to send queue\n"));
+        Output::send<LogLevel::Verbose>(STR("Exception while appending to checked location queue\n"));
+    }
+}
+
+void CheckedLocationQueue::deleteCheckedLocationQueue()
+{
+    std::string filePath = getCheckedLocationQueueFilePath();
+    if (filePath.empty())
+        return;
+
+    try
+    {
+        if (std::filesystem::exists(filePath))
+        {
+            std::filesystem::remove(filePath);
+            Output::send<LogLevel::Verbose>(STR("Deleted send queue file\n"));
+        }
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while deleting send queue\n"));
     }
 }
