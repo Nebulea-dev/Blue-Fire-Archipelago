@@ -415,17 +415,6 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 		}
 	}
 
-	// Process queued locations if any exist
-	if (SendQueue::sendQueueFileExists())
-	{
-		Output::send<LogLevel::Verbose>(STR("Send queue found, processing queued locations\n"));
-		auto queuedLocations = SendQueue::loadAndClearSendQueue();
-		for (int64_t locationID : queuedLocations)
-		{
-			Output::send<LogLevel::Verbose>(STR("Processing queued location: {}\n"), locationID);
-			LocationManager::SendOrQueueLocation(locationID);
-		}
-	}
 
 	Output::send<LogLevel::Verbose>(STR("Re-generating the original amount field of the shop item list\n"));
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
@@ -688,14 +677,9 @@ void LocationManager::logIncorrectMapping(const std::wstring locationName)
 void LocationManager::SendOrQueueLocation(int64_t locationID)
 {
 	AP_ConnectionStatus status = AP_GetConnectionStatus();
-	if (status == AP_ConnectionStatus::Authenticated)
-	{
-		AP_SendItem(locationID);
-		Output::send<LogLevel::Verbose>(STR("Sent location {} to Archipelago\n"), locationID);
-	}
-	else
-	{
-		SendQueue::saveLocationToSendQueue(locationID);
-		Output::send<LogLevel::Verbose>(STR("Not connected to Archipelago, queued location {} for later\n"), locationID);
-	}
+	bool bIsAuthenticated = (status == AP_ConnectionStatus::Authenticated);
+	bool bWasPreviouslyAuthenticated = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->wasAuthenticatedPreviously() : false;
+	bool bIsGameLoaded = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->isGameLoaded() : false;
+
+	SendQueue::appendLocationToQueue(locationID, bWasPreviouslyAuthenticated, bIsGameLoaded);
 }

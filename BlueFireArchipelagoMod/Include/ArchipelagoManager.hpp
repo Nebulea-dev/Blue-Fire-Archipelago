@@ -106,6 +106,15 @@ class ArchipelagoManager
 	 */
 	void setGameLoaded(bool loaded);
 
+	/*******************************************************************************
+	 * @fn      wasAuthenticatedPreviously
+	 *
+	 * @brief   Returns whether we were authenticated in previous check.
+	 *
+	 * @return  true if was authenticated in previous check
+	 */
+	bool wasAuthenticatedPreviously() const;
+
 	private:
 
 	void (*successfulConnectionCallback)(void);
@@ -113,6 +122,7 @@ class ArchipelagoManager
 	bool bDeathLinkEnabled;
 	bool bIsGameLoaded;
 	std::atomic<bool> bConnectionMonitorRunning;
+	std::atomic<bool> bWasAuthenticatedPreviously;
 	std::thread connectionMonitorThread;
 
 	/*******************************************************************************

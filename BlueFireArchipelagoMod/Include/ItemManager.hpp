@@ -315,14 +315,32 @@ class SendQueue
 	static void saveLocationToSendQueue(int64_t locationID);
 
 	/*******************************************************************************
-	 * @fn      loadAndClearSendQueue
+	 * @fn      flushUnsendQueuedLocations
 	 *
-	 * @brief   Loads all pending locations from queue and deletes the file.
+	 * @brief   Sends all locations from lastSentIndex onwards in the queue.
 	 *
-	 *          Reads the queue file, returns all location IDs as a vector,
-	 *          then deletes the queue file from disk for this save.
+	 *          Reads the queue file and sends all locations that haven't been
+	 *          sent yet (starting from lastSentIndex). Updates lastSentIndex
+	 *          to mark them as sent. Queue file persists.
 	 *
-	 * @return  Vector of location IDs that were queued to send
+	 * @return  Number of locations that were sent
 	 */
-	static std::vector<int64_t> loadAndClearSendQueue();
+	static int flushUnsendQueuedLocations();
+
+	/*******************************************************************************
+	 * @fn      appendLocationToQueue
+	 *
+	 * @brief   Appends a location to queue and optionally sends if authenticated.
+	 *
+	 *          Appends location to persistent queue. If already authenticated
+	 *          and was previously authenticated and in game, also sends it
+	 *          immediately and updates sent index.
+	 *
+	 * @param   locationID - The location ID to queue/send
+	 * @param   bWasPreviouslyAuthenticated - Whether we were authenticated before
+	 * @param   bIsGameLoaded - Whether game is currently loaded
+	 *
+	 * @return  none
+	 */
+	static void appendLocationToQueue(int64_t locationID, bool bWasPreviouslyAuthenticated, bool bIsGameLoaded);
 };

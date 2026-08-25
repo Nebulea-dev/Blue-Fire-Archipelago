@@ -11,12 +11,13 @@
 #include <ItemManager.hpp>
 #include <LocationManager.hpp>
 #include <DeathLinkManager.hpp>
+#include <Helper/UnrealObjectQueries.hpp>
 
 using namespace RC;
 using namespace Unreal;
 using namespace ArchipelagoModConfig;
 
-ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false), bConnectionMonitorRunning(false)
+ArchipelagoManager::ArchipelagoManager() : successfulConnectionCallback(NULL), bResetConnectionStatusLoop(false), bDeathLinkEnabled(false), bIsGameLoaded(false), bConnectionMonitorRunning(false), bWasAuthenticatedPreviously(false)
 {
 	this->initCallbacks();
 	this->startConnectionMonitor();
@@ -229,6 +230,11 @@ void ArchipelagoManager::setGameLoaded(bool loaded)
 	Output::send<LogLevel::Verbose>(STR("Game loaded state set to: {}\n"), loaded ? STR("true") : STR("false"));
 }
 
+bool ArchipelagoManager::wasAuthenticatedPreviously() const
+{
+	return bWasAuthenticatedPreviously;
+}
+
 void ArchipelagoManager::startConnectionMonitor()
 {
 	if (bConnectionMonitorRunning)
@@ -262,22 +268,24 @@ void ArchipelagoManager::connectionMonitorThreadFunc()
 			break;
 
 		AP_ConnectionStatus status = AP_GetConnectionStatus();
-		if (status == AP_ConnectionStatus::Authenticated && bIsGameLoaded)
+		bool bIsNowAuthenticated = (status == AP_ConnectionStatus::Authenticated);
+
+		// Detect transition from not authenticated to authenticated
+		if (!bWasAuthenticatedPreviously && bIsNowAuthenticated && bIsGameLoaded)
 		{
-			Output::send<LogLevel::Verbose>(STR("Connection monitor: reconnected to Archipelago, flushing send queue\n"));
+			Output::send<LogLevel::Verbose>(STR("Connection monitor: reconnected to Archipelago and in game, flushing send queue\n"));
 
 			if (SendQueue::sendQueueFileExists())
 			{
-				auto queuedLocations = SendQueue::loadAndClearSendQueue();
-				if (!queuedLocations.empty())
+				int sentCount = SendQueue::flushUnsendQueuedLocations();
+				if (sentCount > 0)
 				{
-					Output::send<LogLevel::Verbose>(STR("Connection monitor: sending {} queued locations\n"), queuedLocations.size());
-					for (int64_t locationID : queuedLocations)
-					{
-						AP_SendItem(locationID);
-					}
+					Output::send<LogLevel::Verbose>(STR("Connection monitor: sent {} queued locations\n"), sentCount);
 				}
 			}
 		}
+
+		// Update previous state for next check
+		bWasAuthenticatedPreviously = bIsNowAuthenticated;
 	}
 }

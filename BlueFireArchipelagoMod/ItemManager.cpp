@@ -2,6 +2,8 @@
 #include <Unreal/Hooks.hpp>
 #include <DynamicOutput/DynamicOutput.hpp>
 
+#include <Archipelago.h>
+
 #include <Helper/ObjectFinder.hpp>
 #include <Helper/HookHelper.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
@@ -702,14 +704,14 @@ void SendQueue::saveLocationToSendQueue(int64_t locationID)
     }
 }
 
-std::vector<int64_t> SendQueue::loadAndClearSendQueue()
+int SendQueue::flushUnsendQueuedLocations()
 {
-    std::vector<int64_t> locations;
     std::string filePath = getSendQueueFilePath();
+    int sentCount = 0;
 
     if (filePath.empty() || !std::filesystem::exists(filePath))
     {
-        return locations;
+        return sentCount;
     }
 
     try
@@ -718,30 +720,106 @@ std::vector<int64_t> SendQueue::loadAndClearSendQueue()
         Json::Reader reader;
 
         std::ifstream inFile(filePath);
-        if (!reader.parse(inFile, root) || !root.isMember("locations"))
+        if (!reader.parse(inFile, root))
         {
             inFile.close();
-            std::filesystem::remove(filePath);
-            return locations;
+            return sentCount;
         }
         inFile.close();
 
-        const Json::Value& locationArray = root["locations"];
-        for (const auto& location : locationArray)
+        if (!root.isMember("locations") || !root.isMember("lastSentIndex"))
         {
-            if (location.isInt64())
+            return sentCount;
+        }
+
+        const Json::Value& locationArray = root["locations"];
+        int lastSentIndex = root["lastSentIndex"].asInt();
+
+        for (int i = lastSentIndex; i < (int)locationArray.size(); ++i)
+        {
+            if (locationArray[i].isInt64())
             {
-                locations.push_back(location.asInt64());
+                int64_t locationID = locationArray[i].asInt64();
+                AP_SendItem(locationID);
+                sentCount++;
             }
         }
 
-        std::filesystem::remove(filePath);
-        Output::send<LogLevel::Verbose>(STR("Loaded and cleared {} locations from send queue\n"), locations.size());
+        if (sentCount > 0)
+        {
+            root["lastSentIndex"] = lastSentIndex + sentCount;
+
+            std::ofstream outFile(filePath);
+            Json::FastWriter writer;
+            outFile << writer.write(root);
+            outFile.close();
+
+            Output::send<LogLevel::Verbose>(STR("Flushed {} queued locations\n"), sentCount);
+        }
     }
     catch (const std::exception&)
     {
-        Output::send<LogLevel::Verbose>(STR("Exception while loading send queue\n"));
+        Output::send<LogLevel::Verbose>(STR("Exception while flushing send queue\n"));
     }
 
-    return locations;
+    return sentCount;
+}
+
+void SendQueue::appendLocationToQueue(int64_t locationID, bool bWasPreviouslyAuthenticated, bool bIsGameLoaded)
+{
+    std::string filePath = getSendQueueFilePath();
+    if (filePath.empty())
+    {
+        Output::send<LogLevel::Error>(STR("Could not determine send queue file path\n"));
+        return;
+    }
+
+    try
+    {
+        Json::Value root;
+        Json::Reader reader;
+
+        if (std::filesystem::exists(filePath))
+        {
+            std::ifstream inFile(filePath);
+            if (!reader.parse(inFile, root) || !root.isMember("locations"))
+            {
+                root["locations"] = Json::Value(Json::arrayValue);
+                root["lastSentIndex"] = 0;
+            }
+            inFile.close();
+        }
+        else
+        {
+            root["locations"] = Json::Value(Json::arrayValue);
+            root["lastSentIndex"] = 0;
+        }
+
+        root["locations"].append((Json::Value::Int64)locationID);
+
+        std::ofstream outFile(filePath);
+        Json::FastWriter writer;
+        outFile << writer.write(root);
+        outFile.close();
+
+        Output::send<LogLevel::Verbose>(STR("Appended location {} to queue (total: {})\n"), (int64_t)locationID, root["locations"].size());
+
+        // If already authenticated and was previously authenticated and in game, send immediately
+        if (bWasPreviouslyAuthenticated && bIsGameLoaded)
+        {
+            AP_SendItem(locationID);
+            root["lastSentIndex"] = root["locations"].size();
+
+            std::ofstream outFile2(filePath);
+            Json::FastWriter writer2;
+            outFile2 << writer2.write(root);
+            outFile2.close();
+
+            Output::send<LogLevel::Verbose>(STR("Sent location {} immediately\n"), (int64_t)locationID);
+        }
+    }
+    catch (const std::exception&)
+    {
+        Output::send<LogLevel::Verbose>(STR("Exception while appending to send queue\n"));
+    }
 }
