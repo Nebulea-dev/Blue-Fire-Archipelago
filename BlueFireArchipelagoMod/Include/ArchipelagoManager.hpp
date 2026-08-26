@@ -3,6 +3,7 @@
 #include <Unreal/UObject.hpp>
 #include <thread>
 #include <atomic>
+#include <KeyTracker.hpp>
 
 using namespace RC;
 using namespace Unreal;
@@ -115,6 +116,16 @@ class ArchipelagoManager
 	 */
 	bool wasAuthenticatedPreviously() const;
 
+	/*******************************************************************************
+	 * @fn      getKeyTracker
+	 *
+	 * @brief   Returns the key tracker containing which keys have been obtained.
+	 *
+	 * @return  Reference to the KeyTracker struct
+	 */
+	const KeyTracker& getKeyTracker() const;
+
+	KeyTracker keyTracker;
 
 	static bool bShouldDeleteQueues;
 

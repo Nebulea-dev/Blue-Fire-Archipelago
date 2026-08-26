@@ -89,15 +89,28 @@ void ArchipelagoManager::StaticLocationCheckCallback(int64_t location)
 void ArchipelagoManager::OnItemClear()
 {
 	Output::send<LogLevel::Verbose>(STR("Clearing items received from Archipelago\n"));
+	keyTracker.reset();
+}
+
+const KeyTracker& ArchipelagoManager::getKeyTracker() const
+{
+	return keyTracker;
 }
 
 
 void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 {
+	// Update the list of keys obtained so we can unlock the corresponding doors
+	int itemID = (int)item - ArchipelagoModConfig::Archipelago::BF_BASE_ID;
+	uint16_t itemCategory = (itemID - (itemID % 100)) / 100;
+	if (itemCategory == 7)
+	{
+		int keyIndex = itemID % 100;
+		keyTracker.updateKey(keyIndex);
+	}
+
 	// If the item was already given
 	if(!notifyPlayer) return;
-
-	int itemID = (int)item - ArchipelagoModConfig::Archipelago::BF_BASE_ID;
 
 	// If game is not loaded, queue the item for later
 	if (!bIsGameLoaded)
