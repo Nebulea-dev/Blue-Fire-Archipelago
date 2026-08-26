@@ -143,6 +143,17 @@ class ItemManager
 	void givePlayerImportantItem(int itemID);
 
 	/*******************************************************************************
+	 * @fn      givePlayerKeyItem
+	 *
+	 * @brief   Give the player a key item.
+	 *
+	 * @param   itemID - The item ID (0-based index)
+	 *
+	 * @return  none
+	 */
+	void givePlayerKeyItem(int itemID);
+
+	/*******************************************************************************
 	 * @fn      givePlayerCustomItem
 	 *
 	 * @brief   Give the player a custom item requiring special handling logic.

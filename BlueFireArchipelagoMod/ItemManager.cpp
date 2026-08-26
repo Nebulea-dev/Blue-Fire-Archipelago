@@ -76,7 +76,11 @@ void ItemManager::itemReceiveCb(int itemID)
             break;
 
         case 7:
-            givePlayerCustomItem(itemID - 700);
+            givePlayerKeyItem(itemID - 700);
+            break;
+
+        case 8:
+            givePlayerCustomItem(itemID - 800);
             break;
 
         default:
@@ -331,6 +335,58 @@ void ItemManager::givePlayerImportantItem(int itemID)
 
     inventoryItem newItem = {};
     newItem.item = itemID;
+    newItem.amount = 1;
+    inventory->Push(newItem);
+}
+
+void ItemManager::givePlayerKeyItem(int itemID)
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player key item ID: {}\n"), itemID);
+
+    uint32_t inGameItemID = 0;
+
+    switch(itemID)
+    {
+        // Old Keys (indices 0-7)
+        case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+            inGameItemID = 2;
+            break;
+        // Holy Keys (indices 8-10)
+        case 8: case 9: case 10:
+            inGameItemID = 57;
+            break;
+        case 11:  // Uthas Temple Key
+            inGameItemID = 60;
+            break;
+        case 12:  // Temple of Gods Key
+            inGameItemID = 61;
+            break;
+        case 13:  // Steam Key
+            inGameItemID = 62;
+            break;
+        case 14:  // Key of Ember
+            inGameItemID = 56;
+            break;
+        case 15:  // Graveyard Key
+            inGameItemID = 63;
+            break;
+        default:
+            Output::send<LogLevel::Error>(STR("Unknown key item ID: {}\n"), itemID);
+            return;
+    }
+
+    TArray<inventoryItem>* inventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
+    if (!inventory)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get passive inventory in givePlayerKeyItem\n"));
+        return;
+    }
+
+    if (UnrealObjectQueries::StackItemInInventory(inventory, inGameItemID))
+        return;
+
+    inventoryItem newItem = {};
+    newItem.item = inGameItemID;
     newItem.amount = 1;
     inventory->Push(newItem);
 }
