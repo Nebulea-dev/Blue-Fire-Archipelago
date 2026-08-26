@@ -72,7 +72,7 @@ void ItemManager::itemReceiveCb(int itemID)
             break;
 
         case 6:
-            givePlayerKeyItem(itemID - 600);
+            givePlayerImportantItem(itemID - 600);
             break;
 
         case 7:
@@ -96,12 +96,12 @@ bool ItemManager::PlayNewItemPreHook(UObject* Context, FFrame& Stack, void* RESU
     // TODO : Fix leak
     FText* itemName = new FText(Strings::ITEM_NAME);
     FText* itemDescription = new FText(Strings::ITEM_DESCRIPTION);
-    uint8_t* keyItem = new uint8_t(UI::KEY_ITEM_TYPE);
+    uint8_t* importantItem = new uint8_t(UI::IMPORTANT_ITEM_TYPE);
     uint32_t* itemAmount = new uint32_t(UI::ITEM_AMOUNT);
 
     BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_IN_TEXT, Stack, itemName);
     BlueFireArchipelagoMod::hookManager->setParamValue<FText>(PropertyNames::PARAM_DESCRIPTION, Stack, itemDescription);
-    BlueFireArchipelagoMod::hookManager->setParamValue<uint8_t>(PropertyNames::PARAM_KEY_ITEM, Stack, keyItem);
+    BlueFireArchipelagoMod::hookManager->setParamValue<uint8_t>(PropertyNames::PARAM_IMPORTANT_ITEM, Stack, importantItem);
     BlueFireArchipelagoMod::hookManager->setParamValue<uint32_t>(PropertyNames::PARAM_AMOUNT, Stack, itemAmount);
 
     // Do not prevent the original function from being called
@@ -315,14 +315,14 @@ void ItemManager::givePlayerItem(int itemID)
     inventory->Push(newItem);
 }
 
-void ItemManager::givePlayerKeyItem(int itemID)
+void ItemManager::givePlayerImportantItem(int itemID)
 {
     Output::send<LogLevel::Verbose>(STR("Giving player passive item ID: {}\n"), itemID);
 
     TArray<inventoryItem>* inventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
     if (!inventory)
     {
-        Output::send<LogLevel::Error>(STR("Could not get passive inventory in givePlayerKeyItem\n"));
+        Output::send<LogLevel::Error>(STR("Could not get passive inventory in givePlayerImportantItem\n"));
         return;
     }
 
