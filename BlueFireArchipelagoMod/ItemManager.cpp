@@ -38,6 +38,8 @@ ItemManager::ItemManager()
 
 void ItemManager::itemReceiveCb(int itemID)
 {
+    Output::send<LogLevel::Verbose>(STR("Giving item with ID {}\n"), itemID);
+
     if(itemID < 0)
     {
         Output::send<LogLevel::Error>(STR("Item has an ID under the base ID of the game, cannot be mapped to a valid item\n"));
@@ -824,8 +826,25 @@ void CheckedLocationQueue::appendCheckedLocation(int64_t locationID)
     }
 
     // Read current state from managers
-    bool bWasPreviouslyAuthenticated = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->wasAuthenticatedPreviously() : false;
+	bool bIsAuthenticated = (AP_GetConnectionStatus() == AP_ConnectionStatus::Authenticated);
     bool bIsGameLoaded = BlueFireArchipelagoMod::arcManager ? BlueFireArchipelagoMod::arcManager->isGameLoaded() : false;
+
+
+    // If already authenticated and in game, send immediately
+    if (bIsAuthenticated && bIsGameLoaded)
+    {
+        AP_SendItem(locationID);
+        Output::send<LogLevel::Verbose>(STR("Sent location {} immediately\n"), (int64_t)locationID);
+        return;
+    }
+    else
+    {
+        Output::send<LogLevel::Error>(STR("Couldn't send item to server\n"));
+        Output::send<LogLevel::Error>(STR("Value of bIsAuthenticated : {}\n"), bIsAuthenticated);
+        Output::send<LogLevel::Error>(STR("Value of bIsGameLoaded : {}\n"), bIsGameLoaded);
+        Output::send<LogLevel::Error>(STR("Value of isGameLoaded : {}\n"), BlueFireArchipelagoMod::arcManager->isGameLoaded());
+        Output::send<LogLevel::Error>(STR("Value of BlueFireArchipelagoMod::arcManager : {}\n"), (void*)BlueFireArchipelagoMod::arcManager);
+    }
 
     try
     {
@@ -856,20 +875,6 @@ void CheckedLocationQueue::appendCheckedLocation(int64_t locationID)
         outFile.close();
 
         Output::send<LogLevel::Verbose>(STR("Appended location {} to queue (total: {})\n"), (int64_t)locationID, root["locations"].size());
-
-        // If already authenticated and was previously authenticated and in game, send immediately
-        if (bWasPreviouslyAuthenticated && bIsGameLoaded)
-        {
-            AP_SendItem(locationID);
-            root["lastSentIndex"] = root["locations"].size();
-
-            std::ofstream outFile2(filePath);
-            Json::FastWriter writer2;
-            outFile2 << writer2.write(root);
-            outFile2.close();
-
-            Output::send<LogLevel::Verbose>(STR("Sent location {} immediately\n"), (int64_t)locationID);
-        }
     }
     catch (const std::exception&)
     {

@@ -394,70 +394,16 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 {
 	Output::send<LogLevel::Verbose>(STR("Level loaded, setting game loaded state to true\n"));
 
-	if (!ArchipelagoManager::bShouldDeleteQueues)
-	{
-		return false;
-	}
-
-	if (!BlueFireArchipelagoMod::itemManager)
-	{
-		Output::send<LogLevel::Error>(STR("itemManager is null in StartNewGameHook\n"));
-		return false;
-	}
-
-	CheckedLocationQueue::deleteCheckedLocationQueue();
-	ReceivedItemQueue::deleteReceivedItemQueue();
-
-	ArchipelagoManager::bShouldDeleteQueues = false;
-
-
 	// Set game loaded flag
 	if (BlueFireArchipelagoMod::arcManager)
 	{
 		BlueFireArchipelagoMod::arcManager->setGameLoaded(true);
 	}
 
-	// Process queued items if any exist
-	if (ReceivedItemQueue::receivedItemQueueFileExists())
+	if (!BlueFireArchipelagoMod::itemManager)
 	{
-		Output::send<LogLevel::Verbose>(STR("Item queue found, processing queued items\n"));
-		auto queuedItems = ReceivedItemQueue::flushReceivedItems();
-		if (BlueFireArchipelagoMod::itemManager && BlueFireArchipelagoMod::arcManager)
-		{
-			for (int itemID : queuedItems)
-			{
-				Output::send<LogLevel::Verbose>(STR("Processing queued item: {}\n"), itemID);
-				BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
-			}
-		}
-	}
-
-	// Print all obtained keys
-	if (BlueFireArchipelagoMod::arcManager)
-	{
-		const KeyTracker& keys = BlueFireArchipelagoMod::arcManager->getKeyTracker();
-		Output::send<LogLevel::Warning>(STR("=== KEYS OBTAINED ===\n"));
-
-		if (keys.oldKeyFireKeep) Output::send<LogLevel::Warning>(STR("Old Key - Fire Keep\n"));
-		if (keys.oldKeyForestTempleAmbush) Output::send<LogLevel::Warning>(STR("Old Key - Forest Temple Ambush\n"));
-		if (keys.oldKeyForestTempleCenterRoom) Output::send<LogLevel::Warning>(STR("Old Key - Forest Temple Center Room\n"));
-		if (keys.oldKeyForestTempleAmbush2) Output::send<LogLevel::Warning>(STR("Old Key - Forest Temple Ambush 2\n"));
-		if (keys.oldKeyUthasTempleMainRoom) Output::send<LogLevel::Warning>(STR("Old Key - Uthas Temple Main Room\n"));
-		if (keys.oldKeyUthasTempleAmbush) Output::send<LogLevel::Warning>(STR("Old Key - Uthas Temple Ambush\n"));
-		if (keys.oldKeyUthasTemple2ndSide) Output::send<LogLevel::Warning>(STR("Old Key - Uthas Temple 2nd Side\n"));
-		if (keys.oldKeyUthasTempleFinalFloor) Output::send<LogLevel::Warning>(STR("Old Key - Uthas Temple Final Floor\n"));
-
-		if (keys.holyKeyForestTempleBoss) Output::send<LogLevel::Warning>(STR("Holy Key - Forest Temple Boss\n"));
-		if (keys.holyKeyForestTempleNuosClaw) Output::send<LogLevel::Warning>(STR("Holy Key - Forest Temple Nuos Claw\n"));
-		if (keys.holyKeyUthasTempleHolyTower) Output::send<LogLevel::Warning>(STR("Holy Key - Uthas Temple Holy Tower\n"));
-
-		if (keys.uthasTempleKey) Output::send<LogLevel::Warning>(STR("Uthas Temple Key\n"));
-		if (keys.templeOfGodsKey) Output::send<LogLevel::Warning>(STR("Temple of Gods Key\n"));
-		if (keys.steamKey) Output::send<LogLevel::Warning>(STR("Steam Key\n"));
-		if (keys.keyOfEmber) Output::send<LogLevel::Warning>(STR("Key of Ember\n"));
-		if (keys.graveyardKey) Output::send<LogLevel::Warning>(STR("Graveyard Key\n"));
-
-		Output::send<LogLevel::Warning>(STR("====================\n"));
+		Output::send<LogLevel::Error>(STR("itemManager is null in StartNewGameHook\n"));
+		return false;
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Re-generating the original amount field of the shop item list\n"));
@@ -523,6 +469,32 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 			(*shop)[i] = item;
 		}
 	}
+
+
+	if (ArchipelagoManager::bShouldDeleteQueues)
+	{
+		CheckedLocationQueue::deleteCheckedLocationQueue();
+		ReceivedItemQueue::deleteReceivedItemQueue();
+
+		ArchipelagoManager::bShouldDeleteQueues = false;
+		return false;
+	}
+
+	// Process queued items if any exist
+	if (ReceivedItemQueue::receivedItemQueueFileExists())
+	{
+		Output::send<LogLevel::Verbose>(STR("Item queue found, processing queued items\n"));
+		auto queuedItems = ReceivedItemQueue::flushReceivedItems();
+		if (BlueFireArchipelagoMod::itemManager && BlueFireArchipelagoMod::arcManager)
+		{
+			for (int itemID : queuedItems)
+			{
+				Output::send<LogLevel::Verbose>(STR("Processing queued item: {}\n"), itemID);
+				BlueFireArchipelagoMod::itemManager->itemReceiveCb(itemID);
+			}
+		}
+	}
+
 
     return false;
 }

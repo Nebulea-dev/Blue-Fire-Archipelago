@@ -179,7 +179,7 @@ namespace ArchipelagoModConfig
 		// Hook parameters
 		constexpr auto PARAM_IN_TEXT = STR("InText");
 		constexpr auto PARAM_DESCRIPTION = STR("Description");
-		constexpr auto PARAM_IMPORTANT_ITEM = STR("ImportantItem");
+		constexpr auto PARAM_IMPORTANT_ITEM = STR("KeyItem");
 		constexpr auto PARAM_AMOUNT = STR("Amount");
 	}
 
