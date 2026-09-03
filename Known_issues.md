@@ -10,15 +10,4 @@
 ## Locations
 
 - NPC/Quests/Bosses still give the vanilla item when completing the quest
-- All chests inside void gates have the same name, and map to only one location. They need to be differentiated
 - The Ancient Relic pickup at the entrance of Stoneheart City is not properly removed from the inventory of the player after pickup. It still correctly gives the location though
-
-## Archipelago
-
-- The locations checked are not saved in a file dynamically. This is required by the Archipelago spec to make sure that no locations are lost during a disconnection
-- The AP World gives useless keys that were removed from the game (ex: Key Ice Master)
-- The name of Spirits are missmatched with the actual spirit in-game
-
-## General
-
-- Closing the game though the exit game option causes a UE crash because not all object listeners are unregistered. Very low priority
