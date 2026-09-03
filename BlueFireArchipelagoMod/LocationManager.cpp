@@ -47,7 +47,7 @@ bool LocationManager::OnChestOpened(UObject* Context, FFrame& Stack, void* RESUL
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromChestName(chestName, chestFullName);
 	if (!locationID.has_value())
 	{
-		logIncorrectMapping(chestName);
+		logIncorrectMapping(chestFullName);
 		return false;
 	}
 
@@ -137,27 +137,31 @@ bool LocationManager::OnDialogueWithStatueEnded(UObject* Context, FFrame& Stack,
 	}
 
 	// The dialogue has been cancelled and the emote was not purchased
-	if(emoteInventory->Top() != *emoteEnum)
+	if(emoteInventory->Num() > 0 && emoteInventory->Top() != *emoteEnum)
 	{
 		return false;
 	}
 
 
 	const std::wstring statueName = Context->GetNamePrivate().ToString();
+	const std::wstring statueFullName = Context->GetFullName();
 
 	// Match the statue name to a location ID and mark it as checked
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromStatueName(statueName);
 	if (!locationID.has_value())
 	{
-		logIncorrectMapping(statueName);
+		logIncorrectMapping(statueFullName);
 		return false;
 	}
 
 	Output::send<LogLevel::Verbose>(STR("Emote Statue {} purchased, marking location ID {} as checked in Archipelago\n"), statueName, locationID.value());
 	LocationManager::SendOrQueueLocation(locationID.value());
 
-	// TODO : remove item from inventory
-	emoteInventory->Pop(true);
+	// Remove the emote from the inventory
+	if(emoteInventory->Num() > 0 && emoteInventory->Top() == *emoteEnum)
+	{
+		emoteInventory->Pop(true);
+	}
 
 
 	return false;
@@ -184,12 +188,13 @@ bool LocationManager::OnItemPickup(UObject* Context, FFrame& Stack, void* RESULT
 {
 	// Get the path of the pickup
 	const std::wstring pickupName = Context->GetNamePrivate().ToString();
+	const std::wstring pickupFullName = Context->GetFullName();
 
 	// Match the pickup name to a location ID and mark it as checked
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromPickupName(pickupName);
 	if (!locationID.has_value())
 	{
-		logIncorrectMapping(pickupName);
+		logIncorrectMapping(pickupFullName);
 		return false;
 	}
 
@@ -279,12 +284,13 @@ bool LocationManager::OnSpiritPickup(UObject* Context, FFrame& Stack, void* RESU
 
 	// Get the path of the pickup
 	const std::wstring pickupName = Context->GetNamePrivate().ToString();
+	const std::wstring pickupFullName = Context->GetFullName();
 
 	// Match the pickup name to a location ID and mark it as checked
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromPickupName(pickupName);
 	if (!locationID.has_value())
 	{
-		logIncorrectMapping(pickupName);
+		logIncorrectMapping(pickupFullName);
 		return false;
 	}
 
@@ -326,12 +332,13 @@ bool LocationManager::OnVoidGateCompleted(UObject* Context, FFrame& Stack, void*
 {
 	// Get the path of the gate
 	const std::wstring gateName = Context->GetNamePrivate().ToString();
+	const std::wstring gateFullName = Context->GetFullName();
 
 	// Match the gate name to a location ID and mark it as checked
 	std::optional<uint32_t> locationID = BlueFireArchipelagoMod::locationManager->GetLocationIDFromVoidGateName(gateName);
 	if (!locationID.has_value())
 	{
-		logIncorrectMapping(gateName);
+		logIncorrectMapping(gateFullName);
 		return false;
 	}
 
@@ -501,7 +508,6 @@ bool LocationManager::OnLevelLoaded(UObject* Context, FFrame& Stack, void* RESUL
 
 bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT_DECL)
 {
-	Output::send<LogLevel::Error>(STR("OnItemBought\n"));
     std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
     if(!gameInstance.has_value())
     {
@@ -536,7 +542,6 @@ bool LocationManager::OnItemBought(UObject* Context, FFrame& Stack, void* RESULT
 		return false;
 	}
 
-	Output::send<LogLevel::Error>(STR("Num of items : {}\n"), (shops[*WorldShop])->Num());
 	for(int32_t i = 0; i < (shops[*WorldShop])->Num(); i++)
     {
         inventoryItem globalItem = (*shops[*WorldShop])[i];

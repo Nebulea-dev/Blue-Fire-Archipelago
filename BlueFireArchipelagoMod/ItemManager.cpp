@@ -130,7 +130,13 @@ bool ItemManager::StartNewGame(UObject* Context, FFrame& Stack, void* RESULT_DEC
 		return false;
 	}
 
+    // Remove the initial emote to randomize it
     emoteInventory->Pop(true);
+
+    // The price of the emote is free if there's exactly 1 emote in the inventory
+    // Therefore there must always be at least 2 emotes, which initially are the empty emote (ID 14)
+    emoteInventory->Push(14);
+    emoteInventory->Push(14);
 
     int32* currency = UnrealObjectQueries::GetNestedPropertyValue<int32>(gameInstance.value(), L"PlayerStats", L"Currency_10_C5BEBFCD4803BE8A33ADC7BB805F1659");
     if (!currency)
@@ -161,6 +167,21 @@ void ItemManager::givePlayerEmote(int emoteID)
         Output::send<LogLevel::Error>(STR("Could not find the Emotes parameter of the game instance\n"));
 		return;
 	}
+
+    // The price of the emote is free if there's exactly 1 emote in the inventory
+    // Therefore there must always be at least 2 emotes, which initially are the empty emote (ID 14)
+
+    // If both empty emotes are still there
+    if(emoteInventory->Num() >=2 && (*emoteInventory)[0] == 14)
+    {
+        (*emoteInventory)[0] = emoteID;
+        return;
+    }
+    if(emoteInventory->Num() >=2 && (*emoteInventory)[1] == 14)
+    {
+        (*emoteInventory)[1] = emoteID;
+        return;
+    }
 
     emoteInventory->Push(emoteID);
 }
