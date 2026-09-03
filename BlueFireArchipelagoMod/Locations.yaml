@@ -68,6 +68,8 @@ regions:
     - name: Kung Fu Emote Chest
       dance: Kung Fu
       objectName: Dance_Platform_KungFu_Chest
+    - name: Path Of Victory Void chest
+      fullObjectName: Chest_Master_C /Game/BlueFire/Maps/World/Voids/16_VoidPaul/Void_Paul.Void_Paul:PersistentLevel.Chest_Master_2
     void_gates:
     - name: Path of Victory Void Gate
       objectName: Void_Gate_Paul
@@ -263,7 +265,7 @@ regions:
     - name: Ladder Chest
       objectName: Chest_A01_Nuos_Loot_03
     - name: Void chest
-      fullObjectName: TODO/Chest_Master_2
+      fullObjectName: Chest_Master_C /Game/BlueFire/Maps/World/Voids/03_VoidEasy/Void_Easy.Void_Easy:PersistentLevel.Chest_Master_2
     - name: Hello Emote Chest
       objectName: Dance_Platform_Hello2_Chest
     pickups:
@@ -414,10 +416,6 @@ regions:
       objectName: Chest_A01_Uthas_Key_05
     - name: Holy Chest
       objectName: Chest_A01_Uthas_MasterKey2_5
-  - name: Top of Entrance
-    pickups:
-    - name: Entrance Spirit
-      objectName: TODO
 
 - name: Temple Gardens
   subregions:
