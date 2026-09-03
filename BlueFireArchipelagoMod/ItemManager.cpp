@@ -431,7 +431,20 @@ void ItemManager::givePlayerCustomItem(int itemID)
     // Fire Essence Slot (itemID = 2)
     else if(itemID == 2)
     {
-        // TODO : Add also the essence slot to the player instance
+        std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+        if (!gameInstance.has_value())
+        {
+            Output::send<LogLevel::Error>(STR("Could not find game instance\n"));
+            return;
+        }
+
+        uint32_t* FireOrbs = UnrealObjectQueries::GetNestedPropertyValue<uint32_t>(gameInstance.value(), L"PlayerStats", L"FireOrbs_31_254F6FA346D4ECAF6F2E4B86D1E9BAFC");
+        if (!FireOrbs)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get fire orbs from game instance\n"));
+            return;
+        }
+        (*FireOrbs)++;
 
         TArray<inventoryItem>* passiveInventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
         if (passiveInventory)
@@ -450,8 +463,25 @@ void ItemManager::givePlayerCustomItem(int itemID)
     // Spirit Slot (itemID = 3)
     else if(itemID == 3)
     {
-        // TODO : Add also the spirit slot to the player instance
+        std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+        if (!gameInstance.has_value())
+        {
+            Output::send<LogLevel::Error>(STR("Could not find game instance\n"));
+            return;
+        }
 
+        uint32_t* spiritSlots = UnrealObjectQueries::GetNestedPropertyValue<uint32_t>(gameInstance.value(), L"PlayerStats", L"SpiritSlots_55_CB306EB747E6D8A63CE10DBF4E9B69B5");
+        if (!spiritSlots)
+        {
+            Output::send<LogLevel::Error>(STR("Could not get spirit slots from game instance\n"));
+            return;
+        }
+        (*spiritSlots)++;
+
+        // This code gives the spirit slot item to the passive inventory
+        // However, this doesn't exist in the real game, and might just be a bit ugly
+
+        /*
         TArray<inventoryItem>* passiveInventory = UnrealObjectQueries::GetPassiveInventoryFromGameInstance();
         if (passiveInventory)
         {
@@ -465,6 +495,7 @@ void ItemManager::givePlayerCustomItem(int itemID)
                 Output::send<LogLevel::Verbose>(STR("Added Spirit Slot to passive inventory\n"));
             }
         }
+        */
     }
     // x1000 Currency (itemID = 4)
     else if(itemID == 4)
