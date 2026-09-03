@@ -45,6 +45,8 @@ public:
     static bool OnKillGoddess(UObject* Context, FFrame& Stack, void* RESULT_DECL);
     static bool OnManaUpgrade(UObject* Context, FFrame& Stack, void* RESULT_DECL);
 
+    static bool OnSpiritSlotBought(UObject* Context, FFrame& Stack, void* RESULT_DECL);
+
 
 private:
     int itemPrice = 100;

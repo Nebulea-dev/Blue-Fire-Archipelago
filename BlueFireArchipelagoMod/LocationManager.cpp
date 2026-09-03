@@ -33,6 +33,8 @@ LocationManager::LocationManager()
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/Enemies/Master/BP_BossDoor_Queen.BP_BossDoor_Queen_C:Kill Goddess"), OnKillGoddess);
 
 	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/InteractiveObjects/Bounds/Checkpoint/CheckPoint.CheckPoint_C:Get Mana"), OnManaUpgrade);
+
+	BlueFireArchipelagoMod::hookManager->registerPostHook(STR("Function /Game/BlueFire/NPC/SpiritHunter/NPC_SpiritHunter.NPC_SpiritHunter_C:Sape"), OnSpiritSlotBought);
 }
 
 // ============== Chest related methods ==============
@@ -677,6 +679,31 @@ std::optional<uint32_t> LocationManager::GetBaseLocationIDForManaUpgrade(uint32_
 	}
 }
 
+
+// ============== Spirit slot shop methods ==============
+
+
+bool LocationManager::OnSpiritSlotBought(UObject* Context, FFrame& Stack, void* RESULT_DECL)
+{
+	Output::send<LogLevel::Verbose>(STR("Spirit slot bought from the Spirit Hunter shop\n"));
+
+	std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+	if (!gameInstance.has_value())
+	{
+		Output::send<LogLevel::Error>(STR("Could not find game instance\n"));
+		return false;
+	}
+
+	uint32_t* spiritSlots = UnrealObjectQueries::GetNestedPropertyValue<uint32_t>(gameInstance.value(), L"PlayerStats", L"SpiritSlots_55_CB306EB747E6D8A63CE10DBF4E9B69B5");
+	if (!spiritSlots)
+	{
+		Output::send<LogLevel::Error>(STR("Could not get spirit slots from game instance\n"));
+		return false;
+	}
+	(*spiritSlots)--;
+
+	return false;
+}
 
 
 // ============== Logs methods ==============
