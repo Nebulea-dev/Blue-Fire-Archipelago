@@ -204,6 +204,61 @@ class ItemManager
 	 * @return  none
 	 */
 	void givePlayerCurrency(int32_t amount);
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveJump
+	 *
+	 * @brief   Handle progressive jump (double jump) upgrade.
+	 *
+	 *          Grants the player a double jump ability level via givePlayerAbility.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveJump();
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveDash
+	 *
+	 * @brief   Handle progressive dash upgrade.
+	 *
+	 *          Grants the player a dash ability level via givePlayerAbility.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveDash();
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveWallClimb
+	 *
+	 * @brief   Handle progressive wall climb upgrade.
+	 *
+	 *          Grants the player a wall climb/run ability level via givePlayerAbility.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveWallClimb();
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveSpinAttack
+	 *
+	 * @brief   Handle progressive spin attack upgrade.
+	 *
+	 *          Grants the player a spin attack ability level via givePlayerAbility.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveSpinAttack();
+
+	/*******************************************************************************
+	 * @fn      givePlayerProgressiveRunning
+	 *
+	 * @brief   Handle progressive running (sprint) upgrade.
+	 *
+	 *          Grants the player a running/sprint ability level via givePlayerAbility.
+	 *
+	 * @return  none
+	 */
+	void givePlayerProgressiveRunning();
 };
 
 struct inventoryItem

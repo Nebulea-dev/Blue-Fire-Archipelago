@@ -92,6 +92,31 @@ void BlueFireArchipelagoMod::on_unreal_init()
 
 
 
+    // Debug keys for testing progressive movement items
+    register_keydown_event(Input::Key::F6, {}, [this]() {
+        Output::send<LogLevel::Warning>(STR("[DEBUG] F6 pressed - Testing Progressive Jump\n"));
+        itemManager->givePlayerProgressiveJump();
+    });
+
+    register_keydown_event(Input::Key::F7, {}, [this]() {
+        Output::send<LogLevel::Warning>(STR("[DEBUG] F7 pressed - Testing Progressive Dash\n"));
+        itemManager->givePlayerProgressiveDash();
+    });
+
+    register_keydown_event(Input::Key::F8, {}, [this]() {
+        Output::send<LogLevel::Warning>(STR("[DEBUG] F8 pressed - Testing Progressive Wall Climb\n"));
+        itemManager->givePlayerProgressiveWallClimb();
+    });
+
+    register_keydown_event(Input::Key::F9, {}, [this]() {
+        Output::send<LogLevel::Warning>(STR("[DEBUG] F9 pressed - Testing Progressive Spin Attack\n"));
+        itemManager->givePlayerProgressiveSpinAttack();
+    });
+
+    register_keydown_event(Input::Key::F10, {}, [this]() {
+        Output::send<LogLevel::Warning>(STR("[DEBUG] F10 pressed - Testing Progressive Running\n"));
+        itemManager->givePlayerProgressiveRunning();
+    });
 }
 
 BlueFireArchipelagoMod::~BlueFireArchipelagoMod()

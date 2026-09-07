@@ -512,6 +512,31 @@ void ItemManager::givePlayerCustomItem(int itemID)
     {
         givePlayerCurrency(3000);
     }
+    // Progressive Jump (itemID = 7)
+    else if(itemID == 7)
+    {
+        givePlayerProgressiveJump();
+    }
+    // Progressive Dash (itemID = 8)
+    else if(itemID == 8)
+    {
+        givePlayerProgressiveDash();
+    }
+    // Progressive Wall Climb (itemID = 9)
+    else if(itemID == 9)
+    {
+        givePlayerProgressiveWallClimb();
+    }
+    // Progressive Spin Attack (itemID = 10)
+    else if(itemID == 10)
+    {
+        givePlayerProgressiveSpinAttack();
+    }
+    // Progressive Running (itemID = 11)
+    else if(itemID == 11)
+    {
+        givePlayerProgressiveRunning();
+    }
     else
     {
         Output::send<LogLevel::Error>(STR("Unknown custom item ID: {}\n"), itemID);
@@ -616,6 +641,243 @@ void ItemManager::givePlayerCurrency(int32_t amount)
 
     *currency += amount;
     Output::send<LogLevel::Verbose>(STR("Updated currency to: {}\n"), *currency);
+}
+
+void ItemManager::givePlayerProgressiveJump()
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player Progressive Jump level...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerProgressiveJump\n"));
+        return;
+    }
+
+    bool hasFarasGrace = false;
+    bool hasFlyingOnop = false;
+    bool hasDoubleJump = false;
+    bool hasHolyCentry = false;
+
+    for(int32_t i = 0; i < spirits->Num(); i++)
+    {
+        if((*spirits)[i] == 0) hasFarasGrace = true;      // Fara's Grace
+        if((*spirits)[i] == 27) hasFlyingOnop = true;     // Flying Onop
+        if((*spirits)[i] == 2) hasHolyCentry = true;      // Holy Centry
+    }
+
+    uint8_t* doubleJump = UnrealObjectQueries::GetNestedPropertyValue<uint8_t>(gameInstance.value(), L"PlayerAbilities", L"DoubleJump_9_9ACF69B4474D76AACA0E349806254782");
+    if (doubleJump && *doubleJump)
+    {
+        hasDoubleJump = true;
+    }
+
+    // Give next item in progression
+    if(!hasFarasGrace)
+    {
+        givePlayerSpirit(0);
+        Output::send<LogLevel::Verbose>(STR("Gave Fara's Grace Spirit\n"));
+    }
+    else if(!hasFlyingOnop)
+    {
+        givePlayerSpirit(27);
+        Output::send<LogLevel::Verbose>(STR("Gave Flying Onop Spirit\n"));
+    }
+    else if(!hasDoubleJump)
+    {
+        givePlayerAbility(2);  // Double Jump
+        Output::send<LogLevel::Verbose>(STR("Gave Double Jump Ability\n"));
+    }
+    else if(!hasHolyCentry)
+    {
+        givePlayerSpirit(2);
+        Output::send<LogLevel::Verbose>(STR("Gave Holy Centry Spirit\n"));
+    }
+}
+
+void ItemManager::givePlayerProgressiveDash()
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player Progressive Dash level...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerProgressiveDash\n"));
+        return;
+    }
+
+    bool hasStormCentry = false;
+    bool hasFireKeepTear = false;
+
+    for(int32_t i = 0; i < spirits->Num(); i++)
+    {
+        if((*spirits)[i] == 10) hasStormCentry = true;    // Storm Centry
+        if((*spirits)[i] == 3) hasFireKeepTear = true;    // Fire Keep Tear
+    }
+
+    if(!hasStormCentry)
+    {
+        givePlayerSpirit(10);
+        Output::send<LogLevel::Verbose>(STR("Gave Storm Centry Spirit\n"));
+    }
+    else if(!hasFireKeepTear)
+    {
+        givePlayerSpirit(3);
+        Output::send<LogLevel::Verbose>(STR("Gave Fire Keep Tear Spirit\n"));
+    }
+}
+
+void ItemManager::givePlayerProgressiveWallClimb()
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player Progressive Wall Climb level...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerProgressiveWallClimb\n"));
+        return;
+    }
+
+    bool hasWallClimbAbility = false;
+    bool hasOnopSiblings = false;
+
+    uint8_t* wallJump = UnrealObjectQueries::GetNestedPropertyValue<uint8_t>(gameInstance.value(), L"PlayerAbilities", L"WallJump_12_8CC261B848F97BE432C43FBFDFB65D1D");
+    if (wallJump && *wallJump)
+    {
+        hasWallClimbAbility = true;
+    }
+
+    for(int32_t i = 0; i < spirits->Num(); i++)
+    {
+        if((*spirits)[i] == 18) hasOnopSiblings = true;   // Onop Siblings
+    }
+
+    if(!hasWallClimbAbility)
+    {
+        givePlayerAbility(3);  // Wall Run
+        Output::send<LogLevel::Verbose>(STR("Gave Wall Climb Ability\n"));
+    }
+    else if(!hasOnopSiblings)
+    {
+        givePlayerSpirit(18);
+        Output::send<LogLevel::Verbose>(STR("Gave Onop Siblings Spirit\n"));
+    }
+}
+
+void ItemManager::givePlayerProgressiveSpinAttack()
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player Progressive Spin Attack level...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerProgressiveSpinAttack\n"));
+        return;
+    }
+
+    bool hasSpinAttackAbility = false;
+    bool hasMoiTheDreadful = false;
+    bool hasPossessedBook = false;
+
+    uint8_t* spinAttack = UnrealObjectQueries::GetNestedPropertyValue<uint8_t>(gameInstance.value(), L"PlayerAbilities", L"SpinAttack_27_19AE29114077C361BA4934AD401C4A0B");
+    if (spinAttack && *spinAttack)
+    {
+        hasSpinAttackAbility = true;
+    }
+
+    for(int32_t i = 0; i < spirits->Num(); i++)
+    {
+        if((*spirits)[i] == 14) hasMoiTheDreadful = true;  // Moi The Dreadful
+        if((*spirits)[i] == 12) hasPossessedBook = true;   // Possessed Book
+    }
+
+    if(!hasSpinAttackAbility)
+    {
+        givePlayerAbility(9);  // Spin Attack
+        Output::send<LogLevel::Verbose>(STR("Gave Spin Attack Ability\n"));
+    }
+    else if(!hasMoiTheDreadful)
+    {
+        givePlayerSpirit(14);
+        Output::send<LogLevel::Verbose>(STR("Gave Moi The Dreadful Spirit\n"));
+    }
+    else if(!hasPossessedBook)
+    {
+        givePlayerSpirit(12);
+        Output::send<LogLevel::Verbose>(STR("Gave Possessed Book Spirit\n"));
+    }
+}
+
+void ItemManager::givePlayerProgressiveRunning()
+{
+    Output::send<LogLevel::Verbose>(STR("Giving player Progressive Running level...\n"));
+
+    std::optional<UObject*> gameInstance = UnrealObjectQueries::FindGameInstance();
+    if(!gameInstance.has_value())
+    {
+        Output::send<LogLevel::Error>(STR("Could not find the game instance object\n"));
+        return;
+    }
+
+    TArray<uint8_t>* spirits = UnrealObjectQueries::GetNestedPropertyValue<TArray<uint8_t>>(gameInstance.value(), L"PlayerEquipment", L"SpecialEffects_6_F506303E4AEAD142AFC632B92A252F0A");
+    if (!spirits)
+    {
+        Output::send<LogLevel::Error>(STR("Could not get spirits array in givePlayerProgressiveRunning\n"));
+        return;
+    }
+
+    bool hasForestGuardian = false;
+    bool hasSprintAbility = false;
+
+    for(int32_t i = 0; i < spirits->Num(); i++)
+    {
+        if((*spirits)[i] == 13) hasForestGuardian = true;  // Forest Guardian
+    }
+
+    uint8_t* sprint = UnrealObjectQueries::GetNestedPropertyValue<uint8_t>(gameInstance.value(), L"PlayerAbilities", L"Sprint_21_A2EA9CA54248830C70D2A096307CA144");
+    if (sprint && *sprint)
+    {
+        hasSprintAbility = true;
+    }
+
+    if(!hasForestGuardian)
+    {
+        givePlayerSpirit(13);
+        Output::send<LogLevel::Verbose>(STR("Gave Forest Guardian Spirit\n"));
+    }
+    else if(!hasSprintAbility)
+    {
+        givePlayerAbility(4);  // Sprint
+        Output::send<LogLevel::Verbose>(STR("Gave Running Ability\n"));
+    }
 }
 
 std::string ReceivedItemQueue::getReceivedItemQueueFilePath()
