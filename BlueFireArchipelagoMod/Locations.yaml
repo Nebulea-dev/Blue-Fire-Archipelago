@@ -99,6 +99,15 @@ regions:
     - name: Spirit Hunter's Shop
       shopId: 2
       items: 4
+    spiritslotshop:
+    - name: Spirit Slot Purchase 1
+    - name: Spirit Slot Purchase 2
+    - name: Spirit Slot Purchase 3
+    - name: Spirit Slot Purchase 4
+    - name: Spirit Slot Purchase 5
+    - name: Spirit Slot Purchase 6
+    - name: Spirit Slot Purchase 7
+    - name: Spirit Slot Purchase 8
   - name: Pipes
     chests:
     - name: Jail Cell Chest

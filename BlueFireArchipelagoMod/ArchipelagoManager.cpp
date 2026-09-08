@@ -11,6 +11,7 @@
 #include <ItemManager.hpp>
 #include <LocationManager.hpp>
 #include <DeathLinkManager.hpp>
+#include <PersistenceManager.hpp>
 #include <Helper/UnrealObjectQueries.hpp>
 
 
@@ -116,7 +117,7 @@ void ArchipelagoManager::OnItemReceive(int64_t item, bool notifyPlayer)
 	if (!bIsGameLoaded)
 	{
 		Output::send<LogLevel::Verbose>(STR("Game not loaded, queueing item {} for later\n"), itemID);
-		ReceivedItemQueue::appendReceivedItem(itemID);
+		PersistenceManager::appendReceivedItem(itemID);
 		return;
 	}
 
@@ -317,9 +318,9 @@ void ArchipelagoManager::connectionMonitorThreadFunc()
 		{
 			Output::send<LogLevel::Verbose>(STR("Connection monitor: reconnected to Archipelago and in game, flushing send queue\n"));
 
-			if (CheckedLocationQueue::checkedLocationQueueFileExists())
+			if (PersistenceManager::saveDataFileExists())
 			{
-				int sentCount = CheckedLocationQueue::flushUnsentCheckedLocations();
+				int sentCount = PersistenceManager::flushUnsentCheckedLocations();
 				if (sentCount > 0)
 				{
 					Output::send<LogLevel::Verbose>(STR("Connection monitor: sent {} queued locations\n"), sentCount);

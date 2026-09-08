@@ -33,6 +33,7 @@ add_library(${TARGET} SHARED
     Helper/UnrealObjectQueries.cpp
     MainMenuManager.cpp
     ItemManager.cpp
+    PersistenceManager.cpp
     ArchipelagoManager.cpp
     LocationManager.cpp
     DeathLinkManager.cpp

@@ -59,6 +59,8 @@ struct Subregion {
     #[serde(default)]
     shops: Vec<Shop>,
     #[serde(default)]
+    spiritslotshop: Vec<Location>,
+    #[serde(default)]
     events: Vec<Event>,
     #[serde(default)]
     mana_upgrades: Vec<ManaUpgrade>,
@@ -170,6 +172,18 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("    }\n");
     header.push_str("\n");
 
+    // Store the spirit slot shop base location ID for later
+    let mut spirit_slot_shop_base_id: u32 = 0;
+
+    header.push_str("    /**\n");
+    header.push_str("     * Get the base location ID for spirit slot shop purchases\n");
+    header.push_str("     * @return Base location ID (location ID = base_id + slot_index, where slot_index is 0-7)\n");
+    header.push_str("     */\n");
+    header.push_str("    static uint32_t GetSpiritSlotShopBaseLocationID()\n");
+    header.push_str("    {\n");
+    header.push_str("        return s_spiritSlotShopBaseLocationID;\n");
+    header.push_str("    }\n");
+    header.push_str("\n");
 
     header.push_str("public:\n");
     header.push_str("    // Shop location IDs (not in the map, but reserved in ID space)\n");
@@ -229,6 +243,14 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
                     let escaped_name = escape_string(&location.objectName);
                     void_gate_entries.push_str(&format!("        {{L\"{}\", {}}},\n", escaped_name, location_id));
                 }
+                location_id += 1;
+            }
+
+            // Process spiritslotshop (these are tracked by spiritSlotsPurchased counter, not object names)
+            if !subregion.spiritslotshop.is_empty() {
+                spirit_slot_shop_base_id = location_id;
+            }
+            for _location in &subregion.spiritslotshop {
                 location_id += 1;
             }
 
@@ -295,6 +317,10 @@ fn generate_header(yaml_path: &PathBuf, output_path: &PathBuf) -> Result<(), Box
     header.push_str("    static inline const std::map<uint32_t, uint32_t> s_manaUpgradeIDToLocationID = {\n");
     header.push_str(&mana_entries);
     header.push_str("    };\n");
+
+    header.push_str("    static constexpr uint32_t s_spiritSlotShopBaseLocationID = ");
+    header.push_str(&spirit_slot_shop_base_id.to_string());
+    header.push_str(";\n");
 
     header.push_str("};\n");
 
